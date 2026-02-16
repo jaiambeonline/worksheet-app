@@ -320,7 +320,6 @@ async function generatePDF(){
         (!toDate || r.work_date <= toDate)
     );
 
-
     if(filtered.length===0){ alert("No data"); return;}
 
     let y=15;
@@ -332,8 +331,17 @@ async function generatePDF(){
     y+=8;
 
     doc.setFontSize(8);
-    doc.text(`Filters: Contractor=${contractorList.join(",")||"ALL"} | Assign=${assignList.join(",")||"ALL"} | Crane=${craneList.join(",")||"ALL"} | Type=${typeList.join(",")||"ALL"} | From=${fromDate||"START"} To=${toDate||"END"}`,margin,y);
-    y+=10;
+    doc.text(
+`Filters:
+Contractor: ${contractor || "ALL"}
+Assign: ${assign || "ALL"}
+Crane: ${craneNo || "ALL"}
+Type: ${craneType || "ALL"}
+From: ${fromDate || "START"}  To: ${toDate || "END"}`,
+margin,
+y
+    );
+    y+=20;
 
     const rowHeight=7;
     const columns=["SR","Date","Client","Contractor","Crane","In","Out","Lunch","Hrs","Unit","Rate","Amount","PO"];
@@ -352,7 +360,13 @@ async function generatePDF(){
     y+=rowHeight;
 
     filtered.forEach((r,i)=>{
-        if(y>180){ doc.addPage(); y=20; drawRow(columns,y); y+=rowHeight; }
+        if(y>180){ 
+            doc.addPage(); 
+            y=20; 
+            drawRow(columns,y); 
+            y+=rowHeight; 
+        }
+
         drawRow([
             i+1,
             r.work_date,
@@ -368,6 +382,7 @@ async function generatePDF(){
             Number(r.amount).toFixed(2),
             r.po
         ],y);
+
         y+=rowHeight;
     });
 
