@@ -154,21 +154,31 @@ function calculate(){
 }
 
 function addRow(){
-    let calc=calculate();
-    let row={
-        work_date:document.getElementById("work_date").value,
-        client:document.getElementById("client").value,
-        contractor:document.getElementById("contractor").value,
-        crane_type:document.getElementById("crane_type").value,
-        crane_no:document.getElementById("crane_no").value,
-        total_hours:document.getElementById("total_hours").value,
-        amount:document.getElementById("amount").value,
-        po:calc?calc.po:""
+
+    let calc = calculate();
+
+    let row = {
+        work_date: document.getElementById("work_date").value,
+        client: document.getElementById("client").value,
+        contractor: document.getElementById("contractor").value,
+        crane_type: document.getElementById("crane_type").value,
+        crane_no: document.getElementById("crane_no").value,
+        assign: document.getElementById("assign").value,
+        in_time: document.getElementById("in_time").value,
+        out_time: document.getElementById("out_time").value,
+        lunch: document.getElementById("lunch").value,
+        total_hours: document.getElementById("total_hours").value,
+        unit: document.getElementById("unit").value,
+        rate: document.getElementById("rate").value,
+        amount: document.getElementById("amount").value,
+        po: calc ? calc.po : ""
     };
+
     rows.push(row);
-    localStorage.setItem("rows",JSON.stringify(rows));
+    localStorage.setItem("rows", JSON.stringify(rows));
     renderTable();
 }
+
 
 function renderTable(){
     let tbody=document.querySelector("#table tbody");
@@ -201,42 +211,101 @@ function renderTable(){
 }
 
 function exportExcel(){
-    if(rows.length===0){ alert("No data"); return;}
-    const today=new Date().toISOString().split("T")[0];
-    const ws=XLSX.utils.json_to_sheet(rows);
-    const wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,ws,"Worksheets");
-    XLSX.writeFile(wb,`Bhavishya_Worksheet_${today}.xlsx`);
+
+    if(rows.length === 0){
+        alert("No data");
+        return;
+    }
+
+    const today = new Date().toISOString().split("T")[0];
+
+    const data = rows.map(r => ({
+        work_date: r.work_date || "",
+        client_name: r.client || "",
+        contractor_name: r.contractor || "",
+        crane_type: r.crane_type || "",
+        po_code: r.po || "",
+        crane_number: r.crane_no || "",
+        assign_sir: r.assign || "",
+        in_time: r.in_time || "",
+        out_time: r.out_time || "",
+        lunch_minutes: r.lunch || 0,
+        total_hours: parseFloat(r.total_hours || 0),
+        unit_type: r.unit || "",
+        rate: parseFloat(r.rate || 0),
+        amount: parseFloat(r.amount || 0)
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Worksheets");
+
+    XLSX.writeFile(workbook, `Bhavishya_Worksheet_${today}.xlsx`);
 }
+
 
 async function generatePDF(){
-    const {jsPDF}=window.jspdf;
-    const doc=new jsPDF();
-    const contractor=document.getElementById("pdf_contractor").value;
-    const today=new Date().toISOString().split("T")[0];
 
-    let filtered=contractor?rows.filter(r=>r.contractor===contractor):rows;
-    if(filtered.length===0){ alert("No data"); return;}
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const contractor = document.getElementById("pdf_contractor").value;
+    const today = new Date().toISOString().split("T")[0];
 
-    doc.setFontSize(16);
-    doc.text("BHAVISHYA ENTERPRISE",105,15,{align:"center"});
+    let filtered = contractor ? rows.filter(r => r.contractor === contractor) : rows;
+    if(filtered.length === 0){
+        alert("No data");
+        return;
+    }
+
+    doc.setFontSize(14);
+    doc.setFont(undefined, "bold");
+    doc.text("BHAVISHYA ENTERPRISE", 105, 15, { align: "center" });
+
     doc.setFontSize(10);
-    doc.text("Valsad - 396020 | M: 8866995757",105,22,{align:"center"});
-    doc.line(14,28,196,28);
+    doc.setFont(undefined, "normal");
+    doc.text("Valsad - 396020 | M: 8866995757", 105, 22, { align: "center" });
 
-    let y=38;
-    doc.setFontSize(12);
-    doc.text(`Contractor: ${contractor||"ALL"}`,14,y);
-    y+=10;
+    doc.line(14, 28, 196, 28);
 
-    filtered.forEach(r=>{
-        doc.text(`${r.work_date} | ${r.client} | ${r.crane_no} | ${r.total_hours} Hrs | ₹${r.amount}`,14,y);
-        y+=8;
-        if(y>280){ doc.addPage(); y=20;}
+    let y = 38;
+
+    doc.setFontSize(11);
+    doc.text("Contractor: " + (contractor || "ALL"), 14, y);
+    y += 10;
+
+    // Table Header
+    doc.setFont(undefined, "bold");
+    doc.text("Date", 14, y);
+    doc.text("Client", 40, y);
+    doc.text("Crane", 90, y);
+    doc.text("Hours", 130, y);
+    doc.text("Amount", 160, y);
+
+    y += 5;
+    doc.line(14, y, 196, y);
+    y += 8;
+
+    doc.setFont(undefined, "normal");
+
+    filtered.forEach(r => {
+
+        doc.text(String(r.work_date), 14, y);
+        doc.text(String(r.client), 40, y);
+        doc.text(String(r.crane_no), 90, y);
+        doc.text(String(r.total_hours), 130, y);
+        doc.text("₹ " + String(r.amount), 160, y);
+
+        y += 8;
+
+        if(y > 280){
+            doc.addPage();
+            y = 20;
+        }
     });
 
-    doc.save(`Bhavishya_${contractor||"ALL"}_${today}.pdf`);
+    doc.save(`Bhavishya_${contractor || "ALL"}_${today}.pdf`);
 }
+
 
 function clearAll(){
     if(confirm("Clear all data?")){
