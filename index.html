@@ -247,7 +247,8 @@ function exportExcel(){
 async function generatePDF(){
 
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+    const doc = new jsPDF("p", "mm", "a4");
+
     const contractor = document.getElementById("pdf_contractor").value;
     const today = new Date().toISOString().split("T")[0];
 
@@ -260,100 +261,129 @@ async function generatePDF(){
         return;
     }
 
-    // ===== HEADER =====
-    doc.setFontSize(15);
-    doc.setFont(undefined, "bold");
-    doc.text("BHAVISHYA ENTERPRISE", 105, 15, { align: "center" });
+    let y = 15;
 
+    // ===== HEADER =====
+    doc.setFontSize(14);
+    doc.setFont(undefined, "bold");
+    doc.text("BHAVISHYA ENTERPRISE", 105, y, { align: "center" });
+
+    y += 6;
     doc.setFontSize(9);
     doc.setFont(undefined, "normal");
-    doc.text("Shop No 5, T M Park, Mukund Parnera", 105, 22, { align: "center" });
-    doc.text("Valsad - 396020 | M: 8866995757", 105, 27, { align: "center" });
-    doc.text("bhavishyaenterprisevalsad@gmail.com", 105, 32, { align: "center" });
+    doc.text("Shop No 5, T M Park, Mukund Parnera", 105, y, { align: "center" });
+    y += 5;
+    doc.text("Valsad - 396020 | M: 8866995757", 105, y, { align: "center" });
+    y += 5;
+    doc.text("bhavishyaenterprisevalsad@gmail.com", 105, y, { align: "center" });
 
-    doc.line(14, 38, 196, 38);
+    y += 5;
+    doc.line(10, y, 200, y);
 
-    let y = 48;
-
+    y += 8;
     doc.setFontSize(11);
     doc.setFont(undefined, "bold");
-    doc.text("Worksheet Report", 105, y, { align: "center" });
+    doc.text("WORKSHEET REPORT", 105, y, { align: "center" });
 
-    y += 10;
-
-    doc.setFont(undefined, "normal");
-    doc.text("Contractor: " + (contractor || "ALL"), 14, y);
-    doc.text("Date: " + today, 150, y);
     y += 8;
+    doc.setFont(undefined, "normal");
+    doc.text("Contractor: " + (contractor || "ALL"), 10, y);
+    doc.text("Date: " + today, 150, y);
+
+    y += 8;
+
+    // ===== TABLE SETTINGS =====
+    const colX = {
+        sr: 10,
+        date: 18,
+        client: 32,
+        crane: 65,
+        in: 85,
+        out: 97,
+        hrs: 110,
+        rate: 125,
+        amt: 150
+    };
+
+    const rowHeight = 6;
 
     // ===== TABLE HEADER =====
     doc.setFontSize(8);
     doc.setFont(undefined, "bold");
 
-    doc.text("Date", 14, y);
-    doc.text("Client", 28, y);
-    doc.text("Crane", 60, y);
-    doc.text("In", 78, y);
-    doc.text("Out", 90, y);
-    doc.text("Lunch", 102, y);
-    doc.text("Hrs", 118, y);
-    doc.text("Unit", 130, y);
-    doc.text("Rate", 145, y);
-    doc.text("Amount", 165, y);
+    doc.text("SR", colX.sr, y);
+    doc.text("Date", colX.date, y);
+    doc.text("Client", colX.client, y);
+    doc.text("Crane", colX.crane, y);
+    doc.text("In", colX.in, y);
+    doc.text("Out", colX.out, y);
+    doc.text("Hrs", colX.hrs, y);
+    doc.text("Rate", colX.rate, y);
+    doc.text("Amount", colX.amt, y);
 
+    y += 2;
+    doc.line(10, y, 200, y);
     y += 4;
-    doc.line(14, y, 196, y);
-    y += 6;
 
     doc.setFont(undefined, "normal");
 
     let hydra=0, faranaH=0, faranaD=0, totalAmt=0;
 
-    filtered.forEach(r=>{
-
-        doc.text(String(r.work_date), 14, y);
-        doc.text(String(r.client).substring(0,10), 28, y);
-        doc.text(String(r.crane_no), 60, y);
-        doc.text(String(r.in_time), 78, y);
-        doc.text(String(r.out_time), 90, y);
-        doc.text(String(r.lunch), 102, y);
-        doc.text(String(r.total_hours), 118, y);
-        doc.text(String(r.unit), 130, y);
-        doc.text(String(r.rate), 145, y);
-        doc.text("₹"+String(r.amount), 165, y);
-
-        // Summary calculation
-        if(r.po==="9119720043") hydra += parseFloat(r.total_hours||0);
-        if(r.po==="9719720185") faranaH += parseFloat(r.total_hours||0);
-        if(r.po==="9719720186") faranaD += 1;
-        totalAmt += parseFloat(r.amount||0);
-
-        y += 6;
+    filtered.forEach((r,index)=>{
 
         if(y > 270){
             doc.addPage();
             y = 20;
         }
+
+        // Table Row
+        doc.text(String(index+1), colX.sr, y);
+        doc.text(String(r.work_date), colX.date, y);
+        doc.text(String(r.client).substring(0,15), colX.client, y);
+        doc.text(String(r.crane_no), colX.crane, y);
+        doc.text(String(r.in_time), colX.in, y);
+        doc.text(String(r.out_time), colX.out, y);
+        doc.text(String(r.total_hours), colX.hrs, y);
+
+        doc.text(String(r.rate), colX.rate, y);
+
+        // Right aligned amount
+        doc.text("₹ " + Number(r.amount).toFixed(2), 195, y, { align: "right" });
+
+        // Draw row line
+        doc.line(10, y+2, 200, y+2);
+
+        // Summary logic
+        if(r.po==="9119720043") hydra += parseFloat(r.total_hours||0);
+        if(r.po==="9719720185") faranaH += parseFloat(r.total_hours||0);
+        if(r.po==="9719720186") faranaD += 1;
+        totalAmt += parseFloat(r.amount||0);
+
+        y += rowHeight;
     });
 
     y += 6;
-    doc.line(14, y, 196, y);
-    y += 8;
+    doc.line(10, y, 200, y);
+    y += 6;
 
     doc.setFont(undefined, "bold");
-    doc.text("PO WISE SUMMARY:", 14, y);
-    y += 8;
+    doc.text("PO WISE SUMMARY", 10, y);
+    y += 6;
 
-    doc.text("HYDRA HOURS (9119720043): " + hydra.toFixed(2), 14, y);
-    y += 6;
-    doc.text("FARANA HOURS (9719720185): " + faranaH.toFixed(2), 14, y);
-    y += 6;
-    doc.text("FARANA DAYS (9719720186): " + faranaD, 14, y);
-    y += 6;
-    doc.text("TOTAL AMOUNT: ₹ " + totalAmt.toFixed(2), 14, y);
+    doc.setFont(undefined, "normal");
+    doc.text("HYDRA HOURS (9119720043): " + hydra.toFixed(2), 10, y);
+    y += 5;
+    doc.text("FARANA HOURS (9719720185): " + faranaH.toFixed(2), 10, y);
+    y += 5;
+    doc.text("FARANA DAYS (9719720186): " + faranaD, 10, y);
+    y += 5;
+
+    doc.setFont(undefined, "bold");
+    doc.text("TOTAL AMOUNT: ₹ " + totalAmt.toFixed(2), 10, y);
 
     doc.save(`Bhavishya_${contractor || "ALL"}_${today}.pdf`);
 }
+
 
 
 
