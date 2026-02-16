@@ -247,7 +247,9 @@ function exportExcel(){
 async function generatePDF(){
 
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF("p", "mm", "a4");
+
+    // Landscape A4
+    const doc = new jsPDF("l", "mm", "a4");
 
     const contractor = document.getElementById("pdf_contractor").value;
     const today = new Date().toISOString().split("T")[0];
@@ -262,68 +264,74 @@ async function generatePDF(){
     }
 
     let y = 15;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 10;
 
     // ===== HEADER =====
-    doc.setFontSize(14);
+    doc.setFontSize(16);
     doc.setFont(undefined, "bold");
-    doc.text("BHAVISHYA ENTERPRISE", 105, y, { align: "center" });
+    doc.text("BHAVISHYA ENTERPRISE", pageWidth/2, y, { align: "center" });
 
     y += 6;
-    doc.setFontSize(9);
+    doc.setFontSize(10);
     doc.setFont(undefined, "normal");
-    doc.text("Shop No 5, T M Park, Mukund Parnera", 105, y, { align: "center" });
-    y += 5;
-    doc.text("Valsad - 396020 | M: 8866995757", 105, y, { align: "center" });
-    y += 5;
-    doc.text("bhavishyaenterprisevalsad@gmail.com", 105, y, { align: "center" });
+    doc.text("Shop No 5, T M Park, Mukund Parnera - Valsad - 396020", pageWidth/2, y, { align: "center" });
 
     y += 5;
-    doc.line(10, y, 200, y);
+    doc.text("M: 8866995757 | bhavishyaenterprisevalsad@gmail.com", pageWidth/2, y, { align: "center" });
+
+    y += 5;
+    doc.line(margin, y, pageWidth - margin, y);
 
     y += 8;
+
     doc.setFontSize(11);
-    doc.setFont(undefined, "bold");
-    doc.text("WORKSHEET REPORT", 105, y, { align: "center" });
+    doc.text("WORKSHEET REPORT", pageWidth/2, y, { align: "center" });
 
     y += 8;
-    doc.setFont(undefined, "normal");
-    doc.text("Contractor: " + (contractor || "ALL"), 10, y);
-    doc.text("Date: " + today, 150, y);
+    doc.text("Contractor: " + (contractor || "ALL"), margin, y);
+    doc.text("Date: " + today, pageWidth - 50, y);
 
     y += 8;
 
-    // ===== TABLE SETTINGS =====
-    const colX = {
-        sr: 10,
-        date: 18,
-        client: 32,
-        crane: 65,
-        in: 85,
-        out: 97,
-        hrs: 110,
-        rate: 125,
-        amt: 150
-    };
+    // ===== TABLE STRUCTURE =====
+    const startX = margin;
+    const rowHeight = 7;
 
-    const rowHeight = 6;
+    const columns = [
+        { title: "SR", width: 10 },
+        { title: "Date", width: 20 },
+        { title: "Client", width: 25 },
+        { title: "Contractor", width: 25 },
+        { title: "Crane Type", width: 18 },
+        { title: "Crane No", width: 20 },
+        { title: "Assign", width: 20 },
+        { title: "In", width: 15 },
+        { title: "Out", width: 15 },
+        { title: "Lunch", width: 12 },
+        { title: "Hours", width: 15 },
+        { title: "Unit", width: 15 },
+        { title: "Rate", width: 15 },
+        { title: "Amount", width: 20 },
+        { title: "PO", width: 20 }
+    ];
 
-    // ===== TABLE HEADER =====
-    doc.setFontSize(8);
+    function drawRow(rowData, yPos, isHeader=false){
+
+        let x = startX;
+
+        rowData.forEach((cell, i) => {
+            doc.rect(x, yPos, columns[i].width, rowHeight);
+            doc.text(String(cell), x + 2, yPos + 5);
+            x += columns[i].width;
+        });
+    }
+
+    // Draw Header Row
+    doc.setFontSize(7);
     doc.setFont(undefined, "bold");
-
-    doc.text("SR", colX.sr, y);
-    doc.text("Date", colX.date, y);
-    doc.text("Client", colX.client, y);
-    doc.text("Crane", colX.crane, y);
-    doc.text("In", colX.in, y);
-    doc.text("Out", colX.out, y);
-    doc.text("Hrs", colX.hrs, y);
-    doc.text("Rate", colX.rate, y);
-    doc.text("Amount", colX.amt, y);
-
-    y += 2;
-    doc.line(10, y, 200, y);
-    y += 4;
+    drawRow(columns.map(c => c.title), y);
+    y += rowHeight;
 
     doc.setFont(undefined, "normal");
 
@@ -331,29 +339,31 @@ async function generatePDF(){
 
     filtered.forEach((r,index)=>{
 
-        if(y > 270){
+        if(y > 180){
             doc.addPage();
             y = 20;
+            drawRow(columns.map(c => c.title), y);
+            y += rowHeight;
         }
 
-        // Table Row
-        doc.text(String(index+1), colX.sr, y);
-        doc.text(String(r.work_date), colX.date, y);
-        doc.text(String(r.client).substring(0,15), colX.client, y);
-        doc.text(String(r.crane_no), colX.crane, y);
-        doc.text(String(r.in_time), colX.in, y);
-        doc.text(String(r.out_time), colX.out, y);
-        doc.text(String(r.total_hours), colX.hrs, y);
+        drawRow([
+            index+1,
+            r.work_date,
+            r.client,
+            r.contractor,
+            r.crane_type,
+            r.crane_no,
+            r.assign,
+            r.in_time,
+            r.out_time,
+            r.lunch,
+            r.total_hours,
+            r.unit,
+            r.rate,
+            Number(r.amount).toFixed(2),
+            r.po
+        ], y);
 
-        doc.text(String(r.rate), colX.rate, y);
-
-        // Right aligned amount
-        doc.text("₹ " + Number(r.amount).toFixed(2), 195, y, { align: "right" });
-
-        // Draw row line
-        doc.line(10, y+2, 200, y+2);
-
-        // Summary logic
         if(r.po==="9119720043") hydra += parseFloat(r.total_hours||0);
         if(r.po==="9719720185") faranaH += parseFloat(r.total_hours||0);
         if(r.po==="9719720186") faranaD += 1;
@@ -362,30 +372,26 @@ async function generatePDF(){
         y += rowHeight;
     });
 
-    y += 6;
-    doc.line(10, y, 200, y);
-    y += 6;
+    y += 8;
 
+    doc.setFontSize(10);
     doc.setFont(undefined, "bold");
-    doc.text("PO WISE SUMMARY", 10, y);
+    doc.text("PO WISE SUMMARY", margin, y);
     y += 6;
 
     doc.setFont(undefined, "normal");
-    doc.text("HYDRA HOURS (9119720043): " + hydra.toFixed(2), 10, y);
+    doc.text("HYDRA HOURS (9119720043): " + hydra.toFixed(2), margin, y);
     y += 5;
-    doc.text("FARANA HOURS (9719720185): " + faranaH.toFixed(2), 10, y);
+    doc.text("FARANA HOURS (9719720185): " + faranaH.toFixed(2), margin, y);
     y += 5;
-    doc.text("FARANA DAYS (9719720186): " + faranaD, 10, y);
+    doc.text("FARANA DAYS (9719720186): " + faranaD, margin, y);
     y += 5;
 
     doc.setFont(undefined, "bold");
-    doc.text("TOTAL AMOUNT: ₹ " + totalAmt.toFixed(2), 10, y);
+    doc.text("TOTAL AMOUNT: ₹ " + totalAmt.toFixed(2), margin, y);
 
     doc.save(`Bhavishya_${contractor || "ALL"}_${today}.pdf`);
 }
-
-
-
 
 function clearAll(){
     if(confirm("Clear all data?")){
