@@ -320,17 +320,24 @@ async function generatePDF(){
         (!toDate || r.work_date <= toDate)
     );
 
-    if(filtered.length===0){ alert("No data"); return;}
+    if(filtered.length===0){ 
+        alert("No data"); 
+        return;
+    }
 
-    let y=15;
-    const margin=10;
-    const pageWidth=doc.internal.pageSize.getWidth();
+    let y = 15;
+    const margin = 10;
+    const pageWidth = doc.internal.pageSize.getWidth();
 
+    // ===== HEADER =====
     doc.setFontSize(14);
-    doc.text("BHAVISHYA ENTERPRISE",pageWidth/2,y,{align:"center"});
-    y+=8;
+    doc.setFont(undefined,"bold");
+    doc.text("BHAVISHYA ENTERPRISE", pageWidth/2, y, {align:"center"});
+    y += 8;
 
     doc.setFontSize(8);
+    doc.setFont(undefined,"normal");
+
     doc.text(
 `Filters:
 Contractor: ${contractor || "ALL"}
@@ -338,33 +345,41 @@ Assign: ${assign || "ALL"}
 Crane: ${craneNo || "ALL"}
 Type: ${craneType || "ALL"}
 From: ${fromDate || "START"}  To: ${toDate || "END"}`,
-margin,
-y
+        margin,
+        y
     );
-    y+=20;
 
-    const rowHeight=7;
-    const columns=["SR","Date","Client","Contractor","Crane","In","Out","Lunch","Hrs","Unit","Rate","Amount","PO"];
-    const colWidth=[10,20,25,25,20,15,15,12,15,15,15,20,20];
+    y += 20;
+
+    // ===== TABLE STRUCTURE =====
+    const rowHeight = 7;
+    const columns = ["SR","Date","Client","Contractor","Crane","In","Out","Lunch","Hrs","Unit","Rate","Amount","PO"];
+    const colWidth = [10,20,25,25,20,15,15,12,15,15,15,20,20];
 
     function drawRow(data,yPos){
-        let x=margin;
+        let x = margin;
         data.forEach((cell,i)=>{
             doc.rect(x,yPos,colWidth[i],rowHeight);
             doc.text(String(cell),x+2,yPos+5);
-            x+=colWidth[i];
+            x += colWidth[i];
         });
     }
 
     drawRow(columns,y);
-    y+=rowHeight;
+    y += rowHeight;
+
+    let hydra = 0;
+    let faranaH = 0;
+    let faranaD = 0;
+    let totalAmt = 0;
 
     filtered.forEach((r,i)=>{
-        if(y>180){ 
-            doc.addPage(); 
-            y=20; 
-            drawRow(columns,y); 
-            y+=rowHeight; 
+
+        if(y > 180){
+            doc.addPage();
+            y = 20;
+            drawRow(columns,y);
+            y += rowHeight;
         }
 
         drawRow([
@@ -381,13 +396,42 @@ y
             r.rate,
             Number(r.amount).toFixed(2),
             r.po
-        ],y);
+        ], y);
 
-        y+=rowHeight;
+        // ===== SUMMARY CALCULATION =====
+        if(r.po === "9119720043") hydra += parseFloat(r.total_hours || 0);
+        if(r.po === "9719720185") faranaH += parseFloat(r.total_hours || 0);
+        if(r.po === "9719720186") faranaD += 1;
+
+        totalAmt += parseFloat(r.amount || 0);
+
+        y += rowHeight;
     });
+
+    // ===== SUMMARY BLOCK =====
+    y += 10;
+
+    doc.setFontSize(10);
+    doc.setFont(undefined,"bold");
+    doc.text("PO WISE SUMMARY", margin, y);
+    y += 8;
+
+    doc.setFont(undefined,"normal");
+    doc.text(`HYDRA HOURS (9119720043): ${hydra.toFixed(2)}`, margin, y);
+    y += 6;
+
+    doc.text(`FARANA HOURS (9719720185): ${faranaH.toFixed(2)}`, margin, y);
+    y += 6;
+
+    doc.text(`FARANA DAYS (9719720186): ${faranaD}`, margin, y);
+    y += 6;
+
+    doc.setFont(undefined,"bold");
+    doc.text(`TOTAL AMOUNT: ₹ ${totalAmt.toFixed(2)}`, margin, y);
 
     doc.save(`Bhavishya_Report_${today}.pdf`);
 }
+
 
 function clearAll(){
     if(confirm("Clear all data?")){
