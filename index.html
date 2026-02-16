@@ -86,16 +86,23 @@ HYDRA HRS: 0 | FARANA HRS: 0 | FARANA DAYS: 0 | TOTAL ₹: 0
 <h4>PDF Filters</h4>
 
 <label>Contractor</label>
-<select id="pdf_contractor" class="multi" multiple></select>
+<select id="pdf_contractor">
+<option value="">ALL</option>
+</select>
 
 <label>Assign Sir</label>
-<select id="pdf_assign" class="multi" multiple></select>
+<select id="pdf_assign">
+<option value="">ALL</option>
+</select>
 
 <label>Crane No</label>
-<select id="pdf_crane_no" class="multi" multiple></select>
+<select id="pdf_crane_no">
+<option value="">ALL</option>
+</select>
 
 <label>Crane Type</label>
-<select id="pdf_crane_type" class="multi" multiple>
+<select id="pdf_crane_type">
+<option value="">ALL</option>
 <option>HYDRA</option>
 <option>FARANA</option>
 </select>
@@ -105,6 +112,7 @@ HYDRA HRS: 0 | FARANA HRS: 0 | FARANA DAYS: 0 | TOTAL ₹: 0
 
 <label>To Date</label>
 <input type="date" id="pdf_to">
+
 
 <table id="table">
 <thead>
@@ -195,13 +203,16 @@ function addRow(){
 }
 
 function populateFilters(){
+
     function setOptions(id, values){
-        document.getElementById(id).innerHTML=
-        values.map(v=>`<option value="${v}">${v}</option>`).join("");
+        const select = document.getElementById(id);
+        select.innerHTML = '<option value="">ALL</option>' +
+            values.map(v=>`<option value="${v}">${v}</option>`).join("");
     }
-    setOptions("pdf_contractor",[...new Set(rows.map(r=>r.contractor))]);
-    setOptions("pdf_assign",[...new Set(rows.map(r=>r.assign))]);
-    setOptions("pdf_crane_no",[...new Set(rows.map(r=>r.crane_no))]);
+
+    setOptions("pdf_contractor", [...new Set(rows.map(r=>r.contractor))]);
+    setOptions("pdf_assign", [...new Set(rows.map(r=>r.assign))]);
+    setOptions("pdf_crane_no", [...new Set(rows.map(r=>r.crane_no))]);
 }
 
 function renderTable(){
@@ -248,21 +259,22 @@ async function generatePDF(){
     const doc = new jsPDF("l","mm","a4");
     const today = new Date().toISOString().split("T")[0];
 
-    const contractorList = getSelectedValues("pdf_contractor");
-    const assignList = getSelectedValues("pdf_assign");
-    const craneList = getSelectedValues("pdf_crane_no");
-    const typeList = getSelectedValues("pdf_crane_type");
+    const contractor = document.getElementById("pdf_contractor").value;
+    const assign = document.getElementById("pdf_assign").value;
+    const craneNo = document.getElementById("pdf_crane_no").value;
+    const craneType = document.getElementById("pdf_crane_type").value;
     const fromDate = document.getElementById("pdf_from").value;
     const toDate = document.getElementById("pdf_to").value;
 
     let filtered = rows.filter(r =>
-        (contractorList.length===0||contractorList.includes(r.contractor)) &&
-        (assignList.length===0||assignList.includes(r.assign)) &&
-        (craneList.length===0||craneList.includes(r.crane_no)) &&
-        (typeList.length===0||typeList.includes(r.crane_type)) &&
-        (!fromDate||r.work_date>=fromDate) &&
-        (!toDate||r.work_date<=toDate)
+        (!contractor || r.contractor === contractor) &&
+        (!assign || r.assign === assign) &&
+        (!craneNo || r.crane_no === craneNo) &&
+        (!craneType || r.crane_type === craneType) &&
+        (!fromDate || r.work_date >= fromDate) &&
+        (!toDate || r.work_date <= toDate)
     );
+
 
     if(filtered.length===0){ alert("No data"); return;}
 
