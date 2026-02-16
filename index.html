@@ -3,76 +3,105 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Crane Worksheet</title>
+<title>Bhavishya Enterprise - Crane Worksheet</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
 body {
     font-family: 'Poppins', sans-serif;
     background:#f4f6f9;
     padding:15px;
+    margin:0;
 }
+
 .card {
     background:white;
-    padding:15px;
-    border-radius:10px;
-    box-shadow:0 4px 10px rgba(0,0,0,0.05);
-    margin-bottom:15px;
+    padding:18px;
+    border-radius:14px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.08);
+    margin-bottom:18px;
 }
+
+.header {
+    background:linear-gradient(135deg,#2b7cff,#004aad);
+    color:white;
+    text-align:center;
+}
+
+.header h2 {
+    margin:5px 0;
+}
+
+.header p {
+    margin:2px 0;
+    font-size:13px;
+}
+
 input, select {
     width:100%;
-    padding:8px;
-    margin:5px 0;
-    border-radius:6px;
+    padding:9px;
+    margin:6px 0;
+    border-radius:8px;
     border:1px solid #ccc;
 }
+
 button {
     width:100%;
     padding:10px;
     margin-top:10px;
     border:none;
-    border-radius:6px;
+    border-radius:8px;
     font-weight:600;
     cursor:pointer;
 }
+
 .primary { background:#2b7cff; color:white; }
 .danger { background:#e74c3c; color:white; }
+
 table {
     width:100%;
     border-collapse: collapse;
     font-size:12px;
 }
+
 th, td {
-    padding:6px;
+    padding:8px;
     border-bottom:1px solid #eee;
-    text-align:left;
 }
-th { background:#fafafa; }
+
+th {
+    background:#fafafa;
+    font-weight:600;
+}
+
 .summary-box {
     background:#2b7cff;
     color:white;
-    padding:12px;
-    border-radius:8px;
+    padding:14px;
+    border-radius:10px;
     text-align:center;
+    font-weight:600;
 }
 </style>
 </head>
 
 <body>
 
-<h2>Crane Worksheet</h2>
+<div class="card header">
+    <h2>BHAVISHYA ENTERPRISE</h2>
+    <p>Shop No 5, T M Park, Mukund Parnera</p>
+    <p>Valsad - 396020</p>
+    <p>M: 8866995757</p>
+    <p>bhavishyaenterprisevalsad@gmail.com</p>
+</div>
 
 <div class="card">
-<h3>Entry</h3>
+<h3>Worksheet Entry</h3>
 
 <input type="date" id="work_date">
-
-<input list="clients" id="client" placeholder="Client">
-<datalist id="clients"></datalist>
-
-<input list="contractors" id="contractor" placeholder="Contractor">
-<datalist id="contractors"></datalist>
+<input id="client" placeholder="Client">
+<input id="contractor" placeholder="Contractor">
 
 <select id="crane_type">
 <option>HYDRA</option>
@@ -87,8 +116,7 @@ th { background:#fafafa; }
 <option>GJ15SV1314</option>
 </select>
 
-<input list="assign_list" id="assign" placeholder="Assign Sir">
-<datalist id="assign_list"></datalist>
+<input id="assign" placeholder="Assign Sir">
 
 <input type="time" id="in_time">
 <input type="time" id="out_time">
@@ -100,38 +128,15 @@ th { background:#fafafa; }
 </select>
 
 <input type="number" id="rate" placeholder="Rate">
-
-<input type="text" id="total_hours" placeholder="Total Hours" readonly>
-<input type="text" id="unit" placeholder="Unit" readonly>
-<input type="text" id="amount" placeholder="Amount" readonly>
+<input id="total_hours" placeholder="Total Hours" readonly>
+<input id="unit" placeholder="Unit" readonly>
+<input id="amount" placeholder="Amount" readonly>
 
 <button class="primary" onclick="addRow()">Add Worksheet</button>
 </div>
 
-<div class="card">
-<h3>Filter</h3>
-
-<label>From Date</label>
-<input type="date" id="from_date" onchange="renderTable()">
-
-<label>To Date</label>
-<input type="date" id="to_date" onchange="renderTable()">
-
-<label>Contractor</label>
-<select id="filter_contractor" onchange="renderTable()">
-<option value="">ALL</option>
-</select>
-
-<label>Crane Type</label>
-<select id="filter_crane_type" onchange="renderTable()">
-<option value="">ALL</option>
-<option>HYDRA</option>
-<option>FARANA</option>
-</select>
-</div>
-
 <div class="summary-box" id="summary">
-Total Entries: 0 | Total Hours: 0 | Total Amount: ₹0
+HYDRA HRS: 0 | FARANA HRS: 0 | FARANA DAYS: 0 | TOTAL ₹: 0
 </div>
 
 <div class="card">
@@ -141,6 +146,7 @@ Total Entries: 0 | Total Hours: 0 | Total Amount: ₹0
 <th>Date</th>
 <th>Client</th>
 <th>Crane</th>
+<th>PO</th>
 <th>Hours</th>
 <th>Amount</th>
 </tr>
@@ -148,16 +154,14 @@ Total Entries: 0 | Total Hours: 0 | Total Amount: ₹0
 <tbody></tbody>
 </table>
 
-<button class="primary" onclick="generatePDF()">Generate PDF</button>
 <button class="danger" onclick="clearAll()">Clear All</button>
 </div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 let rows = JSON.parse(localStorage.getItem("rows") || "[]");
 
 function calculate(){
+
     let client = document.getElementById("client").value.toUpperCase();
     let crane = document.getElementById("crane_type").value;
     let inTime = document.getElementById("in_time").value;
@@ -175,42 +179,61 @@ function calculate(){
     let hours = (outDate - inDate)/(1000*60*60) - lunch/60;
     hours = Math.max(hours,0);
 
-    let amount=0, unit="";
+    let amount=0, unit="", po="";
 
     if(client==="ATUL LTD"){
+
         rateField.readOnly=true;
-        if(crane==="HYDRA"){ rateField.value=750; unit="HOURS"; amount=hours*750; }
-        else{
-            if(hours<7){ rateField.value=1500; unit="HOURS"; amount=hours*1500; }
-            else{ rateField.value=10000; unit="DAY"; amount=10000; }
+
+        if(crane==="HYDRA"){
+            rateField.value=750;
+            unit="HOURS";
+            amount=hours*750;
+            po="9119720043";
+        }else{
+            if(hours<7){
+                rateField.value=1500;
+                unit="HOURS";
+                amount=hours*1500;
+                po="9719720185";
+            }else{
+                rateField.value=10000;
+                unit="DAY";
+                amount=10000;
+                po="9719720186";
+            }
         }
     }else{
         rateField.readOnly=false;
         let rate=parseFloat(rateField.value||0);
-        if(rateType==="Hourly"){ unit="HOURS"; amount=hours*rate; }
-        else{ unit="FIXED"; amount=rate; }
+        if(rateType==="Hourly"){
+            unit="HOURS";
+            amount=hours*rate;
+        }else{
+            unit="FIXED";
+            amount=rate;
+        }
     }
 
     document.getElementById("total_hours").value=hours.toFixed(2);
     document.getElementById("unit").value=unit;
     document.getElementById("amount").value=amount.toFixed(2);
+
+    return {hours, amount, po};
 }
 
-document.querySelectorAll("input, select").forEach(el=>{
-    el.addEventListener("input",calculate);
-});
-
 function addRow(){
-    calculate();
+
+    let calc = calculate();
 
     let row={
         work_date:document.getElementById("work_date").value,
         client:document.getElementById("client").value,
-        contractor:document.getElementById("contractor").value,
         crane_type:document.getElementById("crane_type").value,
         crane_no:document.getElementById("crane_no").value,
         total_hours:document.getElementById("total_hours").value,
-        amount:document.getElementById("amount").value
+        amount:document.getElementById("amount").value,
+        po: calc ? calc.po : ""
     };
 
     rows.push(row);
@@ -220,60 +243,29 @@ function addRow(){
 
 function renderTable(){
 
-    let from=document.getElementById("from_date").value;
-    let to=document.getElementById("to_date").value;
-    let contractor=document.getElementById("filter_contractor").value;
-    let craneType=document.getElementById("filter_crane_type").value;
-
-    let filtered=rows.filter(r=>{
-        return (!from || r.work_date>=from)
-        && (!to || r.work_date<=to)
-        && (!contractor || r.contractor===contractor)
-        && (!craneType || r.crane_type===craneType);
-    });
-
-    document.getElementById("filter_contractor").innerHTML=
-        '<option value="">ALL</option>'+
-        [...new Set(rows.map(r=>r.contractor))]
-        .map(x=>`<option>${x}</option>`).join("");
-
     let tbody=document.querySelector("#table tbody");
-    tbody.innerHTML=filtered.map(r=>`
+    tbody.innerHTML=rows.map(r=>`
         <tr>
         <td>${r.work_date}</td>
         <td>${r.client}</td>
         <td>${r.crane_no}</td>
+        <td>${r.po || ""}</td>
         <td>${r.total_hours}</td>
         <td>${r.amount}</td>
         </tr>
     `).join("");
 
-    let totalHours=filtered.reduce((a,b)=>a+parseFloat(b.total_hours||0),0);
-    let totalAmount=filtered.reduce((a,b)=>a+parseFloat(b.amount||0),0);
+    let hydra=0, faranaH=0, faranaD=0, totalAmt=0;
 
-    document.getElementById("summary").innerHTML=
-        `Total Entries: ${filtered.length} | Total Hours: ${totalHours.toFixed(2)} | Total Amount: ₹${totalAmount.toFixed(2)}`;
-
-    return filtered;
-}
-
-async function generatePDF(){
-    const { jsPDF }=window.jspdf;
-    const doc=new jsPDF();
-    let filtered=renderTable();
-    if(filtered.length===0){ alert("No data"); return; }
-
-    doc.setFontSize(14);
-    doc.text("Crane Worksheet Summary",14,15);
-
-    let y=25;
-    filtered.forEach(r=>{
-        doc.text(`${r.work_date} | ${r.client} | ${r.crane_no} | ${r.total_hours} Hrs | ₹${r.amount}`,14,y);
-        y+=8;
-        if(y>280){ doc.addPage(); y=20; }
+    rows.forEach(r=>{
+        if(r.po==="9119720043") hydra += parseFloat(r.total_hours||0);
+        if(r.po==="9719720185") faranaH += parseFloat(r.total_hours||0);
+        if(r.po==="9719720186") faranaD += 1;
+        totalAmt += parseFloat(r.amount||0);
     });
 
-    doc.save("worksheet_summary.pdf");
+    document.getElementById("summary").innerHTML=
+        `HYDRA HRS: ${hydra.toFixed(2)} | FARANA HRS: ${faranaH.toFixed(2)} | FARANA DAYS: ${faranaD} | TOTAL ₹: ${totalAmt.toFixed(2)}`;
 }
 
 function clearAll(){
@@ -283,6 +275,10 @@ function clearAll(){
         renderTable();
     }
 }
+
+document.querySelectorAll("input, select").forEach(el=>{
+    el.addEventListener("input",calculate);
+});
 
 renderTable();
 </script>
