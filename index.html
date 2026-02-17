@@ -290,13 +290,38 @@ function getSelectedValues(id){
 }
 
 function exportExcel(){
-    if(rows.length===0){ alert("No data"); return;}
+
+    if(rows.length===0){ 
+        alert("No data"); 
+        return;
+    }
+
     const today=new Date().toISOString().split("T")[0];
-    const ws=XLSX.utils.json_to_sheet(rows);
-    const wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,ws,"Worksheets");
-    XLSX.writeFile(wb,`Bhavishya_Worksheet_${today}.xlsx`);
+
+    const data = rows.map(r => ({
+        work_date: r.work_date,
+        client_name: r.client,
+        contractor_name: r.contractor,
+        crane_type: r.crane_type,
+        po_code: r.po,
+        crane_number: r.crane_no,
+        assign_sir: r.assign,
+        in_time: r.in_time,
+        out_time: r.out_time,
+        lunch_minutes: r.lunch,
+        total_hours: r.total_hours,
+        unit_type: r.unit,
+        rate: r.rate,
+        amount: r.amount
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Worksheets");
+
+    XLSX.writeFile(wb, `Bhavishya_Worksheet_${today}.xlsx`);
 }
+
 
 async function generatePDF(){
 
