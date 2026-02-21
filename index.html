@@ -9,28 +9,42 @@
 
 <style>
 body { font-family:'Poppins',sans-serif; background:#f4f6f9; padding:15px; margin:0;}
+
 .card { background:white; padding:18px; border-radius:14px; box-shadow:0 8px 25px rgba(0,0,0,0.08); margin-bottom:18px;}
+
 .header { background:linear-gradient(135deg,#2b7cff,#004aad); color:white; text-align:center;}
+
 input,select { width:100%; padding:8px; margin:6px 0; border-radius:8px; border:1px solid #ccc;}
+
 button { width:100%; padding:10px; margin-top:10px; border:none; border-radius:8px; font-weight:600; cursor:pointer;}
+
 .primary { background:#2b7cff; color:white;}
+
+.danger { background:#e74c3c; color:white;}
+
+.summary-box { background:#eef2f7; padding:10px; border-radius:8px; margin:10px 0; font-weight:600;}
+
+.error { color:red; font-size:12px; margin-top:8px; display:none; text-align:center;}
 </style>
 </head>
 
 <body>
 
-<div class="card">
+<!-- ================= LOGIN SCREEN ================= -->
+<div id="loginScreen" class="card">
 
-    <div class="company-name">BHAVISHYA ENTERPRISE</div>
+    <div style="text-align:center;font-weight:700;font-size:20px;">
+        BHAVISHYA ENTERPRISE
+    </div>
 
-    <div class="company-info">
+    <div style="text-align:center;font-size:13px;color:#555;margin:10px 0;">
         Shop No 5, T M Park, Mukund Parnera<br>
         Valsad - 396020<br>
         M: 8866995757<br>
         bhavishyaenterprisevalsad@gmail.com
     </div>
 
-    <h3>Login</h3>
+    <h3 style="text-align:center;">Login</h3>
 
     <input type="password" id="password" placeholder="Enter Password">
     <button onclick="login()">Login</button>
@@ -38,6 +52,8 @@ button { width:100%; padding:10px; margin-top:10px; border:none; border-radius:8
     <div class="error" id="errorMsg">Incorrect Password</div>
 
 </div>
+<!-- ================= MAIN APP (HIDDEN FIRST) ================= -->
+<div id="mainApp" style="display:none;">
 
 <div class="card header">
 <h2>BHAVISHYA ENTERPRISE</h2>
@@ -45,6 +61,7 @@ button { width:100%; padding:10px; margin-top:10px; border:none; border-radius:8
 <p>Valsad - 396020</p>
 <p>M: 8866995757</p>
 <p>bhavishyaenterprisevalsad@gmail.com</p>
+<button class="danger" onclick="logout()">Logout</button>
 </div>
 
 <div class="card">
@@ -151,19 +168,24 @@ HYDRA HRS: 0 | FARANA HRS: 0 | FARANA DAYS: 0 | TOTAL ₹: 0
 
 <script>
 
-const APP_PASSWORD = "bhavishya123"; // Change this password
+/* ================= LOGIN SYSTEM ================= */
+
+const APP_PASSWORD = "bhavishya123";
 
 function login(){
-
     const pass = document.getElementById("password").value;
 
     if(pass === APP_PASSWORD){
-        alert("Login Successful!");
-        // You can redirect here
-        // window.location.href = "dashboard.html";
+        document.getElementById("loginScreen").style.display="none";
+        document.getElementById("mainApp").style.display="block";
     }else{
         document.getElementById("errorMsg").style.display="block";
     }
+}
+
+function logout(){
+    document.getElementById("mainApp").style.display="none";
+    document.getElementById("loginScreen").style.display="block";
 }
 
 let rows = JSON.parse(localStorage.getItem("rows") || "[]");
