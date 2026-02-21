@@ -7,29 +7,91 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <style>
-body { font-family:'Poppins',sans-serif; background:#f4f6f9; padding:15px; margin:0;}
-.card { background:white; padding:18px; border-radius:14px; box-shadow:0 8px 25px rgba(0,0,0,0.08); margin-bottom:18px;}
-.header { background:linear-gradient(135deg,#2b7cff,#004aad); color:white; text-align:center;}
-.header h2 { margin:5px 0;}
-.header p { margin:2px 0; font-size:13px;}
-input,select { width:100%; padding:8px; margin:5px 0; border-radius:8px; border:1px solid #ccc;}
-button { width:100%; padding:10px; margin-top:10px; border:none; border-radius:8px; font-weight:600; cursor:pointer;}
-.primary { background:#2b7cff; color:white;}
-.danger { background:#e74c3c; color:white;}
-table { width:100%; border-collapse:collapse; font-size:12px;}
-th,td { padding:8px; border-bottom:1px solid #eee;}
-th { background:#fafafa; font-weight:600;}
-.summary-box { background:#2b7cff; color:white; padding:14px; border-radius:10px; text-align:center; font-weight:600;}
-.multi { height:70px; }
+
+body{
+    font-family:'Poppins',sans-serif;
+    margin:0;
+    background:linear-gradient(135deg,#1e3c72,#2a5298);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:16px;
+    width:95%;
+    max-width:420px;
+    box-shadow:0 15px 40px rgba(0,0,0,0.25);
+}
+
+h2,h3{
+    margin:5px 0;
+    text-align:center;
+}
+
+.company-info{
+    font-size:12px;
+    text-align:center;
+    margin-bottom:15px;
+    color:#555;
+}
+
+input,select{
+    width:100%;
+    padding:10px;
+    margin:6px 0;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:8px;
+    background:#2a5298;
+    color:white;
+    font-weight:600;
+    margin-top:10px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#1e3c72;
+}
+
+.logout{
+    background:#e74c3c;
+}
+
+.hidden{
+    display:none;
+}
+
 </style>
 </head>
 
 <body>
+<!-- LOGIN SCREEN -->
+<div class="card" id="loginCard">
+    <h2>BHAVISHYA ENTERPRISE</h2>
+    <div class="company-info">
+        Shop No 5, T M Park, Mukund Parnera<br>
+        Valsad - 396020<br>
+        M: 8866995757<br>
+        bhavishyaenterprisevalsad@gmail.com
+    </div>
 
+    <h3>Login</h3>
+    <input type="password" id="password" placeholder="Enter Password">
+    <button onclick="login()">Login</button>
+</div>
+<!-- MAIN APP -->
+<div class="card hidden" id="mainApp">
 <div class="card header">
 <h2>BHAVISHYA ENTERPRISE</h2>
 <p>Shop No 5, T M Park, Mukund Parnera</p>
@@ -141,6 +203,37 @@ HYDRA HRS: 0 | FARANA HRS: 0 | FARANA DAYS: 0 | TOTAL ₹: 0
 </div>
 
 <script>
+
+// ===== LOGIN SYSTEM =====
+
+const APP_PASSWORD = "bhavishya123";  // change this
+
+function login(){
+
+    const pass = document.getElementById("password").value;
+
+    if(pass === APP_PASSWORD){
+        sessionStorage.setItem("loggedIn","true");
+        showApp();
+    }else{
+        alert("Wrong Password");
+    }
+}
+
+function logout(){
+    sessionStorage.removeItem("loggedIn");
+    location.reload();
+}
+
+function showApp(){
+    document.getElementById("loginCard").classList.add("hidden");
+    document.getElementById("mainApp").classList.remove("hidden");
+}
+
+// Auto login if already logged
+if(sessionStorage.getItem("loggedIn")==="true"){
+    showApp();
+}
 
 let rows = JSON.parse(localStorage.getItem("rows") || "[]");
 
