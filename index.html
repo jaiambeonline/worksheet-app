@@ -19,6 +19,26 @@ button { width:100%; padding:10px; margin-top:10px; border:none; border-radius:8
 
 <body>
 
+<div class="card">
+
+    <div class="company-name">BHAVISHYA ENTERPRISE</div>
+
+    <div class="company-info">
+        Shop No 5, T M Park, Mukund Parnera<br>
+        Valsad - 396020<br>
+        M: 8866995757<br>
+        bhavishyaenterprisevalsad@gmail.com
+    </div>
+
+    <h3>Login</h3>
+
+    <input type="password" id="password" placeholder="Enter Password">
+    <button onclick="login()">Login</button>
+
+    <div class="error" id="errorMsg">Incorrect Password</div>
+
+</div>
+
 <div class="card header">
 <h2>BHAVISHYA ENTERPRISE</h2>
 <p>Shop No 5, T M Park, Mukund Parnera</p>
@@ -131,7 +151,20 @@ HYDRA HRS: 0 | FARANA HRS: 0 | FARANA DAYS: 0 | TOTAL ₹: 0
 
 <script>
 
+const APP_PASSWORD = "bhavishya123"; // Change this password
 
+function login(){
+
+    const pass = document.getElementById("password").value;
+
+    if(pass === APP_PASSWORD){
+        alert("Login Successful!");
+        // You can redirect here
+        // window.location.href = "dashboard.html";
+    }else{
+        document.getElementById("errorMsg").style.display="block";
+    }
+}
 
 let rows = JSON.parse(localStorage.getItem("rows") || "[]");
 
