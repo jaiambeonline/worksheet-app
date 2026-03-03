@@ -8,99 +8,45 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-body{
-    margin:0;
-    font-family:'Poppins',sans-serif;
-    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-    
-}
+body { font-family:'Poppins',sans-serif; background:#f4f6f9; padding:15px; margin:0;}
 
-/* Glass Card */
-.login-card{
-    width:90%;
-    max-width:420px;
-    padding:35px;
-    border-radius:20px;
-    background:rgba(255,255,255,0.15);
-    backdrop-filter:blur(15px);
-    box-shadow:0 20px 45px rgba(0,0,0,0.4);
-    text-align:center;
-    color:white;
-}
+.card { background:white; padding:18px; border-radius:14px; box-shadow:0 8px 25px rgba(0,0,0,0.08); margin-bottom:18px;}
 
-.company-name{
-    font-size:22px;
-    font-weight:700;
-    margin-bottom:8px;
-}
+.header { background:linear-gradient(135deg,#2b7cff,#004aad); color:white; text-align:center;}
 
-.company-info{
-    font-size:13px;
-    opacity:0.9;
-    line-height:1.6;
-    margin-bottom:25px;
-}
+input,select { width:100%; padding:8px; margin:6px 0; border-radius:8px; border:1px solid #ccc;}
 
-.login-card h3{
-    margin-bottom:15px;
-    font-weight:600;
-}
+button { width:100%; padding:10px; margin-top:10px; border:none; border-radius:8px; font-weight:600; cursor:pointer;}
 
-.login-card input{
-    width:100%;
-    padding:12px;
-    border-radius:8px;
-    border:none;
-    margin:8px 0;
-    font-size:14px;
-}
+.primary { background:#2b7cff; color:white;}
 
-.login-card button{
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:8px;
-    background:linear-gradient(135deg,#00c6ff,#0072ff);
-    color:white;
-    font-weight:600;
-    cursor:pointer;
-    transition:0.3s;
-}
+.danger { background:#e74c3c; color:white;}
 
-.login-card button:hover{
-    transform:scale(1.03);
-    box-shadow:0 8px 20px rgba(0,0,0,0.3);
-}
+.summary-box { background:#eef2f7; padding:10px; border-radius:8px; margin:10px 0; font-weight:600;}
 
-.error{
-    color:#ffb3b3;
-    font-size:12px;
-    margin-top:8px;
-    display:none;
-}
+.error { color:red; font-size:12px; margin-top:8px; display:none; text-align:center;}
 </style>
 </head>
 
 <body>
 
 <!-- ================= LOGIN SCREEN ================= -->
-<div id="loginScreen" class="login-card">
+<div id="loginScreen" class="card">
 
-    <div class="company-name">
+    <div style="text-align:center;font-weight:700;font-size:20px;">
         BHAVISHYA ENTERPRISE
     </div>
 
-    <div class="company-info">
+    <div style="text-align:center;font-size:13px;color:#555;margin:10px 0;">
         Shop No 5, T M Park, Mukund Parnera<br>
         Valsad - 396020<br>
         M: 8866995757<br>
         bhavishyaenterprisevalsad@gmail.com
     </div>
 
-    <h3>Secure Login</h3>
+    <h3 style="text-align:center;">Login</h3>
 
     <input type="password" id="password" placeholder="Enter Password">
-
     <button onclick="login()">Login</button>
 
     <div class="error" id="errorMsg">Incorrect Password</div>
