@@ -7,29 +7,155 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-<style>
-body { font-family:'Poppins',sans-serif; background:#f4f6f9; padding:15px; margin:0;}
+body{
+font-family:'Poppins',sans-serif;
+background:#eef2f7;
+margin:0;
+padding:10px;
+display:flex;
+justify-content:center;
+}
 
-.card { background:white; padding:18px; border-radius:14px; box-shadow:0 8px 25px rgba(0,0,0,0.08); margin-bottom:18px;}
+/* APP CONTAINER */
 
-.header { background:linear-gradient(135deg,#2b7cff,#004aad); color:white; text-align:center;}
+.app{
+width:100%;
+max-width:420px;
+}
 
-input,select { width:100%; padding:8px; margin:6px 0; border-radius:8px; border:1px solid #ccc;}
+/* CARDS */
 
-button { width:100%; padding:10px; margin-top:10px; border:none; border-radius:8px; font-weight:600; cursor:pointer;}
+.card{
+background:white;
+padding:16px;
+border-radius:16px;
+box-shadow:0 8px 20px rgba(0,0,0,0.08);
+margin-bottom:14px;
+}
 
-.primary { background:#2b7cff; color:white;}
+/* HEADER */
 
-.danger { background:#e74c3c; color:white;}
+.header{
+background:linear-gradient(135deg,#2b7cff,#004aad);
+color:white;
+text-align:center;
+padding:18px;
+border-radius:16px;
+}
 
-.summary-box { background:#eef2f7; padding:10px; border-radius:8px; margin:10px 0; font-weight:600;}
+.header h2{
+margin:0;
+font-size:18px;
+}
 
-.error { color:red; font-size:12px; margin-top:8px; display:none; text-align:center;}
-</style>
+.header p{
+margin:2px 0;
+font-size:11px;
+}
+
+/* INPUTS */
+
+input,select{
+width:100%;
+padding:9px 10px;
+margin:5px 0;
+border-radius:10px;
+border:1px solid #d5d9e0;
+font-size:13px;
+background:#fafafa;
+}
+
+input:focus,select:focus{
+outline:none;
+border-color:#2b7cff;
+background:white;
+}
+
+/* BUTTONS */
+
+button{
+width:100%;
+padding:10px;
+margin-top:8px;
+border:none;
+border-radius:10px;
+font-weight:600;
+cursor:pointer;
+font-size:13px;
+}
+
+.primary{
+background:linear-gradient(135deg,#2b7cff,#004aad);
+color:white;
+}
+
+.primary:hover{
+opacity:0.95;
+}
+
+.danger{
+background:#e74c3c;
+color:white;
+}
+
+/* SUMMARY */
+
+.summary-box{
+background:#f5f7fb;
+padding:10px;
+border-radius:10px;
+font-weight:600;
+font-size:12px;
+text-align:center;
+}
+
+/* TABLE */
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+font-size:11px;   /* SMALL FONT */
+}
+
+th{
+background:#2b7cff;
+color:white;
+padding:6px;
+font-size:11px;
+}
+
+td{
+padding:5px;
+border-bottom:1px solid #eee;
+font-size:11px;
+}
+
+tr:nth-child(even){
+background:#f7f9fc;
+}
+
+/* KEEP TABLE COMPACT */
+
+#table{
+max-height:200px;
+overflow:auto;
+display:block;
+}
+
+/* ERROR */
+
+.error{
+color:red;
+font-size:12px;
+margin-top:8px;
+display:none;
+text-align:center;
+}
 </head>
 
 <body>
-
+<div class="app">
 <!-- ================= LOGIN SCREEN ================= -->
 <div id="loginScreen" class="card">
 
@@ -569,5 +695,6 @@ document.querySelectorAll("input,select").forEach(el=>{
 renderTable();
 
 </script>
+</div>
 </body>
 </html>
