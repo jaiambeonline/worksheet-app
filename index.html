@@ -583,14 +583,21 @@ async function generatePDF(){
     const fromDate = document.getElementById("pdf_from").value;
     const toDate = document.getElementById("pdf_to").value;
 
-    let filtered = rows.filter(r =>
-        (!contractor || r.contractor === contractor) &&
-        (!assign || r.assign === assign) &&
-        (!craneNo || r.crane_no === craneNo) &&
-        (!craneType || r.crane_type === craneType) &&
-        (!fromDate || r.work_date >= fromDate) &&
-        (!toDate || r.work_date <= toDate)
-    );
+    let filtered = rows.filter(r => {
+
+        const rowDate = new Date(r.work_date);
+        const from = fromDate ? new Date(fromDate) : null;
+        const to = toDate ? new Date(toDate) : null;
+
+        return (
+            (!contractor || r.contractor === contractor) &&
+            (!assign || r.assign === assign) &&
+            (!craneNo || r.crane_no === craneNo) &&
+            (!craneType || r.crane_type === craneType) &&
+            (!from || rowDate >= from) &&
+            (!to || rowDate <= to)
+        );
+    });
 
     if(filtered.length===0){ 
         alert("No data"); 
