@@ -507,6 +507,8 @@ function populateFilters(){
     setOptions("pdf_crane_no", [...new Set(rows.map(r=>r.crane_no))]);
 }
 
+/* ================= FILTER FUNCTION ================= */
+
 function getFilteredRows(){
 
     const contractor = document.getElementById("pdf_contractor").value;
@@ -532,49 +534,63 @@ function getFilteredRows(){
         );
     });
 }
-    
+
+/* ================= TABLE RENDER ================= */
+
 function renderTable(){
+
     populateFilters();
-    let tbody=document.querySelector("#table tbody");
+
     const filtered = getFilteredRows();
 
-tbody.innerHTML = filtered.map(r => `
-<tr>
-<td>${r.work_date}</td>
-<td>${r.client}</td>
-<td>${r.contractor}</td>
-<td>${r.crane_no}</td>
-<td>${r.total_hours}</td>
-<td>${r.amount}</td>
-</tr>
-`).join("");
+    let tbody = document.querySelector("#table tbody");
+
+    tbody.innerHTML = filtered.map(r => `
+        <tr>
+        <td>${r.work_date}</td>
+        <td>${r.client}</td>
+        <td>${r.contractor}</td>
+        <td>${r.crane_no}</td>
+        <td>${r.total_hours}</td>
+        <td>${r.amount}</td>
+        </tr>`).join("");
 
     let hydra=0,faranaH=0,faranaD=0,totalAmt=0;
-    rows.forEach(r=>{
+
+    filtered.forEach(r=>{
         if(r.po==="9119720043") hydra+=parseFloat(r.total_hours||0);
         if(r.po==="9719720185") faranaH+=parseFloat(r.total_hours||0);
         if(r.po==="9719720186") faranaD+=1;
         totalAmt+=parseFloat(r.amount||0);
     });
 
-    document.getElementById("summary").innerHTML=
+    document.getElementById("summary").innerHTML =
     `HYDRA HRS: ${hydra.toFixed(2)} | FARANA HRS: ${faranaH.toFixed(2)} | FARANA DAYS: ${faranaD} | TOTAL ₹: ${totalAmt.toFixed(2)}`;
 }
 
-function getSelectedValues(id){
-    return Array.from(document.getElementById(id).selectedOptions).map(o=>o.value);
-}
+/* ================= FILTER LIVE UPDATE ================= */
+
+document.querySelectorAll(
+"#pdf_contractor,#pdf_assign,#pdf_crane_no,#pdf_crane_type,#pdf_from,#pdf_to"
+).forEach(el => el.addEventListener("change", renderTable));
 
 function exportExcel(){
 
-    if(rows.length===0){ 
-        alert("No data"); 
+    if(typeof XLSX === "undefined"){
+        alert("Excel library not loaded");
         return;
     }
 
-    const today=new Date().toISOString().split("T")[0];
+    const filtered = getFilteredRows();
 
-    const data = rows.map(r => ({
+    if(filtered.length === 0){
+        alert("No data");
+        return;
+    }
+
+    const today = new Date().toISOString().split("T")[0];
+
+    const data = filtered.map(r => ({
         work_date: r.work_date,
         client_name: r.client,
         contractor_name: r.contractor,
@@ -593,11 +609,13 @@ function exportExcel(){
 
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
+
     XLSX.utils.book_append_sheet(wb, ws, "Worksheets");
 
     XLSX.writeFile(wb, `Bhavishya_Worksheet_${today}.xlsx`);
 }
 
+/* ================= PDF ================= */
 
 async function generatePDF(){
 
@@ -605,31 +623,10 @@ async function generatePDF(){
     const doc = new jsPDF("l","mm","a4");
     const today = new Date().toISOString().split("T")[0];
 
-    const contractor = document.getElementById("pdf_contractor").value;
-    const assign = document.getElementById("pdf_assign").value;
-    const craneNo = document.getElementById("pdf_crane_no").value;
-    const craneType = document.getElementById("pdf_crane_type").value;
-    const fromDate = document.getElementById("pdf_from").value;
-    const toDate = document.getElementById("pdf_to").value;
+    const filtered = getFilteredRows();
 
-    let filtered = rows.filter(r => {
-
-        const rowDate = new Date(r.work_date);
-        const from = fromDate ? new Date(fromDate) : null;
-        const to = toDate ? new Date(toDate) : null;
-
-        return (
-            (!contractor || r.contractor === contractor) &&
-            (!assign || r.assign === assign) &&
-            (!craneNo || r.crane_no === craneNo) &&
-            (!craneType || r.crane_type === craneType) &&
-            (!from || rowDate >= from) &&
-            (!to || rowDate <= to)
-        );
-    });
-
-    if(filtered.length===0){ 
-        alert("No data"); 
+    if(filtered.length===0){
+        alert("No data");
         return;
     }
 
@@ -637,29 +634,11 @@ async function generatePDF(){
     const margin = 10;
     const pageWidth = doc.internal.pageSize.getWidth();
 
-    // ===== HEADER =====
     doc.setFontSize(14);
     doc.setFont(undefined,"bold");
     doc.text("BHAVISHYA ENTERPRISE", pageWidth/2, y, {align:"center"});
-    y += 8;
+    y += 10;
 
-    doc.setFontSize(8);
-    doc.setFont(undefined,"normal");
-
-    doc.text(
-`Filters:
-Contractor: ${contractor || "ALL"}
-Assign: ${assign || "ALL"}
-Crane: ${craneNo || "ALL"}
-Type: ${craneType || "ALL"}
-From: ${fromDate || "START"}  To: ${toDate || "END"}`,
-        margin,
-        y
-    );
-
-    y += 20;
-
-    // ===== TABLE STRUCTURE =====
     const rowHeight = 7;
     const columns = ["SR","Date","Client","Contractor","Crane","In","Out","Lunch","Hrs","Unit","Rate","Amount","PO"];
     const colWidth = [10,20,25,25,20,15,15,12,15,15,15,20,20];
@@ -706,7 +685,6 @@ From: ${fromDate || "START"}  To: ${toDate || "END"}`,
             r.po
         ], y);
 
-        // ===== SUMMARY CALCULATION =====
         if(r.po === "9119720043") hydra += parseFloat(r.total_hours || 0);
         if(r.po === "9719720185") faranaH += parseFloat(r.total_hours || 0);
         if(r.po === "9719720186") faranaD += 1;
@@ -716,7 +694,6 @@ From: ${fromDate || "START"}  To: ${toDate || "END"}`,
         y += rowHeight;
     });
 
-    // ===== SUMMARY BLOCK =====
     y += 10;
 
     doc.setFontSize(10);
@@ -725,13 +702,11 @@ From: ${fromDate || "START"}  To: ${toDate || "END"}`,
     y += 8;
 
     doc.setFont(undefined,"normal");
-    doc.text(`HYDRA HOURS (9119720043): ${hydra.toFixed(2)}`, margin, y);
+    doc.text(`HYDRA HOURS: ${hydra.toFixed(2)}`, margin, y);
     y += 6;
-
-    doc.text(`FARANA HOURS (9719720185): ${faranaH.toFixed(2)}`, margin, y);
+    doc.text(`FARANA HOURS: ${faranaH.toFixed(2)}`, margin, y);
     y += 6;
-
-    doc.text(`FARANA DAYS (9719720186): ${faranaD}`, margin, y);
+    doc.text(`FARANA DAYS: ${faranaD}`, margin, y);
     y += 6;
 
     doc.setFont(undefined,"bold");
@@ -739,8 +714,6 @@ From: ${fromDate || "START"}  To: ${toDate || "END"}`,
 
     doc.save(`Bhavishya_Report_${today}.pdf`);
 }
-
-
 function clearAll(){
     if(confirm("Clear all data?")){
         rows=[];
