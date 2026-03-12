@@ -507,18 +507,47 @@ function populateFilters(){
     setOptions("pdf_crane_no", [...new Set(rows.map(r=>r.crane_no))]);
 }
 
+function getFilteredRows(){
+
+    const contractor = document.getElementById("pdf_contractor").value;
+    const assign = document.getElementById("pdf_assign").value;
+    const craneNo = document.getElementById("pdf_crane_no").value;
+    const craneType = document.getElementById("pdf_crane_type").value;
+    const fromDate = document.getElementById("pdf_from").value;
+    const toDate = document.getElementById("pdf_to").value;
+
+    return rows.filter(r => {
+
+        const rowDate = new Date(r.work_date);
+        const from = fromDate ? new Date(fromDate) : null;
+        const to = toDate ? new Date(toDate) : null;
+
+        return (
+            (!contractor || r.contractor === contractor) &&
+            (!assign || r.assign === assign) &&
+            (!craneNo || r.crane_no === craneNo) &&
+            (!craneType || r.crane_type === craneType) &&
+            (!from || rowDate >= from) &&
+            (!to || rowDate <= to)
+        );
+    });
+}
+    
 function renderTable(){
     populateFilters();
     let tbody=document.querySelector("#table tbody");
-    tbody.innerHTML=rows.map(r=>`
-        <tr>
-        <td>${r.work_date}</td>
-        <td>${r.client}</td>
-        <td>${r.contractor}</td>
-        <td>${r.crane_no}</td>
-        <td>${r.total_hours}</td>
-        <td>${r.amount}</td>
-        </tr>`).join("");
+    const filtered = getFilteredRows();
+
+tbody.innerHTML = filtered.map(r => `
+<tr>
+<td>${r.work_date}</td>
+<td>${r.client}</td>
+<td>${r.contractor}</td>
+<td>${r.crane_no}</td>
+<td>${r.total_hours}</td>
+<td>${r.amount}</td>
+</tr>
+`).join("");
 
     let hydra=0,faranaH=0,faranaD=0,totalAmt=0;
     rows.forEach(r=>{
