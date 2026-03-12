@@ -496,25 +496,29 @@ function addRow(){
 
 function populateFilters(){
 
+    function uniqueClean(values){
+        return [...new Set(values.map(v => (v || "").trim()))];
+    }
+
     function setOptions(id, values){
         const select = document.getElementById(id);
         select.innerHTML = '<option value="">ALL</option>' +
             values.map(v=>`<option value="${v}">${v}</option>`).join("");
     }
 
-    setOptions("pdf_contractor", [...new Set(rows.map(r=>r.contractor))]);
-    setOptions("pdf_assign", [...new Set(rows.map(r=>r.assign))]);
-    setOptions("pdf_crane_no", [...new Set(rows.map(r=>r.crane_no))]);
+    setOptions("pdf_contractor", uniqueClean(rows.map(r=>r.contractor)));
+    setOptions("pdf_assign", uniqueClean(rows.map(r=>r.assign)));
+    setOptions("pdf_crane_no", uniqueClean(rows.map(r=>r.crane_no)));
 }
 
 /* ================= FILTER FUNCTION ================= */
 
 function getFilteredRows(){
 
-    const contractor = document.getElementById("pdf_contractor").value;
-    const assign = document.getElementById("pdf_assign").value;
-    const craneNo = document.getElementById("pdf_crane_no").value;
-    const craneType = document.getElementById("pdf_crane_type").value;
+    const contractor = document.getElementById("pdf_contractor").value.trim().toLowerCase();
+    const assign = document.getElementById("pdf_assign").value.trim().toLowerCase();
+    const craneNo = document.getElementById("pdf_crane_no").value.trim().toLowerCase();
+    const craneType = document.getElementById("pdf_crane_type").value.trim().toLowerCase();
     const fromDate = document.getElementById("pdf_from").value;
     const toDate = document.getElementById("pdf_to").value;
 
@@ -524,11 +528,16 @@ function getFilteredRows(){
         const from = fromDate ? new Date(fromDate) : null;
         const to = toDate ? new Date(toDate) : null;
 
+        const rContractor = (r.contractor || "").trim().toLowerCase();
+        const rAssign = (r.assign || "").trim().toLowerCase();
+        const rCraneNo = (r.crane_no || "").trim().toLowerCase();
+        const rCraneType = (r.crane_type || "").trim().toLowerCase();
+
         return (
-            (!contractor || r.contractor === contractor) &&
-            (!assign || r.assign === assign) &&
-            (!craneNo || r.crane_no === craneNo) &&
-            (!craneType || r.crane_type === craneType) &&
+            (!contractor || rContractor === contractor) &&
+            (!assign || rAssign === assign) &&
+            (!craneNo || rCraneNo === craneNo) &&
+            (!craneType || rCraneType === craneType) &&
             (!from || rowDate >= from) &&
             (!to || rowDate <= to)
         );
