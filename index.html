@@ -558,12 +558,16 @@ async function loadFromGoogle(){
     
 /* ================= FILTER FUNCTION ================= */
 
+function clean(v){
+    return (v || "").toString().trim().toUpperCase();
+}
+
 function getFilteredRows(){
 
-    const contractor = document.getElementById("pdf_contractor").value;
-    const assign = document.getElementById("pdf_assign").value;
-    const craneNo = document.getElementById("pdf_crane_no").value;
-    const craneType = document.getElementById("pdf_crane_type").value;
+    const contractor = clean(document.getElementById("pdf_contractor").value);
+    const assign = clean(document.getElementById("pdf_assign").value);
+    const craneNo = clean(document.getElementById("pdf_crane_no").value);
+    const craneType = clean(document.getElementById("pdf_crane_type").value);
     const fromDate = document.getElementById("pdf_from").value;
     const toDate = document.getElementById("pdf_to").value;
 
@@ -574,21 +578,28 @@ function getFilteredRows(){
         const to = toDate ? new Date(toDate) : null;
 
         return (
-            (!contractor || r.contractor === contractor) &&
-            (!assign || r.assign === assign) &&
-            (!craneNo || r.crane_no === craneNo) &&
-            (!craneType || r.crane_type === craneType) &&
+            (!contractor || clean(r.contractor) === contractor) &&
+            (!assign || clean(r.assign) === assign) &&
+            (!craneNo || clean(r.crane_no) === craneNo) &&
+            (!craneType || clean(r.crane_type) === craneType) &&
             (!from || rowDate >= from) &&
             (!to || rowDate <= to)
         );
     });
 }
 
+
 function formatDate(dateStr){
     if(!dateStr) return "";
     const d = new Date(dateStr);
     return d.toLocaleDateString("en-GB");
 }
+
+function formatTime(t){
+    if(!t) return "";
+    return t.toString().substring(0,5);
+}
+    
 
 /* ================= TABLE RENDER ================= */
 
@@ -608,8 +619,8 @@ function renderTable(){
             <td>${r.crane_type}</td>
             <td>${r.crane_no}</td>
             <td>${r.assign}</td>
-            <td>${r.in_time}</td>
-            <td>${r.out_time}</td>
+            <td>${formatTime(r.in_time)}</td>
+            <td>${formatTime(r.out_time)}</td>
             <td>${r.lunch}</td>
             <td>${r.total_hours}</td>
             <td>${r.unit}</td>
