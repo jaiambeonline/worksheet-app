@@ -339,7 +339,7 @@ function logout(){
     document.getElementById("loginScreen").style.display="block";
 }
 
-let rows = JSON.parse(localStorage.getItem("rows") || "[]");
+let rows = [];
 
 function calculate(){
 
@@ -470,6 +470,34 @@ async function saveToGoogle(){
         console.error(error);
     }
 }
+
+
+async function loadFromGoogle(){
+
+    const url = "YOUR_SCRIPT_URL";
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    rows = data.map(r => ({
+        work_date: r.work_date,
+        client: r.client_name,
+        contractor: r.contractor_name,
+        crane_type: r.crane_type,
+        crane_no: r.crane_number,
+        assign: r.assign_sir,
+        in_time: r.in_time,
+        out_time: r.out_time,
+        lunch: r.lunch_minutes,
+        total_hours: r.total_hours,
+        unit: r.unit_type,
+        rate: r.rate,
+        amount: r.amount,
+        po: r.po_code
+    }));
+
+    renderTable();
+}
     
 function addRow(){
     let calc=calculate();
@@ -511,6 +539,41 @@ function populateFilters(){
     setOptions("pdf_crane_no", uniqueClean(rows.map(r=>r.crane_no)));
 }
 
+async function loadFromGoogle(){
+
+    const url = "YOUR_SCRIPT_URL";
+
+    try{
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        rows = data.map(r => ({
+            work_date: r.work_date,
+            client: r.client_name,
+            contractor: r.contractor_name,
+            crane_type: r.crane_type,
+            crane_no: r.crane_number,
+            assign: r.assign_sir,
+            in_time: r.in_time,
+            out_time: r.out_time,
+            lunch: r.lunch_minutes,
+            total_hours: r.total_hours,
+            unit: r.unit_type,
+            rate: r.rate,
+            amount: r.amount,
+            po: r.po_code
+        }));
+
+        renderTable();
+
+    }catch(e){
+        alert("Failed to load Google Sheet data");
+        console.error(e);
+    }
+}
+
+    
 /* ================= FILTER FUNCTION ================= */
 
 function getFilteredRows(){
@@ -524,10 +587,10 @@ function getFilteredRows(){
 
     return rows.filter(r => {
 
-        const rContractor = (r.contractor || "").trim().toLowerCase();
-        const rAssign = (r.assign || "").trim().toLowerCase();
-        const rCraneNo = (r.crane_no || "").trim().toLowerCase();
-        const rCraneType = (r.crane_type || "").trim().toLowerCase();
+        const rContractor = (r.contractor || "").toString().trim().toLowerCase();
+        const rAssign = (r.assign || "").toString().trim().toLowerCase();
+        const rCraneNo = (r.crane_no || "").toString().trim().toLowerCase();
+        const rCraneType = (r.crane_type || "").toString().trim().toLowerCase();
 
         const rowDate = new Date(r.work_date);
         const from = fromDate ? new Date(fromDate) : null;
