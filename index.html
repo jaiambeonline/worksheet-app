@@ -498,7 +498,7 @@ function addRow(){
 function populateFilters(){
 
     function uniqueClean(values){
-        return [...new Set(values.map(v => (v || "").trim()))];
+        return [...new Set(values.map(v => (v || "").trim().toUpperCase()))];
     }
 
     function setOptions(id, values){
@@ -561,10 +561,10 @@ function getFilteredRows(){
 
     return rows.filter(r => {
 
-        const rContractor = (r.contractor || "").toString().trim().toLowerCase();
-        const rAssign = (r.assign || "").toString().trim().toLowerCase();
-        const rCraneNo = (r.crane_no || "").toString().trim().toLowerCase();
-        const rCraneType = (r.crane_type || "").toString().trim().toLowerCase();
+        const rContractor = (r.contractor || "").toLowerCase().trim();
+        const rAssign = (r.assign || "").toLowerCase().trim();
+        const rCraneNo = (r.crane_no || "").toLowerCase().trim();
+        const rCraneType = (r.crane_type || "").toLowerCase().trim();
 
         const rowDate = new Date(r.work_date);
         const from = fromDate ? new Date(fromDate) : null;
@@ -614,6 +614,10 @@ function renderTable(){
     `HYDRA HRS: ${hydra.toFixed(2)} | FARANA HRS: ${faranaH.toFixed(2)} | FARANA DAYS: ${faranaD} | TOTAL ₹: ${totalAmt.toFixed(2)}`;
 }
 
+document.querySelectorAll(
+"#pdf_contractor,#pdf_assign,#pdf_crane_no,#pdf_crane_type,#pdf_from,#pdf_to"
+).forEach(el => el.addEventListener("change", renderTable));
+    
 /* ================= FILTER LIVE UPDATE ================= */
 
 document.querySelectorAll(
