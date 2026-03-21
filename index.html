@@ -547,35 +547,69 @@ function formatDate(dateStr) {
     }
 }
 
+// ============== FIXED TIME FORMATTING ==============
 function formatTime(timeVal) {
     if (!timeVal) return "";
+    
     try {
-        // Handle string time format (HH:MM or HH:MM:SS)
-        if (typeof timeVal === "string") {
-            // Remove any timezone info
-            let cleanTime = timeVal.split('T')[1] || timeVal;
-            let parts = cleanTime.split(':');
-            if (parts.length >= 2) {
-                let hours = parts[0].padStart(2, '0');
-                let minutes = parts[1].padStart(2, '0');
-                return `${hours}:${minutes}`;
-            }
-            // If already just HH:MM
-            if (cleanTime.length >= 5 && cleanTime[2] === ':') {
-                return cleanTime.substring(0, 5);
-            }
-            return cleanTime;
+        // If timeVal is empty or undefined
+        if (!timeVal || timeVal === "") return "";
+        
+        // Convert to string and trim
+        let timeStr = String(timeVal).trim();
+        
+        // If it's already in HH:MM format (like "13:30")
+        if (timeStr.match(/^\d{2}:\d{2}$/)) {
+            return timeStr;
         }
         
-        // Handle Date object
-        if (timeVal instanceof Date) {
+        // If it's in HH:MM:SS format (like "13:30:00")
+        if (timeStr.match(/^\d{2}:\d{2}:\d{2}$/)) {
+            let parts = timeStr.split(':');
+            return `${parts[0]}:${parts[1]}`;
+        }
+        
+        // Handle ISO format with T (like "2024-01-01T13:30:00")
+        if (timeStr.includes('T')) {
+            let timePart = timeStr.split('T')[1];
+            let parts = timePart.split(':');
+            if (parts.length >= 2) {
+                return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+            }
+        }
+        
+        // Handle time as number (seconds or milliseconds)
+        if (!isNaN(parseFloat(timeStr)) && isFinite(timeStr)) {
+            let totalMinutes = parseFloat(timeStr);
+            let hours = Math.floor(totalMinutes / 60);
+            let minutes = Math.floor(totalMinutes % 60);
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        }
+        
+        // If it's a Date object
+        if (timeVal instanceof Date && !isNaN(timeVal)) {
             let hours = timeVal.getHours().toString().padStart(2, '0');
             let minutes = timeVal.getMinutes().toString().padStart(2, '0');
             return `${hours}:${minutes}`;
         }
         
-        return String(timeVal).substring(0, 5);
+        // Try to parse as time string
+        let timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
+        if (timeMatch) {
+            let hours = timeMatch[1].padStart(2, '0');
+            let minutes = timeMatch[2];
+            return `${hours}:${minutes}`;
+        }
+        
+        // Last resort - return first 5 characters if they look like time
+        if (timeStr.length >= 5 && timeStr[2] === ':') {
+            return timeStr.substring(0, 5);
+        }
+        
+        return timeStr;
+        
     } catch(e) {
+        console.warn("Time formatting error:", e);
         return String(timeVal || "");
     }
 }
