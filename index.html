@@ -302,9 +302,17 @@ HYDRA HRS: 0 | FARANA HRS: 0 | FARANA DAYS: 0 | TOTAL ₹: 0
 <th>Date</th>
 <th>Client</th>
 <th>Contractor</th>
-<th>Crane</th>
+<th>Crane Type</th>
+<th>Crane No</th>
+<th>Assign</th>
+<th>In</th>
+<th>Out</th>
+<th>Lunch</th>
 <th>Hours</th>
+<th>Unit</th>
+<th>Rate</th>
 <th>Amount</th>
+<th>PO</th>
 </tr>
 </thead>
 <tbody></tbody>
@@ -552,33 +560,34 @@ async function loadFromGoogle(){
 
 function getFilteredRows(){
 
-    const contractor = document.getElementById("pdf_contractor").value.trim().toLowerCase();
-    const assign = document.getElementById("pdf_assign").value.trim().toLowerCase();
-    const craneNo = document.getElementById("pdf_crane_no").value.trim().toLowerCase();
-    const craneType = document.getElementById("pdf_crane_type").value.trim().toLowerCase();
+    const contractor = document.getElementById("pdf_contractor").value;
+    const assign = document.getElementById("pdf_assign").value;
+    const craneNo = document.getElementById("pdf_crane_no").value;
+    const craneType = document.getElementById("pdf_crane_type").value;
     const fromDate = document.getElementById("pdf_from").value;
     const toDate = document.getElementById("pdf_to").value;
 
     return rows.filter(r => {
-
-        const rContractor = (r.contractor || "").toLowerCase().trim();
-        const rAssign = (r.assign || "").toLowerCase().trim();
-        const rCraneNo = (r.crane_no || "").toLowerCase().trim();
-        const rCraneType = (r.crane_type || "").toLowerCase().trim();
 
         const rowDate = new Date(r.work_date);
         const from = fromDate ? new Date(fromDate) : null;
         const to = toDate ? new Date(toDate) : null;
 
         return (
-            (!contractor || rContractor === contractor) &&
-            (!assign || rAssign === assign) &&
-            (!craneNo || rCraneNo === craneNo) &&
-            (!craneType || rCraneType === craneType) &&
+            (!contractor || r.contractor === contractor) &&
+            (!assign || r.assign === assign) &&
+            (!craneNo || r.crane_no === craneNo) &&
+            (!craneType || r.crane_type === craneType) &&
             (!from || rowDate >= from) &&
             (!to || rowDate <= to)
         );
     });
+}
+
+function formatDate(dateStr){
+    if(!dateStr) return "";
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("en-GB");
 }
 
 /* ================= TABLE RENDER ================= */
@@ -593,12 +602,20 @@ function renderTable(){
 
     tbody.innerHTML = filtered.map(r => `
         <tr>
-        <td>${r.work_date}</td>
-        <td>${r.client}</td>
-        <td>${r.contractor}</td>
-        <td>${r.crane_no}</td>
-        <td>${r.total_hours}</td>
-        <td>${r.amount}</td>
+        <td>${formatDate(r.work_date)}</td>
+            <td>${r.client}</td>
+            <td>${r.contractor}</td>
+            <td>${r.crane_type}</td>
+            <td>${r.crane_no}</td>
+            <td>${r.assign}</td>
+            <td>${r.in_time}</td>
+            <td>${r.out_time}</td>
+            <td>${r.lunch}</td>
+            <td>${r.total_hours}</td>
+            <td>${r.unit}</td>
+            <td>${r.rate}</td>
+            <td>${r.amount}</td>
+            <td>${r.po}</td>        
         </tr>`).join("");
 
     let hydra=0,faranaH=0,faranaD=0,totalAmt=0;
