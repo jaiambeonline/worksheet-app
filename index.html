@@ -584,12 +584,16 @@ function clean(v){
 
 function getFilteredRows(){
 
-    const contractor = norm(document.getElementById("pdf_contractor").value);
-    const assign = norm(document.getElementById("pdf_assign").value);
-    const craneNo = norm(document.getElementById("pdf_crane_no").value);
-    const craneType = norm(document.getElementById("pdf_crane_type").value);
+    const contractor = document.getElementById("pdf_contractor").value;
+    const assign = document.getElementById("pdf_assign").value;
+    const craneNo = document.getElementById("pdf_crane_no").value;
+    const craneType = document.getElementById("pdf_crane_type").value;
     const fromDate = document.getElementById("pdf_from").value;
     const toDate = document.getElementById("pdf_to").value;
+
+    console.log("FILTER VALUES:",
+        contractor, assign, craneNo, craneType, fromDate, toDate
+    );
 
     return rows.filter(r => {
 
@@ -598,10 +602,10 @@ function getFilteredRows(){
         const to = toDate ? new Date(toDate) : null;
 
         return (
-            (!contractor || r.contractor === contractor) &&
-            (!assign || r.assign === assign) &&
-            (!craneNo || r.crane_no === craneNo) &&
-            (!craneType || r.crane_type === craneType) &&
+            (!contractor || r.contractor == contractor) &&
+            (!assign || r.assign == assign) &&
+            (!craneNo || r.crane_no == craneNo) &&
+            (!craneType || r.crane_type == craneType) &&
             (!from || rowDate >= from) &&
             (!to || rowDate <= to)
         );
@@ -628,8 +632,6 @@ function formatTime(t){
 /* ================= TABLE RENDER ================= */
 
 function renderTable(){
-
-    populateFilters();
 
     const filtered = getFilteredRows();
 
@@ -671,10 +673,6 @@ document.querySelectorAll(
 ).forEach(el => el.addEventListener("change", renderTable));
     
 /* ================= FILTER LIVE UPDATE ================= */
-
-document.querySelectorAll(
-"#pdf_contractor,#pdf_assign,#pdf_crane_no,#pdf_crane_type,#pdf_from,#pdf_to"
-).forEach(el => el.addEventListener("change", renderTable));
 
 function exportExcel(){
 
