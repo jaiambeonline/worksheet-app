@@ -524,14 +524,14 @@ function getFilteredRows(){
 
     return rows.filter(r => {
 
-        const rowDate = new Date(r.work_date);
-        const from = fromDate ? new Date(fromDate) : null;
-        const to = toDate ? new Date(toDate) : null;
-
         const rContractor = (r.contractor || "").trim().toLowerCase();
         const rAssign = (r.assign || "").trim().toLowerCase();
         const rCraneNo = (r.crane_no || "").trim().toLowerCase();
         const rCraneType = (r.crane_type || "").trim().toLowerCase();
+
+        const rowDate = new Date(r.work_date);
+        const from = fromDate ? new Date(fromDate) : null;
+        const to = toDate ? new Date(toDate) : null;
 
         return (
             (!contractor || rContractor === contractor) &&
