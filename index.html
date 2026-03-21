@@ -441,6 +441,7 @@ tr:nth-child(even) {
         if (!client) { alert("Client name required"); return; }
 
         let calc = calculateAndUpdate();
+        // Inside addRow() function, ensure time values are stored properly:
         let newRow = {
             work_date: work_date,
             client: norm(client),
@@ -448,8 +449,9 @@ tr:nth-child(even) {
             crane_type: document.getElementById("crane_type").value,
             crane_no: document.getElementById("crane_no").value,
             assign: norm(cleanStr(document.getElementById("assign").value)),
-            in_time: document.getElementById("in_time").value,
-            out_time: document.getElementById("out_time").value,
+            // IMPORTANT: Store time exactly as entered (HH:MM format)
+            in_time: document.getElementById("in_time").value,  // This gives "13:30"
+            out_time: document.getElementById("out_time").value, // This gives "17:30"
             lunch: parseFloat(document.getElementById("lunch").value || 0),
             total_hours: parseFloat(document.getElementById("total_hours").value || 0),
             unit: document.getElementById("unit").value,
