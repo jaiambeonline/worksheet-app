@@ -506,7 +506,7 @@ function addRow(){
 function populateFilters(){
 
     function uniqueClean(values){
-        return [...new Set(values.map(v => (v || "").trim().toUpperCase()))];
+        return [...new Set(values.map(v => norm(v)))];
     }
 
     function setOptions(id, values){
@@ -519,6 +519,26 @@ function populateFilters(){
     setOptions("pdf_assign", uniqueClean(rows.map(r=>r.assign)));
     setOptions("pdf_crane_no", uniqueClean(rows.map(r=>r.crane_no)));
 }
+    
+function norm(v){
+    return (v || "").toString().trim().toUpperCase();
+}
+
+function fixTime(t){
+    if(!t) return "";
+
+    if(typeof t === "string"){
+        return t.substring(0,5);
+    }
+
+    const d = new Date(t);
+    return d.toLocaleTimeString("en-GB",{hour:'2-digit',minute:'2-digit'});
+}
+
+function fixDate(d){
+    if(!d) return "";
+    return new Date(d).toISOString().split("T")[0];
+}
 
 async function loadFromGoogle(){
 
@@ -530,31 +550,31 @@ async function loadFromGoogle(){
         const data = await res.json();
 
         rows = data.map(r => ({
-            work_date: r.work_date,
-            client: r.client_name,
-            contractor: r.contractor_name,
-            crane_type: r.crane_type,
-            crane_no: r.crane_number,
-            assign: r.assign_sir,
-            in_time: r.in_time,
-            out_time: r.out_time,
-            lunch: r.lunch_minutes,
-            total_hours: r.total_hours,
-            unit: r.unit_type,
-            rate: r.rate,
-            amount: r.amount,
-            po: r.po_code
+            work_date: fixDate(r.work_date),
+            client: norm(r.client_name),
+            contractor: norm(r.contractor_name),
+            crane_type: norm(r.crane_type),
+            crane_no: norm(r.crane_number),
+            assign: norm(r.assign_sir),
+            in_time: fixTime(r.in_time),
+            out_time: fixTime(r.out_time),
+            lunch: Number(r.lunch_minutes || 0),
+            total_hours: Number(r.total_hours || 0),
+            unit: norm(r.unit_type),
+            rate: Number(r.rate || 0),
+            amount: Number(r.amount || 0),
+            po: norm(r.po_code)
         }));
 
-        renderTable();   // ⭐ IMPORTANT
+        console.log("GOOGLE ROWS:", rows.length);
 
+        renderTable();
 
     }catch(e){
         alert("Failed to load Google Sheet data");
         console.error(e);
     }
 }
-
     
 /* ================= FILTER FUNCTION ================= */
 
@@ -564,10 +584,10 @@ function clean(v){
 
 function getFilteredRows(){
 
-    const contractor = clean(document.getElementById("pdf_contractor").value);
-    const assign = clean(document.getElementById("pdf_assign").value);
-    const craneNo = clean(document.getElementById("pdf_crane_no").value);
-    const craneType = clean(document.getElementById("pdf_crane_type").value);
+    const contractor = norm(document.getElementById("pdf_contractor").value);
+    const assign = norm(document.getElementById("pdf_assign").value);
+    const craneNo = norm(document.getElementById("pdf_crane_no").value);
+    const craneType = norm(document.getElementById("pdf_crane_type").value);
     const fromDate = document.getElementById("pdf_from").value;
     const toDate = document.getElementById("pdf_to").value;
 
@@ -578,16 +598,15 @@ function getFilteredRows(){
         const to = toDate ? new Date(toDate) : null;
 
         return (
-            (!contractor || clean(r.contractor) === contractor) &&
-            (!assign || clean(r.assign) === assign) &&
-            (!craneNo || clean(r.crane_no) === craneNo) &&
-            (!craneType || clean(r.crane_type) === craneType) &&
+            (!contractor || r.contractor === contractor) &&
+            (!assign || r.assign === assign) &&
+            (!craneNo || r.crane_no === craneNo) &&
+            (!craneType || r.crane_type === craneType) &&
             (!from || rowDate >= from) &&
             (!to || rowDate <= to)
         );
     });
 }
-
 
 function formatDate(dateStr){
     if(!dateStr) return "";
@@ -596,8 +615,13 @@ function formatDate(dateStr){
 }
 
 function formatTime(t){
+
     if(!t) return "";
-    return t.toString().substring(0,5);
+
+    if(typeof t === "string") return t.substring(0,5);
+
+    const d = new Date(t);
+    return d.toLocaleTimeString("en-GB",{hour:'2-digit',minute:'2-digit'});
 }
     
 
