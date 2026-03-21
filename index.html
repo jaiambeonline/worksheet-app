@@ -512,18 +512,88 @@ tr:nth-child(even) {
         });
     }
 
-    // Format helpers
-    function formatDate(dateStr) {
-        if (!dateStr) return "";
-        let d = new Date(dateStr);
-        return d.toLocaleDateString("en-GB");
-    }
-    function formatTime(timeVal) {
-        if (!timeVal) return "";
-        if (typeof timeVal === "string") return timeVal.substring(0,5);
-        return "";
-    }
+   // ============== DATE & TIME FORMATTING BLOCK ==============
+// Replace all existing formatDate and formatTime functions with these
 
+function formatDate(dateStr) {
+    if (!dateStr) return "";
+    try {
+        let d;
+        // Handle YYYY-MM-DD format (from input date)
+        if (typeof dateStr === 'string' && dateStr.match(/^\d{4}-\d{2}-\d{2}/)) {
+            d = new Date(dateStr);
+        }
+        // Handle DD/MM/YYYY format
+        else if (typeof dateStr === 'string' && dateStr.includes('/')) {
+            let parts = dateStr.split('/');
+            if (parts.length === 3) {
+                d = new Date(parts[2], parts[1] - 1, parts[0]);
+            } else {
+                d = new Date(dateStr);
+            }
+        }
+        else {
+            d = new Date(dateStr);
+        }
+        
+        if (isNaN(d.getTime())) return dateStr;
+        
+        let day = d.getDate().toString().padStart(2, '0');
+        let month = (d.getMonth() + 1).toString().padStart(2, '0');
+        let year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+    } catch(e) {
+        return dateStr;
+    }
+}
+
+function formatTime(timeVal) {
+    if (!timeVal) return "";
+    try {
+        // Handle string time format (HH:MM or HH:MM:SS)
+        if (typeof timeVal === "string") {
+            // Remove any timezone info
+            let cleanTime = timeVal.split('T')[1] || timeVal;
+            let parts = cleanTime.split(':');
+            if (parts.length >= 2) {
+                let hours = parts[0].padStart(2, '0');
+                let minutes = parts[1].padStart(2, '0');
+                return `${hours}:${minutes}`;
+            }
+            // If already just HH:MM
+            if (cleanTime.length >= 5 && cleanTime[2] === ':') {
+                return cleanTime.substring(0, 5);
+            }
+            return cleanTime;
+        }
+        
+        // Handle Date object
+        if (timeVal instanceof Date) {
+            let hours = timeVal.getHours().toString().padStart(2, '0');
+            let minutes = timeVal.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+        
+        return String(timeVal).substring(0, 5);
+    } catch(e) {
+        return String(timeVal || "");
+    }
+}
+
+// For Excel export - ensure dates are in proper format
+function formatDateForExcel(dateStr) {
+    if (!dateStr) return "";
+    try {
+        let d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        let day = d.getDate().toString().padStart(2, '0');
+        let month = (d.getMonth() + 1).toString().padStart(2, '0');
+        let year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+    } catch(e) {
+        return dateStr;
+    }
+}
     // Render table based on active filters
     function renderTable() {
         const filtered = getFilteredRows();
@@ -678,77 +748,177 @@ tr:nth-child(even) {
         XLSX.writeFile(wb, `Bhavishya_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
     }
 
-    // ---- PDF ----
+    // ============== FIXED PDF GENERATION - NO OVERLAP ==============
     async function generatePDF() {
         const { jsPDF } = window.jspdf;
         const filtered = getFilteredRows();
-        if (filtered.length === 0) { alert("No records for PDF"); return; }
-        const doc = new jsPDF("l", "mm", "a4");
+        if (filtered.length === 0) { alert("No records to export"); return; }
+        
+        // Create landscape A4
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        const pageWidth = doc.internal.pageSize.getWidth();   // ~297mm
+        const marginLeft = 8;
+        const marginRight = 8;
+        const usableWidth = pageWidth - marginLeft - marginRight;
+        
+        // Define column headers and proportional widths (total 100%)
+        const columns = [
+            { header: "Date", key: "date", width: 10 },
+            { header: "Client", key: "client", width: 12 },
+            { header: "Contractor", key: "contractor", width: 12 },
+            { header: "Crane Type", key: "craneType", width: 10 },
+            { header: "Crane No", key: "craneNo", width: 11 },
+            { header: "Assign", key: "assign", width: 10 },
+            { header: "In", key: "in", width: 7 },
+            { header: "Out", key: "out", width: 7 },
+            { header: "Lunch", key: "lunch", width: 7 },
+            { header: "Hours", key: "hours", width: 8 },
+            { header: "Unit", key: "unit", width: 8 },
+            { header: "Rate", key: "rate", width: 9 },
+            { header: "Amount", key: "amount", width: 11 },
+            { header: "PO", key: "po", width: 10 }
+        ];
+        
+        // Calculate exact column positions based on usableWidth
+        let totalPercent = columns.reduce((sum, col) => sum + col.width, 0);
+        let colX = [];
+        let currentX = marginLeft;
+        for (let i = 0; i < columns.length; i++) {
+            let colW = (columns[i].width / totalPercent) * usableWidth;
+            colX.push({ x: currentX, width: colW });
+            currentX += colW;
+        }
+        
+        const rowHeight = 7;
         let y = 20;
-        doc.setFontSize(14);
-        doc.text("BHAVISHYA ENTERPRISE - WORKSHEET", 105, y, { align: "center" });
-        y += 12;
-        const cols = ["SR","Date","Client","Contractor","Crane No","Assign","In","Out","Hrs","Unit","Rate","Amount","PO"];
-        const widths = [8,18,25,25,20,20,12,12,12,12,15,20,18];
-        let startX = 10;
-        function drawHeaders(yPos) {
-            let x = startX;
-            for(let i=0;i<cols.length;i++) {
-                doc.rect(x, yPos, widths[i], 7);
-                doc.text(cols[i], x+1, yPos+5);
-                x += widths[i];
+        
+        // Helper to draw header row
+        function drawHeader(yPos) {
+            doc.setFontSize(9);
+            doc.setFont(undefined, "bold");
+            for (let i = 0; i < columns.length; i++) {
+                let xPos = colX[i].x;
+                let w = colX[i].width;
+                doc.rect(xPos, yPos, w, rowHeight);
+                doc.text(columns[i].header, xPos + 1, yPos + 5);
             }
         }
-        drawHeaders(y);
-        y += 7;
-        let hydra=0, faranaH=0, faranaD=0, totalAmt=0;
-        filtered.forEach((r, idx) => {
-            if(y > 190) { doc.addPage(); y=20; drawHeaders(y); y+=7; }
-            let x = startX;
-            const rowData = [idx+1, r.work_date, r.client, r.contractor, r.crane_no, r.assign, r.in_time.substring(0,5), r.out_time.substring(0,5), r.total_hours, r.unit, r.rate, r.amount.toFixed(2), r.po];
-            for(let i=0;i<rowData.length;i++) {
-                doc.rect(x, y, widths[i], 6);
-                doc.text(String(rowData[i]), x+1, y+4.5);
-                x += widths[i];
+        
+        // Helper to draw data row
+        function drawDataRow(rowData, yPos) {
+            doc.setFontSize(8);
+            doc.setFont(undefined, "normal");
+            for (let i = 0; i < columns.length; i++) {
+                let xPos = colX[i].x;
+                let w = colX[i].width;
+                let cellText = rowData[i] !== undefined ? String(rowData[i]) : "";
+                // Truncate long text to avoid overflow
+                if (cellText.length > 18) cellText = cellText.substring(0, 15) + "..";
+                doc.rect(xPos, yPos, w, rowHeight);
+                doc.text(cellText, xPos + 1, yPos + 5);
             }
-            if(r.po === "9119720043") hydra += r.total_hours;
-            if(r.po === "9719720185") faranaH += r.total_hours;
-            if(r.po === "9719720186") faranaD += 1;
+        }
+        
+        // Title
+        doc.setFontSize(14);
+        doc.setFont(undefined, "bold");
+        doc.text("BHAVISHYA ENTERPRISE - CRANE WORKSHEET", pageWidth / 2, 12, { align: "center" });
+        doc.setFontSize(8);
+        doc.setFont(undefined, "normal");
+        let dateRange = "";
+        let fromDate = document.getElementById("pdf_from").value;
+        let toDate = document.getElementById("pdf_to").value;
+        if (fromDate || toDate) dateRange = `Period: ${fromDate || "START"} to ${toDate || "TODAY"}`;
+        else dateRange = `All Records (${filtered.length} entries)`;
+        doc.text(dateRange, pageWidth / 2, 18, { align: "center" });
+        
+        y = 26;
+        drawHeader(y);
+        y += rowHeight;
+        
+        // summaries for footer
+        let hydra = 0, faranaH = 0, faranaD = 0, totalAmt = 0;
+        
+        // Loop rows with page break control
+        for (let idx = 0; idx < filtered.length; idx++) {
+            const r = filtered[idx];
+            // Check if we need new page (leaving 25mm for footer)
+            if (y > 185) {
+                doc.addPage();
+                y = 18;
+                drawHeader(y);
+                y += rowHeight;
+            }
+            
+            let rowCells = [
+                formatDate(r.work_date),
+                r.client,
+                r.contractor,
+                r.crane_type,
+                r.crane_no,
+                r.assign,
+                formatTime(r.in_time),
+                formatTime(r.out_time),
+                r.lunch,
+                r.total_hours.toFixed(1),
+                r.unit,
+                r.rate,
+                r.amount.toFixed(2),
+                r.po
+            ];
+            drawDataRow(rowCells, y);
+            
+            // accumulate summaries
             totalAmt += r.amount;
-            y += 6;
-        });
+            if (r.po === "9119720043") hydra += r.total_hours;
+            if (r.po === "9719720185") faranaH += r.total_hours;
+            if (r.po === "9719720186") faranaD += 1;
+            
+            y += rowHeight;
+        }
+        
+        // Summary footer on last page
+        y += 4;
+        doc.setFontSize(9);
+        doc.setFont(undefined, "bold");
+        doc.text("SUMMARY (Filtered Data):", marginLeft, y);
+        y += 6;
+        doc.setFontSize(8);
+        doc.setFont(undefined, "normal");
+        doc.text(`HYDRA HOURS: ${hydra.toFixed(2)} hrs`, marginLeft, y);
+        doc.text(`FARANA HOURS: ${faranaH.toFixed(2)} hrs`, marginLeft + 55, y);
+        doc.text(`FARANA DAYS: ${faranaD}`, marginLeft + 110, y);
+        y += 6;
+        doc.setFont(undefined, "bold");
+        doc.text(`TOTAL AMOUNT: ₹ ${totalAmt.toFixed(2)}`, marginLeft, y);
         y += 8;
-        doc.setFontSize(10);
-        doc.text(`HYDRA HRS: ${hydra.toFixed(2)}   FARANA HRS: ${faranaH.toFixed(2)}   FARANA DAYS: ${faranaD}   TOTAL ₹: ${totalAmt.toFixed(2)}`, 10, y);
+        doc.setFontSize(7);
+        doc.setFont(undefined, "italic");
+        doc.text(`Generated on: ${new Date().toLocaleString()}`, marginLeft, y);
+        
+        // Save PDF
         doc.save(`Bhavishya_Report_${new Date().toISOString().slice(0,10)}.pdf`);
     }
 
     function clearAll() {
-        if(confirm("⚠️ Clear ALL worksheet data? This cannot be undone.")) {
-            rows = [];
-            renderTable();
-            populateFilterDropdowns();
-        }
+        if(confirm("Delete ALL records?")) { rows = []; renderTable(); populateFilterDropdowns(); }
     }
 
-    // attach event listeners to filters so they refresh table
-    function attachFilterEvents() {
-        const filterIds = ["pdf_contractor", "pdf_assign", "pdf_crane_no", "pdf_crane_type", "pdf_from", "pdf_to"];
-        filterIds.forEach(id => {
-            const el = document.getElementById(id);
+    // attach filter events
+    function attachFilters() {
+        ["pdf_contractor","pdf_assign","pdf_crane_no","pdf_crane_type","pdf_from","pdf_to"].forEach(id => {
+            let el = document.getElementById(id);
             if(el) el.addEventListener("change", () => renderTable());
         });
     }
-
-    // recalc on input fields
+    
+    // live calculation
     document.querySelectorAll("#in_time, #out_time, #lunch, #rate_type, #rate, #client, #crane_type").forEach(el => {
         if(el) el.addEventListener("input", () => calculateAndUpdate());
     });
     
-    // initial load
     window.onload = () => {
-        attachFilterEvents();
-        // make sure calculate works for manual rate change
+        attachFilters();
         document.getElementById("rate")?.addEventListener("input", () => calculateAndUpdate());
     };
 </script>
