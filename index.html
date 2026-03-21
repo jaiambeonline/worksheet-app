@@ -472,33 +472,7 @@ async function saveToGoogle(){
 }
 
 
-async function loadFromGoogle(){
-
-    const url = "YOUR_SCRIPT_URL";
-
-    const res = await fetch(url);
-    const data = await res.json();
-
-    rows = data.map(r => ({
-        work_date: r.work_date,
-        client: r.client_name,
-        contractor: r.contractor_name,
-        crane_type: r.crane_type,
-        crane_no: r.crane_number,
-        assign: r.assign_sir,
-        in_time: r.in_time,
-        out_time: r.out_time,
-        lunch: r.lunch_minutes,
-        total_hours: r.total_hours,
-        unit: r.unit_type,
-        rate: r.rate,
-        amount: r.amount,
-        po: r.po_code
-    }));
-
-    renderTable();
-}
-loadFromGoogle();  
+  
 function addRow(){
     let calc=calculate();
     let row={
@@ -518,7 +492,6 @@ function addRow(){
         po:calc?calc.po:""
     };
     rows.push(row);
-    localStorage.setItem("rows",JSON.stringify(rows));
     renderTable();
 }
 
@@ -565,7 +538,7 @@ async function loadFromGoogle(){
             po: r.po_code
         }));
 
-        renderTable();
+       
 
     }catch(e){
         alert("Failed to load Google Sheet data");
@@ -798,7 +771,7 @@ document.querySelectorAll("input,select").forEach(el=>{
     el.addEventListener("input",calculate);
 });
 
-renderTable();
+
 
 </script>
 </div>
