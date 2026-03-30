@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Bhavishya Enterprise - Crane Worksheet (Fully Fixed)</title>
+<title>Bhavishya Enterprise - Crane Worksheet</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; }
@@ -15,7 +15,7 @@ body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; paddi
 .header p { margin: 5px 0; font-size: 0.75rem; opacity: 0.9; }
 input, select { width: 100%; padding: 12px 14px; margin: 8px 0; border-radius: 16px; border: 1px solid #cbd5e1; font-size: 0.85rem; font-family: inherit; }
 input:focus, select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.2); }
-button { width: 100%; padding: 12px; margin-top: 12px; border: none; border-radius: 40px; font-weight: 600; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: 0.2s; background: #eef2ff; color: #1e3a8a; }
+button { width: 100%; padding: 12px; margin-top: 12px; border: none; border-radius: 40px; font-weight: 600; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: 0.2s; }
 button.primary { background: #2563eb; color: white; }
 button.danger { background: #dc2626; color: white; }
 button.secondary { background: #f1f5f9; color: #1f2937; border: 1px solid #cbd5e1; }
@@ -48,6 +48,7 @@ tr:nth-child(even) { background: #f8fafc; }
 <body>
 
 <div class="app">
+    <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="card" style="text-align:center;">
         <div style="font-weight:800; font-size:22px; margin-bottom:12px;">🏗️ BHAVISHYA ENTERPRISE</div>
         <div style="font-size:12px; color:#334155; margin:8px 0;">
@@ -59,6 +60,7 @@ tr:nth-child(even) { background: #f8fafc; }
         <div id="errorMsg" class="error-message">❌ Incorrect Password</div>
     </div>
 
+    <!-- MAIN APP -->
     <div id="mainApp" style="display:none;">
         <div class="card header">
             <h2>🏗️ BHAVISHYA ENTERPRISE</h2>
@@ -121,553 +123,558 @@ tr:nth-child(even) { background: #f8fafc; }
 </div>
 
 <script>
-    const APP_PASSWORD = "bhavishya123";
-    let rows = [];
+// Password
+const APP_PASSWORD = "bhavishya123";
+let rows = [];
 
-    function norm(v) { return (v || "").toString().trim().toUpperCase(); }
-    function cleanStr(v) { return (v || "").toString().trim(); }
+function norm(v) { return (v || "").toString().trim().toUpperCase(); }
+function cleanStr(v) { return (v || "").toString().trim(); }
 
-    // ============== TIME PARSING - HANDLES BOTH FORMATS ==============
-    function parseTimeToHHMM(timeValue) {
-        if (!timeValue) return "";
-        
-        let timeStr = String(timeValue).trim();
-        
-        // Format 1: Already HH:MM (perfect format like "13:30")
-        if (timeStr.match(/^\d{2}:\d{2}$/)) {
-            return timeStr;
-        }
-        
-        // Format 2: HH:MM:SS (like "13:30:00")
-        if (timeStr.match(/^\d{2}:\d{2}:\d{2}$/)) {
-            let parts = timeStr.split(':');
-            return `${parts[0]}:${parts[1]}`;
-        }
-        
-        // Format 3: Datetime format like "1899-12-30T08:08:50.000Z"
-        if (timeStr.includes('T') || timeStr.includes('Z')) {
-            try {
-                let dateObj = new Date(timeStr);
-                if (!isNaN(dateObj.getTime())) {
-                    let hours = dateObj.getUTCHours().toString().padStart(2, '0');
-                    let minutes = dateObj.getUTCMinutes().toString().padStart(2, '0');
-                    return `${hours}:${minutes}`;
-                }
-            } catch(e) {}
-        }
-        
-        // Format 4: Any HH:MM pattern in string
-        let timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
-        if (timeMatch) {
-            return `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
-        }
-        
-        return "";
+// ============== TIME PARSING - HANDLES BOTH FORMATS ==============
+function parseTimeToHHMM(timeValue) {
+    if (!timeValue) return "";
+    let timeStr = String(timeValue).trim();
+    
+    // Format 1: HH:MM (perfect)
+    if (timeStr.match(/^\d{2}:\d{2}$/)) return timeStr;
+    
+    // Format 2: HH:MM:SS
+    if (timeStr.match(/^\d{2}:\d{2}:\d{2}$/)) {
+        let parts = timeStr.split(':');
+        return `${parts[0]}:${parts[1]}`;
     }
-
-    function formatDate(dateStr) {
-        if (!dateStr) return "";
+    
+    // Format 3: Datetime format like "1899-12-30T08:08:50.000Z"
+    if (timeStr.includes('T') || timeStr.includes('Z')) {
         try {
-            let d = new Date(dateStr);
-            if (isNaN(d.getTime())) return dateStr;
-            let day = d.getDate().toString().padStart(2, '0');
-            let month = (d.getMonth() + 1).toString().padStart(2, '0');
-            let year = d.getFullYear();
-            return `${day}/${month}/${year}`;
-        } catch(e) { return dateStr; }
-    }
-
-    function formatTimeDisplay(timeVal) {
-        if (!timeVal) return "";
-        let timeStr = String(timeVal).trim();
-        if (timeStr.match(/^\d{2}:\d{2}$/)) return timeStr;
-        if (timeStr.match(/^\d{2}:\d{2}:\d{2}$/)) {
-            let parts = timeStr.split(':');
-            return `${parts[0]}:${parts[1]}`;
-        }
-        let timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
-        if (timeMatch) return `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
-        return timeStr;
-    }
-
-    // ---------- CALCULATION ----------
-    function calculateAndUpdate() {
-        let client = document.getElementById("client").value.trim().toUpperCase();
-        let crane = document.getElementById("crane_type").value;
-        let inTime = document.getElementById("in_time").value;
-        let outTime = document.getElementById("out_time").value;
-        let lunch = parseFloat(document.getElementById("lunch").value || 0);
-        let rateType = document.getElementById("rate_type").value;
-        let rateField = document.getElementById("rate");
-
-        if (!inTime || !outTime) {
-            document.getElementById("total_hours").value = "";
-            document.getElementById("unit").value = "";
-            document.getElementById("amount").value = "";
-            return { po: "" };
-        }
-
-        let inDate = new Date("1970-01-01T" + inTime);
-        let outDate = new Date("1970-01-01T" + outTime);
-        if (outDate < inDate) outDate.setDate(outDate.getDate() + 1);
-        let hours = (outDate - inDate) / (1000 * 60 * 60);
-        hours = hours - (lunch / 60);
-        hours = Math.max(hours, 0);
-
-        let amount = 0, unit = "", po = "";
-
-        if (client === "ATUL LTD") {
-            rateField.readOnly = true;
-            if (crane === "HYDRA") {
-                rateField.value = 750;
-                unit = "HOURS";
-                amount = hours * 750;
-                po = "9119720043";
-            } else if (crane === "FARANA") {
-                if (hours < 7) {
-                    rateField.value = 1500;
-                    unit = "HOURS";
-                    amount = hours * 1500;
-                    po = "9719720185";
-                } else {
-                    rateField.value = 10000;
-                    unit = "DAY";
-                    amount = 10000;
-                    po = "9719720186";
-                }
+            let dateObj = new Date(timeStr);
+            if (!isNaN(dateObj.getTime())) {
+                let hours = dateObj.getUTCHours().toString().padStart(2, '0');
+                let minutes = dateObj.getUTCMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
             }
-        } else {
-            rateField.readOnly = false;
-            let rate = parseFloat(rateField.value || 0);
-            if (rateType === "Hourly") {
-                unit = "HOURS";
-                amount = hours * rate;
-            } else {
-                unit = "FIXED";
-                amount = rate;
-            }
-            po = "";
-        }
-
-        document.getElementById("total_hours").value = hours.toFixed(2);
-        document.getElementById("unit").value = unit;
-        document.getElementById("amount").value = amount.toFixed(2);
-        return { po, hours, amount, unit };
+        } catch(e) {}
     }
+    
+    // Format 4: Any HH:MM pattern
+    let timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
+    if (timeMatch) return `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
+    
+    return "";
+}
 
-    function addRow() {
-        let work_date = document.getElementById("work_date").value;
-        if (!work_date) { alert("Please select work date"); return; }
-        let client = cleanStr(document.getElementById("client").value);
-        if (!client) { alert("Client name required"); return; }
-        
-        let inTime = document.getElementById("in_time").value;
-        let outTime = document.getElementById("out_time").value;
-        if (!inTime || !outTime) { alert("Please select both In Time and Out Time"); return; }
+function formatDate(dateStr) {
+    if (!dateStr) return "";
+    try {
+        let d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        let day = d.getDate().toString().padStart(2, '0');
+        let month = (d.getMonth() + 1).toString().padStart(2, '0');
+        let year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+    } catch(e) { return dateStr; }
+}
 
-        let calc = calculateAndUpdate();
-        
-        let newRow = {
-            work_date: work_date,
-            client: norm(client),
-            contractor: norm(cleanStr(document.getElementById("contractor").value)),
-            crane_type: document.getElementById("crane_type").value,
-            crane_no: document.getElementById("crane_no").value,
-            assign: norm(cleanStr(document.getElementById("assign").value)),
-            in_time: inTime,
-            out_time: outTime,
-            lunch: parseFloat(document.getElementById("lunch").value || 0),
-            total_hours: parseFloat(document.getElementById("total_hours").value || 0),
-            unit: document.getElementById("unit").value,
-            rate: parseFloat(document.getElementById("rate").value || 0),
-            amount: parseFloat(document.getElementById("amount").value || 0),
-            po: calc.po || ""
-        };
-        
-        rows.push(newRow);
-        renderTable();
-        populateFilterDropdowns();
-        
-        document.getElementById("client").value = "";
-        document.getElementById("contractor").value = "";
-        document.getElementById("assign").value = "";
-        document.getElementById("in_time").value = "";
-        document.getElementById("out_time").value = "";
-        document.getElementById("lunch").value = "0";
-        document.getElementById("rate").value = "";
+function formatTimeDisplay(timeVal) {
+    if (!timeVal) return "";
+    let timeStr = String(timeVal).trim();
+    if (timeStr.match(/^\d{2}:\d{2}$/)) return timeStr;
+    if (timeStr.match(/^\d{2}:\d{2}:\d{2}$/)) {
+        let parts = timeStr.split(':');
+        return `${parts[0]}:${parts[1]}`;
+    }
+    let timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
+    if (timeMatch) return `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
+    return timeStr;
+}
+
+// ---------- CALCULATION ----------
+function calculateAndUpdate() {
+    let client = document.getElementById("client").value.trim().toUpperCase();
+    let crane = document.getElementById("crane_type").value;
+    let inTime = document.getElementById("in_time").value;
+    let outTime = document.getElementById("out_time").value;
+    let lunch = parseFloat(document.getElementById("lunch").value || 0);
+    let rateType = document.getElementById("rate_type").value;
+    let rateField = document.getElementById("rate");
+
+    if (!inTime || !outTime) {
         document.getElementById("total_hours").value = "";
         document.getElementById("unit").value = "";
         document.getElementById("amount").value = "";
+        return { po: "" };
     }
 
-    function getFilteredRows() {
-        const contractorFilter = document.getElementById("pdf_contractor").value;
-        const assignFilter = document.getElementById("pdf_assign").value;
-        const craneNoFilter = document.getElementById("pdf_crane_no").value;
-        const craneTypeFilter = document.getElementById("pdf_crane_type").value;
-        const fromDate = document.getElementById("pdf_from").value;
-        const toDate = document.getElementById("pdf_to").value;
+    let inDate = new Date("1970-01-01T" + inTime);
+    let outDate = new Date("1970-01-01T" + outTime);
+    if (outDate < inDate) outDate.setDate(outDate.getDate() + 1);
+    let hours = (outDate - inDate) / (1000 * 60 * 60);
+    hours = hours - (lunch / 60);
+    hours = Math.max(hours, 0);
 
-        return rows.filter(r => {
-            if (contractorFilter && norm(r.contractor) !== norm(contractorFilter)) return false;
-            if (assignFilter && norm(r.assign) !== norm(assignFilter)) return false;
-            if (craneNoFilter && norm(r.crane_no) !== norm(craneNoFilter)) return false;
-            if (craneTypeFilter && norm(r.crane_type) !== norm(craneTypeFilter)) return false;
-            if (fromDate) {
-                let rowDate = new Date(r.work_date);
-                let from = new Date(fromDate);
-                if (rowDate < from) return false;
-            }
-            if (toDate) {
-                let rowDate = new Date(r.work_date);
-                let to = new Date(toDate);
-                to.setHours(23,59,59);
-                if (rowDate > to) return false;
-            }
-            return true;
-        });
-    }
+    let amount = 0, unit = "", po = "";
 
-    function renderTable() {
-        const filtered = getFilteredRows();
-        const tbody = document.getElementById("tableBody");
-        if (!tbody) return;
-
-        tbody.innerHTML = filtered.map(r => `
-            <tr>
-                <td>${formatDate(r.work_date)}</td>
-                <td>${r.client}</td>
-                <td>${r.contractor}</td>
-                <td>${r.crane_type}</td>
-                <td>${r.crane_no}</td>
-                <td>${r.assign}</td>
-                <td>${formatTimeDisplay(r.in_time)}</td>
-                <td>${formatTimeDisplay(r.out_time)}</td>
-                <td>${r.lunch}</td>
-                <td>${r.total_hours}</td>
-                <td>${r.unit}</td>
-                <td>${r.rate}</td>
-                <td>${r.amount.toFixed(2)}</td>
-                <td>${r.po}</td>
-            </tr>
-        `).join("");
-
-        let hydra = 0, faranaH = 0, faranaD = 0, totalAmt = 0;
-        filtered.forEach(r => {
-            totalAmt += (r.amount || 0);
-            if (r.po === "9119720043") hydra += (r.total_hours || 0);
-            if (r.po === "9719720185") faranaH += (r.total_hours || 0);
-            if (r.po === "9719720186") faranaD += 1;
-        });
-        document.getElementById("summary").innerHTML = `HYDRA HRS: ${hydra.toFixed(2)} | FARANA HRS: ${faranaH.toFixed(2)} | FARANA DAYS: ${faranaD} | TOTAL ₹: ${totalAmt.toFixed(2)}`;
-    }
-
-    function populateFilterDropdowns() {
-        const contractors = [...new Set(rows.map(r => r.contractor).filter(v => v && v !== ""))];
-        const assignList = [...new Set(rows.map(r => r.assign).filter(v => v && v !== ""))];
-        const craneNos = [...new Set(rows.map(r => r.crane_no).filter(v => v && v !== ""))];
-
-        const contractorSelect = document.getElementById("pdf_contractor");
-        const assignSelect = document.getElementById("pdf_assign");
-        const craneNoSelect = document.getElementById("pdf_crane_no");
-
-        if (contractorSelect) {
-            let currentVal = contractorSelect.value;
-            contractorSelect.innerHTML = '<option value="">ALL</option>';
-            contractors.forEach(c => { contractorSelect.innerHTML += `<option value="${c}">${c}</option>`; });
-            if (currentVal && contractors.includes(currentVal)) contractorSelect.value = currentVal;
-            else contractorSelect.value = "";
-        }
-
-        if (assignSelect) {
-            let currentAssign = assignSelect.value;
-            assignSelect.innerHTML = '<option value="">ALL</option>';
-            assignList.forEach(a => { assignSelect.innerHTML += `<option value="${a}">${a}</option>`; });
-            if (currentAssign && assignList.includes(currentAssign)) assignSelect.value = currentAssign;
-            else assignSelect.value = "";
-        }
-
-        if (craneNoSelect) {
-            let currentCrane = craneNoSelect.value;
-            craneNoSelect.innerHTML = '<option value="">ALL</option>';
-            craneNos.forEach(cn => { craneNoSelect.innerHTML += `<option value="${cn}">${cn}</option>`; });
-            if (currentCrane && craneNos.includes(currentCrane)) craneNoSelect.value = currentCrane;
-            else craneNoSelect.value = "";
-        }
-    }
-
-    // ---- SAVE TO GOOGLE SHEET ----
-    async function saveToGoogle() {
-        const calc = calculateAndUpdate();
-        
-        const data = {
-            work_date: document.getElementById("work_date").value,
-            client_name: document.getElementById("client").value,
-            contractor_name: document.getElementById("contractor").value,
-            crane_type: document.getElementById("crane_type").value,
-            po_code: calc.po || "",
-            crane_number: document.getElementById("crane_no").value,
-            assign_sir: document.getElementById("assign").value,
-            in_time: document.getElementById("in_time").value,
-            out_time: document.getElementById("out_time").value,
-            lunch_minutes: document.getElementById("lunch").value,
-            total_hours: document.getElementById("total_hours").value,
-            unit_type: document.getElementById("unit").value,
-            rate: document.getElementById("rate").value,
-            amount: document.getElementById("amount").value,
-            source_file: "Bhavishya_" + new Date().toISOString().split("T")[0],
-            created_at: new Date().toISOString()
-        };
-        
-        const url = "https://script.google.com/macros/s/AKfycbxuKB739oBJnVgIAR56Uj7NtQHzOxNLK5xe_POv3mMC1ISKL5XkUqPCU-rqM32UIsN6/exec";
-        try {
-            const response = await fetch(url, { method: "POST", body: JSON.stringify(data) });
-            const result = await response.json();
-            if (result.status === "success") {
-                alert("✅ Saved to Google Sheet!");
-                addRowAfterSave(data);
+    if (client === "ATUL LTD") {
+        rateField.readOnly = true;
+        if (crane === "HYDRA") {
+            rateField.value = 750;
+            unit = "HOURS";
+            amount = hours * 750;
+            po = "9119720043";
+        } else if (crane === "FARANA") {
+            if (hours < 7) {
+                rateField.value = 1500;
+                unit = "HOURS";
+                amount = hours * 1500;
+                po = "9719720185";
             } else {
-                alert("⚠️ Error: " + (result.message || "Unknown"));
+                rateField.value = 10000;
+                unit = "DAY";
+                amount = 10000;
+                po = "9719720186";
             }
-        } catch (error) {
-            alert("❌ Connection Error");
         }
+    } else {
+        rateField.readOnly = false;
+        let rate = parseFloat(rateField.value || 0);
+        if (rateType === "Hourly") {
+            unit = "HOURS";
+            amount = hours * rate;
+        } else {
+            unit = "FIXED";
+            amount = rate;
+        }
+        po = "";
     }
+
+    document.getElementById("total_hours").value = hours.toFixed(2);
+    document.getElementById("unit").value = unit;
+    document.getElementById("amount").value = amount.toFixed(2);
+    return { po, hours, amount, unit };
+}
+
+// ---------- ADD ROW ----------
+function addRow() {
+    let work_date = document.getElementById("work_date").value;
+    if (!work_date) { alert("Please select work date"); return; }
+    let client = cleanStr(document.getElementById("client").value);
+    if (!client) { alert("Client name required"); return; }
     
-    function addRowAfterSave(data) {
-        let newRow = {
-            work_date: data.work_date,
-            client: norm(data.client_name),
-            contractor: norm(data.contractor_name),
-            crane_type: data.crane_type,
-            crane_no: data.crane_number,
-            assign: norm(data.assign_sir),
-            in_time: data.in_time,
-            out_time: data.out_time,
-            lunch: parseFloat(data.lunch_minutes || 0),
-            total_hours: parseFloat(data.total_hours || 0),
-            unit: data.unit_type,
-            rate: parseFloat(data.rate || 0),
-            amount: parseFloat(data.amount || 0),
-            po: data.po_code || ""
-        };
-        rows.push(newRow);
-        renderTable();
-        populateFilterDropdowns();
-    }
+    let inTime = document.getElementById("in_time").value;
+    let outTime = document.getElementById("out_time").value;
+    if (!inTime || !outTime) { alert("Please select both In Time and Out Time"); return; }
 
-    // ---- LOAD FROM GOOGLE SHEET (HANDLES BOTH TIME FORMATS) ----
-    async function loadFromGoogle() {
-        const url = "https://script.google.com/macros/s/AKfycbxuKB739oBJnVgIAR56Uj7NtQHzOxNLK5xe_POv3mMC1ISKL5XkUqPCU-rqM32UIsN6/exec";
-        try {
-            const res = await fetch(url);
-            const data = await res.json();
-            
-            console.log("Raw data from Google:", data);
-            
-            if (Array.isArray(data) && data.length > 0) {
-                rows = data.map(r => ({
-                    work_date: r.work_date || "",
-                    client: norm(r.client_name),
-                    contractor: norm(r.contractor_name),
-                    crane_type: norm(r.crane_type),
-                    crane_no: norm(r.crane_number),
-                    assign: norm(r.assign_sir),
-                    in_time: parseTimeToHHMM(r.in_time),    // KEY FIX: Parse both formats
-                    out_time: parseTimeToHHMM(r.out_time),  // KEY FIX: Parse both formats
-                    lunch: Number(r.lunch_minutes || 0),
-                    total_hours: Number(r.total_hours || 0),
-                    unit: norm(r.unit_type),
-                    rate: Number(r.rate || 0),
-                    amount: Number(r.amount || 0),
-                    po: norm(r.po_code || "")
-                }));
-                
-                console.log("Processed times:", rows.map(r => ({in: r.in_time, out: r.out_time})));
-                renderTable();
-                populateFilterDropdowns();
-            } else {
-                rows = [];
-            }
-        } catch(e) {
-            console.error("Failed to load from Google:", e);
-            rows = [];
+    let calc = calculateAndUpdate();
+    
+    let newRow = {
+        work_date: work_date,
+        client: norm(client),
+        contractor: norm(cleanStr(document.getElementById("contractor").value)),
+        crane_type: document.getElementById("crane_type").value,
+        crane_no: document.getElementById("crane_no").value,
+        assign: norm(cleanStr(document.getElementById("assign").value)),
+        in_time: inTime,
+        out_time: outTime,
+        lunch: parseFloat(document.getElementById("lunch").value || 0),
+        total_hours: parseFloat(document.getElementById("total_hours").value || 0),
+        unit: document.getElementById("unit").value,
+        rate: parseFloat(document.getElementById("rate").value || 0),
+        amount: parseFloat(document.getElementById("amount").value || 0),
+        po: calc.po || ""
+    };
+    
+    rows.push(newRow);
+    renderTable();
+    populateFilterDropdowns();
+    
+    document.getElementById("client").value = "";
+    document.getElementById("contractor").value = "";
+    document.getElementById("assign").value = "";
+    document.getElementById("in_time").value = "";
+    document.getElementById("out_time").value = "";
+    document.getElementById("lunch").value = "0";
+    document.getElementById("rate").value = "";
+}
+
+function getFilteredRows() {
+    const contractorFilter = document.getElementById("pdf_contractor").value;
+    const assignFilter = document.getElementById("pdf_assign").value;
+    const craneNoFilter = document.getElementById("pdf_crane_no").value;
+    const craneTypeFilter = document.getElementById("pdf_crane_type").value;
+    const fromDate = document.getElementById("pdf_from").value;
+    const toDate = document.getElementById("pdf_to").value;
+
+    return rows.filter(r => {
+        if (contractorFilter && norm(r.contractor) !== norm(contractorFilter)) return false;
+        if (assignFilter && norm(r.assign) !== norm(assignFilter)) return false;
+        if (craneNoFilter && norm(r.crane_no) !== norm(craneNoFilter)) return false;
+        if (craneTypeFilter && norm(r.crane_type) !== norm(craneTypeFilter)) return false;
+        if (fromDate) {
+            let rowDate = new Date(r.work_date);
+            let from = new Date(fromDate);
+            if (rowDate < from) return false;
         }
+        if (toDate) {
+            let rowDate = new Date(r.work_date);
+            let to = new Date(toDate);
+            to.setHours(23,59,59);
+            if (rowDate > to) return false;
+        }
+        return true;
+    });
+}
+
+function renderTable() {
+    const filtered = getFilteredRows();
+    const tbody = document.getElementById("tableBody");
+    if (!tbody) return;
+
+    tbody.innerHTML = filtered.map(r => `
+        <tr>
+            <td>${formatDate(r.work_date)}</td>
+            <td>${r.client}</td>
+            <td>${r.contractor}</td>
+            <td>${r.crane_type}</td>
+            <td>${r.crane_no}</td>
+            <td>${r.assign}</td>
+            <td>${formatTimeDisplay(r.in_time)}</td>
+            <td>${formatTimeDisplay(r.out_time)}</td>
+            <td>${r.lunch}</td>
+            <td>${r.total_hours}</td>
+            <td>${r.unit}</td>
+            <td>${r.rate}</td>
+            <td>${r.amount.toFixed(2)}</td>
+            <td>${r.po}</td>
+        </tr>
+    `).join("");
+
+    let hydra = 0, faranaH = 0, faranaD = 0, totalAmt = 0;
+    filtered.forEach(r => {
+        totalAmt += (r.amount || 0);
+        if (r.po === "9119720043") hydra += (r.total_hours || 0);
+        if (r.po === "9719720185") faranaH += (r.total_hours || 0);
+        if (r.po === "9719720186") faranaD += 1;
+    });
+    document.getElementById("summary").innerHTML = `HYDRA HRS: ${hydra.toFixed(2)} | FARANA HRS: ${faranaH.toFixed(2)} | FARANA DAYS: ${faranaD} | TOTAL ₹: ${totalAmt.toFixed(2)}`;
+}
+
+function populateFilterDropdowns() {
+    const contractors = [...new Set(rows.map(r => r.contractor).filter(v => v && v !== ""))];
+    const assignList = [...new Set(rows.map(r => r.assign).filter(v => v && v !== ""))];
+    const craneNos = [...new Set(rows.map(r => r.crane_no).filter(v => v && v !== ""))];
+
+    const contractorSelect = document.getElementById("pdf_contractor");
+    const assignSelect = document.getElementById("pdf_assign");
+    const craneNoSelect = document.getElementById("pdf_crane_no");
+
+    if (contractorSelect) {
+        let currentVal = contractorSelect.value;
+        contractorSelect.innerHTML = '<option value="">ALL</option>';
+        contractors.forEach(c => { contractorSelect.innerHTML += `<option value="${c}">${c}</option>`; });
+        if (currentVal && contractors.includes(currentVal)) contractorSelect.value = currentVal;
+        else contractorSelect.value = "";
     }
 
-    // ---- EXPORT EXCEL ----
-    function exportExcel() {
-        if (typeof XLSX === "undefined") { alert("Excel lib missing"); return; }
-        const filtered = getFilteredRows();
-        if (filtered.length === 0) { alert("No data to export"); return; }
-        
-        const exportData = filtered.map(r => ({
-            work_date: r.work_date,
-            client_name: r.client,
-            contractor_name: r.contractor,
-            crane_type: r.crane_type,
-            po_code: r.po,
-            crane_number: r.crane_no,
-            assign_sir: r.assign,
-            in_time: r.in_time,
-            out_time: r.out_time,
-            lunch_minutes: r.lunch,
-            total_hours: r.total_hours,
-            unit_type: r.unit,
-            rate: r.rate,
-            amount: r.amount,
-            created_at: new Date().toISOString()
-        }));
-        
-        const ws = XLSX.utils.json_to_sheet(exportData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Crane_Worksheets");
-        XLSX.writeFile(wb, `Bhavishya_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
-        alert(`✅ Exported ${filtered.length} records`);
+    if (assignSelect) {
+        let currentAssign = assignSelect.value;
+        assignSelect.innerHTML = '<option value="">ALL</option>';
+        assignList.forEach(a => { assignSelect.innerHTML += `<option value="${a}">${a}</option>`; });
+        if (currentAssign && assignList.includes(currentAssign)) assignSelect.value = currentAssign;
+        else assignSelect.value = "";
     }
 
-    // ---- EXPORT CSV ----
-    function exportCSV() {
-        const filtered = getFilteredRows();
-        if (filtered.length === 0) { alert("No data to export"); return; }
-        
-        const headers = ["work_date", "client_name", "contractor_name", "crane_type", "po_code", "crane_number", "assign_sir", "in_time", "out_time", "lunch_minutes", "total_hours", "unit_type", "rate", "amount", "created_at"];
-        const csvRows = [headers.join(",")];
-        
-        filtered.forEach(r => {
-            const row = [
-                r.work_date, `"${r.client}"`, `"${r.contractor}"`, r.crane_type, r.po, r.crane_no,
-                `"${r.assign}"`, r.in_time, r.out_time, r.lunch, r.total_hours, r.unit, r.rate, r.amount, new Date().toISOString()
-            ];
-            csvRows.push(row.join(","));
-        });
-        
-        const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `Bhavishya_Export_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        alert(`✅ Exported ${filtered.length} records to CSV`);
+    if (craneNoSelect) {
+        let currentCrane = craneNoSelect.value;
+        craneNoSelect.innerHTML = '<option value="">ALL</option>';
+        craneNos.forEach(cn => { craneNoSelect.innerHTML += `<option value="${cn}">${cn}</option>`; });
+        if (currentCrane && craneNos.includes(currentCrane)) craneNoSelect.value = currentCrane;
+        else craneNoSelect.value = "";
     }
+}
 
-    // ---- PDF GENERATION ----
-    async function generatePDF() {
-        const { jsPDF } = window.jspdf;
-        const filtered = getFilteredRows();
-        if (filtered.length === 0) { alert("No records to export"); return; }
+// ---- LOGIN FUNCTION ----
+function login() {
+    const pass = document.getElementById("password").value;
+    if(pass === APP_PASSWORD) {
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("mainApp").style.display = "block";
+        loadFromGoogle();
+    } else {
+        const errDiv = document.getElementById("errorMsg");
+        errDiv.style.display = "block";
+        setTimeout(() => errDiv.style.display = "none", 2000);
+    }
+}
+
+function logout() {
+    document.getElementById("mainApp").style.display = "none";
+    document.getElementById("loginScreen").style.display = "block";
+}
+
+// ---- SAVE TO GOOGLE SHEET ----
+async function saveToGoogle() {
+    const calc = calculateAndUpdate();
+    
+    const data = {
+        work_date: document.getElementById("work_date").value,
+        client_name: document.getElementById("client").value,
+        contractor_name: document.getElementById("contractor").value,
+        crane_type: document.getElementById("crane_type").value,
+        po_code: calc.po || "",
+        crane_number: document.getElementById("crane_no").value,
+        assign_sir: document.getElementById("assign").value,
+        in_time: document.getElementById("in_time").value,
+        out_time: document.getElementById("out_time").value,
+        lunch_minutes: document.getElementById("lunch").value,
+        total_hours: document.getElementById("total_hours").value,
+        unit_type: document.getElementById("unit").value,
+        rate: document.getElementById("rate").value,
+        amount: document.getElementById("amount").value,
+        source_file: "Bhavishya_" + new Date().toISOString().split("T")[0],
+        created_at: new Date().toISOString()
+    };
+    
+    const url = "https://script.google.com/macros/s/AKfycbxuKB739oBJnVgIAR56Uj7NtQHzOxNLK5xe_POv3mMC1ISKL5XkUqPCU-rqM32UIsN6/exec";
+    try {
+        const response = await fetch(url, { method: "POST", body: JSON.stringify(data) });
+        const result = await response.json();
+        if (result.status === "success") {
+            alert("✅ Saved to Google Sheet!");
+            addRowAfterSave(data);
+        } else {
+            alert("⚠️ Error: " + (result.message || "Unknown"));
+        }
+    } catch (error) {
+        alert("❌ Connection Error");
+    }
+}
+
+function addRowAfterSave(data) {
+    let newRow = {
+        work_date: data.work_date,
+        client: norm(data.client_name),
+        contractor: norm(data.contractor_name),
+        crane_type: data.crane_type,
+        crane_no: data.crane_number,
+        assign: norm(data.assign_sir),
+        in_time: data.in_time,
+        out_time: data.out_time,
+        lunch: parseFloat(data.lunch_minutes || 0),
+        total_hours: parseFloat(data.total_hours || 0),
+        unit: data.unit_type,
+        rate: parseFloat(data.rate || 0),
+        amount: parseFloat(data.amount || 0),
+        po: data.po_code || ""
+    };
+    rows.push(newRow);
+    renderTable();
+    populateFilterDropdowns();
+}
+
+// ---- LOAD FROM GOOGLE SHEET ----
+async function loadFromGoogle() {
+    const url = "https://script.google.com/macros/s/AKfycbxuKB739oBJnVgIAR56Uj7NtQHzOxNLK5xe_POv3mMC1ISKL5XkUqPCU-rqM32UIsN6/exec";
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
         
-        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const marginLeft = 8;
-        const usableWidth = pageWidth - marginLeft - 8;
-        
-        const columns = [
-            { header: "Date", width: 12 }, { header: "Client", width: 15 }, { header: "Contractor", width: 15 },
-            { header: "Crane Type", width: 12 }, { header: "Crane No", width: 12 }, { header: "Assign", width: 12 },
-            { header: "In", width: 10 }, { header: "Out", width: 10 }, { header: "Lunch", width: 8 },
-            { header: "Hours", width: 10 }, { header: "Unit", width: 8 }, { header: "Rate", width: 10 },
-            { header: "Amount", width: 12 }, { header: "PO", width: 12 }
+        if (Array.isArray(data) && data.length > 0) {
+            rows = data.map(r => ({
+                work_date: r.work_date || "",
+                client: norm(r.client_name),
+                contractor: norm(r.contractor_name),
+                crane_type: norm(r.crane_type),
+                crane_no: norm(r.crane_number),
+                assign: norm(r.assign_sir),
+                in_time: parseTimeToHHMM(r.in_time),
+                out_time: parseTimeToHHMM(r.out_time),
+                lunch: Number(r.lunch_minutes || 0),
+                total_hours: Number(r.total_hours || 0),
+                unit: norm(r.unit_type),
+                rate: Number(r.rate || 0),
+                amount: Number(r.amount || 0),
+                po: norm(r.po_code || "")
+            }));
+            renderTable();
+            populateFilterDropdowns();
+        }
+    } catch(e) {
+        console.error("Failed to load from Google:", e);
+        rows = [];
+    }
+}
+
+// ---- EXPORT FUNCTIONS ----
+function exportExcel() {
+    if (typeof XLSX === "undefined") { alert("Excel lib missing"); return; }
+    const filtered = getFilteredRows();
+    if (filtered.length === 0) { alert("No data to export"); return; }
+    
+    const exportData = filtered.map(r => ({
+        work_date: r.work_date,
+        client_name: r.client,
+        contractor_name: r.contractor,
+        crane_type: r.crane_type,
+        po_code: r.po,
+        crane_number: r.crane_no,
+        assign_sir: r.assign,
+        in_time: r.in_time,
+        out_time: r.out_time,
+        lunch_minutes: r.lunch,
+        total_hours: r.total_hours,
+        unit_type: r.unit,
+        rate: r.rate,
+        amount: r.amount
+    }));
+    
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Crane_Worksheets");
+    XLSX.writeFile(wb, `Bhavishya_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
+    alert(`✅ Exported ${filtered.length} records`);
+}
+
+function exportCSV() {
+    const filtered = getFilteredRows();
+    if (filtered.length === 0) { alert("No data to export"); return; }
+    
+    const headers = ["work_date", "client_name", "contractor_name", "crane_type", "po_code", "crane_number", "assign_sir", "in_time", "out_time", "lunch_minutes", "total_hours", "unit_type", "rate", "amount"];
+    const csvRows = [headers.join(",")];
+    
+    filtered.forEach(r => {
+        const row = [
+            r.work_date, `"${r.client}"`, `"${r.contractor}"`, r.crane_type, r.po, r.crane_no,
+            `"${r.assign}"`, r.in_time, r.out_time, r.lunch, r.total_hours, r.unit, r.rate, r.amount
         ];
-        
-        let totalPercent = columns.reduce((sum, col) => sum + col.width, 0);
-        let colPositions = [];
-        let currentX = marginLeft;
-        for (let i = 0; i < columns.length; i++) {
-            let colW = (columns[i].width / totalPercent) * usableWidth;
-            colPositions.push({ x: currentX, width: colW });
-            currentX += colW;
-        }
-        
-        const rowHeight = 7;
-        let y = 20;
-        
-        function drawHeader(yPos) {
-            doc.setFontSize(9);
-            doc.setFont(undefined, "bold");
-            for (let i = 0; i < columns.length; i++) {
-                doc.rect(colPositions[i].x, yPos, colPositions[i].width, rowHeight);
-                doc.text(columns[i].header, colPositions[i].x + 1, yPos + 5);
-            }
-        }
-        
-        function drawDataRow(rowData, yPos) {
-            doc.setFontSize(8);
-            doc.setFont(undefined, "normal");
-            for (let i = 0; i < rowData.length; i++) {
-                let cellText = String(rowData[i] || "");
-                if (cellText.length > 18) cellText = cellText.substring(0, 15) + "..";
-                doc.rect(colPositions[i].x, yPos, colPositions[i].width, rowHeight);
-                doc.text(cellText, colPositions[i].x + 1, yPos + 5);
-            }
-        }
-        
-        doc.setFontSize(14);
-        doc.setFont(undefined, "bold");
-        doc.text("BHAVISHYA ENTERPRISE - CRANE WORKSHEET", pageWidth / 2, 12, { align: "center" });
-        
-        y = 26;
-        drawHeader(y);
-        y += rowHeight;
-        
-        let hydra = 0, faranaH = 0, faranaD = 0, totalAmt = 0;
-        
-        for (let idx = 0; idx < filtered.length; idx++) {
-            const r = filtered[idx];
-            if (y > 185) { doc.addPage(); y = 18; drawHeader(y); y += rowHeight; }
-            
-            let rowCells = [
-                formatDate(r.work_date), r.client, r.contractor, r.crane_type, r.crane_no, r.assign,
-                formatTimeDisplay(r.in_time), formatTimeDisplay(r.out_time), r.lunch,
-                r.total_hours.toFixed(2), r.unit, r.rate, r.amount.toFixed(2), r.po
-            ];
-            drawDataRow(rowCells, y);
-            
-            totalAmt += r.amount;
-            if (r.po === "9119720043") hydra += r.total_hours;
-            if (r.po === "9719720185") faranaH += r.total_hours;
-            if (r.po === "9719720186") faranaD += 1;
-            y += rowHeight;
-        }
-        
-        y += 4;
-        doc.setFontSize(9);
-        doc.setFont(undefined, "bold");
-        doc.text("SUMMARY:", marginLeft, y);
-        y += 6;
-        doc.setFontSize(8);
-        doc.text(`HYDRA HOURS: ${hydra.toFixed(2)} hrs`, marginLeft, y);
-        doc.text(`FARANA HOURS: ${faranaH.toFixed(2)} hrs`, marginLeft + 55, y);
-        doc.text(`FARANA DAYS: ${faranaD}`, marginLeft + 110, y);
-        y += 6;
-        doc.setFont(undefined, "bold");
-        doc.text(`TOTAL AMOUNT: ₹ ${totalAmt.toFixed(2)}`, marginLeft, y);
-        
-        doc.save(`Bhavishya_Report_${new Date().toISOString().slice(0,10)}.pdf`);
-    }
-
-    function clearAll() {
-        if(confirm("Delete ALL records?")) { rows = []; renderTable(); populateFilterDropdowns(); alert("All records cleared!"); }
-    }
-
-    function attachFilters() {
-        ["pdf_contractor","pdf_assign","pdf_crane_no","pdf_crane_type","pdf_from","pdf_to"].forEach(id => {
-            let el = document.getElementById(id);
-            if(el) el.addEventListener("change", () => renderTable());
-        });
-    }
-    
-    document.querySelectorAll("#in_time, #out_time, #lunch, #rate_type, #rate, #client, #crane_type").forEach(el => {
-        if(el) el.addEventListener("input", () => calculateAndUpdate());
+        csvRows.push(row.join(","));
     });
     
-    window.onload = () => {
-        attachFilters();
-        document.getElementById("rate")?.addEventListener("input", () => calculateAndUpdate());
-    };
+    const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Bhavishya_Export_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    alert(`✅ Exported ${filtered.length} records to CSV`);
+}
+
+// ---- PDF GENERATION ----
+async function generatePDF() {
+    const { jsPDF } = window.jspdf;
+    const filtered = getFilteredRows();
+    if (filtered.length === 0) { alert("No records to export"); return; }
+    
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const marginLeft = 8;
+    const usableWidth = pageWidth - marginLeft - 8;
+    
+    const columns = [
+        { header: "Date", width: 12 }, { header: "Client", width: 15 }, { header: "Contractor", width: 15 },
+        { header: "Crane Type", width: 12 }, { header: "Crane No", width: 12 }, { header: "Assign", width: 12 },
+        { header: "In", width: 10 }, { header: "Out", width: 10 }, { header: "Lunch", width: 8 },
+        { header: "Hours", width: 10 }, { header: "Unit", width: 8 }, { header: "Rate", width: 10 },
+        { header: "Amount", width: 12 }, { header: "PO", width: 12 }
+    ];
+    
+    let totalPercent = columns.reduce((sum, col) => sum + col.width, 0);
+    let colPositions = [];
+    let currentX = marginLeft;
+    for (let i = 0; i < columns.length; i++) {
+        let colW = (columns[i].width / totalPercent) * usableWidth;
+        colPositions.push({ x: currentX, width: colW });
+        currentX += colW;
+    }
+    
+    const rowHeight = 7;
+    let y = 20;
+    
+    function drawHeader(yPos) {
+        doc.setFontSize(9);
+        doc.setFont(undefined, "bold");
+        for (let i = 0; i < columns.length; i++) {
+            doc.rect(colPositions[i].x, yPos, colPositions[i].width, rowHeight);
+            doc.text(columns[i].header, colPositions[i].x + 1, yPos + 5);
+        }
+    }
+    
+    function drawDataRow(rowData, yPos) {
+        doc.setFontSize(8);
+        doc.setFont(undefined, "normal");
+        for (let i = 0; i < rowData.length; i++) {
+            let cellText = String(rowData[i] || "");
+            if (cellText.length > 18) cellText = cellText.substring(0, 15) + "..";
+            doc.rect(colPositions[i].x, yPos, colPositions[i].width, rowHeight);
+            doc.text(cellText, colPositions[i].x + 1, yPos + 5);
+        }
+    }
+    
+    doc.setFontSize(14);
+    doc.setFont(undefined, "bold");
+    doc.text("BHAVISHYA ENTERPRISE - CRANE WORKSHEET", pageWidth / 2, 12, { align: "center" });
+    
+    y = 26;
+    drawHeader(y);
+    y += rowHeight;
+    
+    let hydra = 0, faranaH = 0, faranaD = 0, totalAmt = 0;
+    
+    for (let idx = 0; idx < filtered.length; idx++) {
+        const r = filtered[idx];
+        if (y > 185) { doc.addPage(); y = 18; drawHeader(y); y += rowHeight; }
+        
+        let rowCells = [
+            formatDate(r.work_date), r.client, r.contractor, r.crane_type, r.crane_no, r.assign,
+            formatTimeDisplay(r.in_time), formatTimeDisplay(r.out_time), r.lunch,
+            r.total_hours.toFixed(2), r.unit, r.rate, r.amount.toFixed(2), r.po
+        ];
+        drawDataRow(rowCells, y);
+        
+        totalAmt += r.amount;
+        if (r.po === "9119720043") hydra += r.total_hours;
+        if (r.po === "9719720185") faranaH += r.total_hours;
+        if (r.po === "9719720186") faranaD += 1;
+        y += rowHeight;
+    }
+    
+    y += 4;
+    doc.setFontSize(9);
+    doc.setFont(undefined, "bold");
+    doc.text("SUMMARY:", marginLeft, y);
+    y += 6;
+    doc.setFontSize(8);
+    doc.text(`HYDRA HOURS: ${hydra.toFixed(2)} hrs`, marginLeft, y);
+    doc.text(`FARANA HOURS: ${faranaH.toFixed(2)} hrs`, marginLeft + 55, y);
+    doc.text(`FARANA DAYS: ${faranaD}`, marginLeft + 110, y);
+    y += 6;
+    doc.setFont(undefined, "bold");
+    doc.text(`TOTAL AMOUNT: ₹ ${totalAmt.toFixed(2)}`, marginLeft, y);
+    
+    doc.save(`Bhavishya_Report_${new Date().toISOString().slice(0,10)}.pdf`);
+}
+
+function clearAll() {
+    if(confirm("Delete ALL records?")) { rows = []; renderTable(); populateFilterDropdowns(); alert("All records cleared!"); }
+}
+
+function attachFilters() {
+    ["pdf_contractor","pdf_assign","pdf_crane_no","pdf_crane_type","pdf_from","pdf_to"].forEach(id => {
+        let el = document.getElementById(id);
+        if(el) el.addEventListener("change", () => renderTable());
+    });
+}
+
+document.querySelectorAll("#in_time, #out_time, #lunch, #rate_type, #rate, #client, #crane_type").forEach(el => {
+    if(el) el.addEventListener("input", () => calculateAndUpdate());
+});
+
+window.onload = () => {
+    attachFilters();
+    document.getElementById("rate")?.addEventListener("input", () => calculateAndUpdate());
+};
 </script>
 </body>
 </html>
