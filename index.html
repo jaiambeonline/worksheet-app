@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Bhavishya Enterprise - Crane Worksheet (Fixed Filters)</title>
+<title>Bhavishya Enterprise - Crane Worksheet (Fully Fixed)</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 * {
@@ -101,6 +101,11 @@ button.secondary {
     border: 1px solid #cbd5e1;
 }
 
+button.success {
+    background: #16a34a;
+    color: white;
+}
+
 .summary-box {
     background: #eef2ff;
     padding: 14px;
@@ -178,6 +183,18 @@ tr:nth-child(even) {
     flex: 1 1 140px;
 }
 
+.button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.button-group button {
+    flex: 1;
+    margin-top: 0;
+}
+
 @media (min-width: 760px) {
     .app {
         max-width: 1280px;
@@ -209,14 +226,6 @@ tr:nth-child(even) {
     font-size: 0.75rem;
     margin-top: 12px;
     display: none;
-}
-
-.badge {
-    background: #d9f99d;
-    color: #365314;
-    font-size: 0.7rem;
-    padding: 2px 8px;
-    border-radius: 40px;
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -328,8 +337,9 @@ tr:nth-child(even) {
                     </table>
                 </div>
 
-                <div style="display: flex; gap: 12px; margin-top: 16px;">
+                <div class="button-group">
                     <button class="primary" onclick="exportExcel()">📎 Export Excel</button>
+                    <button class="success" onclick="exportCSV()">📊 Export CSV</button>
                     <button class="primary" onclick="generatePDF()">📄 Export PDF</button>
                     <button class="danger" onclick="clearAll()">🗑️ Clear All</button>
                 </div>
@@ -346,7 +356,7 @@ tr:nth-child(even) {
         if(pass === APP_PASSWORD) {
             document.getElementById("loginScreen").style.display = "none";
             document.getElementById("mainApp").style.display = "block";
-            loadFromGoogle();  // load existing data after login
+            loadFromGoogle();
         } else {
             const errDiv = document.getElementById("errorMsg");
             errDiv.style.display = "block";
@@ -361,11 +371,11 @@ tr:nth-child(even) {
     // Global rows array
     let rows = [];
 
-    // Helper: normalize text for comparison and unique filters
+    // Helper functions
     function norm(v) { return (v || "").toString().trim().toUpperCase(); }
     function cleanStr(v) { return (v || "").toString().trim(); }
 
-    // ---------- CALCULATION (Hourly / Fixed + Atul special logic) ----------
+    // ---------- CALCULATION ----------
     function calculateAndUpdate() {
         let client = document.getElementById("client").value.trim().toUpperCase();
         let crane = document.getElementById("crane_type").value;
@@ -393,7 +403,6 @@ tr:nth-child(even) {
         let unit = "";
         let po = "";
 
-        // ATUL LTD special logic
         if (client === "ATUL LTD") {
             rateField.readOnly = true;
             if (crane === "HYDRA") {
@@ -433,15 +442,19 @@ tr:nth-child(even) {
         return { po, hours, amount, unit };
     }
 
-    // ---------- ADD ROW (push into rows) ----------
+    // ---------- ADD ROW ----------
     function addRow() {
         let work_date = document.getElementById("work_date").value;
         if (!work_date) { alert("Please select work date"); return; }
         let client = cleanStr(document.getElementById("client").value);
         if (!client) { alert("Client name required"); return; }
+        
+        let inTime = document.getElementById("in_time").value;
+        let outTime = document.getElementById("out_time").value;
+        if (!inTime || !outTime) { alert("Please select both In Time and Out Time"); return; }
 
         let calc = calculateAndUpdate();
-        // Inside addRow() function, ensure time values are stored properly:
+        
         let newRow = {
             work_date: work_date,
             client: norm(client),
@@ -449,9 +462,8 @@ tr:nth-child(even) {
             crane_type: document.getElementById("crane_type").value,
             crane_no: document.getElementById("crane_no").value,
             assign: norm(cleanStr(document.getElementById("assign").value)),
-            // IMPORTANT: Store time exactly as entered (HH:MM format)
-            in_time: document.getElementById("in_time").value,  // This gives "13:30"
-            out_time: document.getElementById("out_time").value, // This gives "17:30"
+            in_time: inTime,
+            out_time: outTime,
             lunch: parseFloat(document.getElementById("lunch").value || 0),
             total_hours: parseFloat(document.getElementById("total_hours").value || 0),
             unit: document.getElementById("unit").value,
@@ -459,13 +471,12 @@ tr:nth-child(even) {
             amount: parseFloat(document.getElementById("amount").value || 0),
             po: calc.po || ""
         };
+        
         rows.push(newRow);
-        renderTable();            // re-render with active filters
-        populateFilterDropdowns(); // update contractor/assign sir options dynamically
-        clearFormFields();        // optional: reset form but keep date?
-    }
-
-    function clearFormFields() {
+        renderTable();
+        populateFilterDropdowns();
+        
+        // Clear form
         document.getElementById("client").value = "";
         document.getElementById("contractor").value = "";
         document.getElementById("assign").value = "";
@@ -476,11 +487,42 @@ tr:nth-child(even) {
         document.getElementById("total_hours").value = "";
         document.getElementById("unit").value = "";
         document.getElementById("amount").value = "";
-        document.getElementById("rate_type").value = "Hourly";
-        // keep crane_type and crane_no as default but can be reset
     }
 
-    // ---------- FILTER LOGIC (FIXED: uses case-insensitive exact match for contractor & assign) ----------
+    // ---------- DATE & TIME FORMATTING ----------
+    function formatDate(dateStr) {
+        if (!dateStr) return "";
+        try {
+            let d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+            let day = d.getDate().toString().padStart(2, '0');
+            let month = (d.getMonth() + 1).toString().padStart(2, '0');
+            let year = d.getFullYear();
+            return `${day}/${month}/${year}`;
+        } catch(e) {
+            return dateStr;
+        }
+    }
+
+    function formatTime(timeVal) {
+        if (!timeVal) return "";
+        let timeStr = String(timeVal).trim();
+        if (timeStr.match(/^\d{2}:\d{2}$/)) return timeStr;
+        if (timeStr.match(/^\d{2}:\d{2}:\d{2}$/)) {
+            let parts = timeStr.split(':');
+            return `${parts[0]}:${parts[1]}`;
+        }
+        if (timeStr.includes('T')) {
+            let timePart = timeStr.split('T')[1];
+            let parts = timePart.split(':');
+            if (parts.length >= 2) return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+        }
+        let timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
+        if (timeMatch) return `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
+        return timeStr;
+    }
+
+    // ---------- FILTER LOGIC ----------
     function getFilteredRows() {
         const contractorFilter = document.getElementById("pdf_contractor").value;
         const assignFilter = document.getElementById("pdf_assign").value;
@@ -490,15 +532,10 @@ tr:nth-child(even) {
         const toDate = document.getElementById("pdf_to").value;
 
         return rows.filter(r => {
-            // Contractor filter: if filter value is non-empty, compare normalized value
             if (contractorFilter && norm(r.contractor) !== norm(contractorFilter)) return false;
-            // Assign Sir filter: critical fix - match exactly normalized assign field
             if (assignFilter && norm(r.assign) !== norm(assignFilter)) return false;
-            // Crane No filter
             if (craneNoFilter && norm(r.crane_no) !== norm(craneNoFilter)) return false;
-            // Crane type filter
             if (craneTypeFilter && norm(r.crane_type) !== norm(craneTypeFilter)) return false;
-            // Date range
             if (fromDate) {
                 let rowDate = new Date(r.work_date);
                 let from = new Date(fromDate);
@@ -514,123 +551,7 @@ tr:nth-child(even) {
         });
     }
 
-   // ============== DATE & TIME FORMATTING BLOCK ==============
-// Replace all existing formatDate and formatTime functions with these
-
-function formatDate(dateStr) {
-    if (!dateStr) return "";
-    try {
-        let d;
-        // Handle YYYY-MM-DD format (from input date)
-        if (typeof dateStr === 'string' && dateStr.match(/^\d{4}-\d{2}-\d{2}/)) {
-            d = new Date(dateStr);
-        }
-        // Handle DD/MM/YYYY format
-        else if (typeof dateStr === 'string' && dateStr.includes('/')) {
-            let parts = dateStr.split('/');
-            if (parts.length === 3) {
-                d = new Date(parts[2], parts[1] - 1, parts[0]);
-            } else {
-                d = new Date(dateStr);
-            }
-        }
-        else {
-            d = new Date(dateStr);
-        }
-        
-        if (isNaN(d.getTime())) return dateStr;
-        
-        let day = d.getDate().toString().padStart(2, '0');
-        let month = (d.getMonth() + 1).toString().padStart(2, '0');
-        let year = d.getFullYear();
-        return `${day}/${month}/${year}`;
-    } catch(e) {
-        return dateStr;
-    }
-}
-
-// ============== FIXED TIME FORMATTING ==============
-function formatTime(timeVal) {
-    if (!timeVal) return "";
-    
-    try {
-        // If timeVal is empty or undefined
-        if (!timeVal || timeVal === "") return "";
-        
-        // Convert to string and trim
-        let timeStr = String(timeVal).trim();
-        
-        // If it's already in HH:MM format (like "13:30")
-        if (timeStr.match(/^\d{2}:\d{2}$/)) {
-            return timeStr;
-        }
-        
-        // If it's in HH:MM:SS format (like "13:30:00")
-        if (timeStr.match(/^\d{2}:\d{2}:\d{2}$/)) {
-            let parts = timeStr.split(':');
-            return `${parts[0]}:${parts[1]}`;
-        }
-        
-        // Handle ISO format with T (like "2024-01-01T13:30:00")
-        if (timeStr.includes('T')) {
-            let timePart = timeStr.split('T')[1];
-            let parts = timePart.split(':');
-            if (parts.length >= 2) {
-                return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
-            }
-        }
-        
-        // Handle time as number (seconds or milliseconds)
-        if (!isNaN(parseFloat(timeStr)) && isFinite(timeStr)) {
-            let totalMinutes = parseFloat(timeStr);
-            let hours = Math.floor(totalMinutes / 60);
-            let minutes = Math.floor(totalMinutes % 60);
-            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-        }
-        
-        // If it's a Date object
-        if (timeVal instanceof Date && !isNaN(timeVal)) {
-            let hours = timeVal.getHours().toString().padStart(2, '0');
-            let minutes = timeVal.getMinutes().toString().padStart(2, '0');
-            return `${hours}:${minutes}`;
-        }
-        
-        // Try to parse as time string
-        let timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
-        if (timeMatch) {
-            let hours = timeMatch[1].padStart(2, '0');
-            let minutes = timeMatch[2];
-            return `${hours}:${minutes}`;
-        }
-        
-        // Last resort - return first 5 characters if they look like time
-        if (timeStr.length >= 5 && timeStr[2] === ':') {
-            return timeStr.substring(0, 5);
-        }
-        
-        return timeStr;
-        
-    } catch(e) {
-        console.warn("Time formatting error:", e);
-        return String(timeVal || "");
-    }
-}
-
-// For Excel export - ensure dates are in proper format
-function formatDateForExcel(dateStr) {
-    if (!dateStr) return "";
-    try {
-        let d = new Date(dateStr);
-        if (isNaN(d.getTime())) return dateStr;
-        let day = d.getDate().toString().padStart(2, '0');
-        let month = (d.getMonth() + 1).toString().padStart(2, '0');
-        let year = d.getFullYear();
-        return `${day}/${month}/${year}`;
-    } catch(e) {
-        return dateStr;
-    }
-}
-    // Render table based on active filters
+    // ---------- RENDER TABLE ----------
     function renderTable() {
         const filtered = getFilteredRows();
         const tbody = document.getElementById("tableBody");
@@ -655,7 +576,6 @@ function formatDateForExcel(dateStr) {
             </tr>
         `).join("");
 
-        // Summary based on filtered rows only
         let hydra = 0, faranaH = 0, faranaD = 0, totalAmt = 0;
         filtered.forEach(r => {
             totalAmt += (r.amount || 0);
@@ -667,9 +587,8 @@ function formatDateForExcel(dateStr) {
             `HYDRA HRS: ${hydra.toFixed(2)} | FARANA HRS: ${faranaH.toFixed(2)} | FARANA DAYS: ${faranaD} | TOTAL ₹: ${totalAmt.toFixed(2)}`;
     }
 
-    // Populate dynamic filter dropdowns (contractor & assign sir & crane no) based on actual rows
+    // ---------- POPULATE FILTER DROPDOWNS ----------
     function populateFilterDropdowns() {
-        // unique values for contractor (normalized but display original case from rows? we show stored value)
         const contractors = [...new Set(rows.map(r => r.contractor).filter(v => v && v !== ""))];
         const assignList = [...new Set(rows.map(r => r.assign).filter(v => v && v !== ""))];
         const craneNos = [...new Set(rows.map(r => r.crane_no).filter(v => v && v !== ""))];
@@ -706,7 +625,6 @@ function formatDateForExcel(dateStr) {
     // ---- GOOGLE SHEET SAVE ----
     async function saveToGoogle() {
         const calc = calculateAndUpdate();
-        const todayFileName = "Bhavishya_" + new Date().toISOString().split("T")[0];
         const data = {
             work_date: document.getElementById("work_date").value,
             client_name: document.getElementById("client").value,
@@ -722,26 +640,53 @@ function formatDateForExcel(dateStr) {
             unit_type: document.getElementById("unit").value,
             rate: document.getElementById("rate").value,
             amount: document.getElementById("amount").value,
-            source_file: todayFileName
+            created_at: new Date().toISOString()
         };
+        
         const url = "https://script.google.com/macros/s/AKfycbxuKB739oBJnVgIAR56Uj7NtQHzOxNLK5xe_POv3mMC1ISKL5XkUqPCU-rqM32UIsN6/exec";
         try {
             const response = await fetch(url, { method: "POST", body: JSON.stringify(data) });
             const result = await response.json();
-            if (result.status === "success") alert("✅ Saved to Google Sheet!");
-            else alert("⚠️ Error: " + (result.message || "Unknown"));
+            if (result.status === "success") {
+                alert("✅ Saved to Google Sheet!");
+                addRowAfterSave(data);
+            } else {
+                alert("⚠️ Error: " + (result.message || "Unknown"));
+            }
         } catch (error) {
             alert("❌ Connection Error");
         }
     }
+    
+    function addRowAfterSave(data) {
+        let newRow = {
+            work_date: data.work_date,
+            client: norm(data.client_name),
+            contractor: norm(data.contractor_name),
+            crane_type: data.crane_type,
+            crane_no: data.crane_number,
+            assign: norm(data.assign_sir),
+            in_time: data.in_time,
+            out_time: data.out_time,
+            lunch: parseFloat(data.lunch_minutes || 0),
+            total_hours: parseFloat(data.total_hours || 0),
+            unit: data.unit_type,
+            rate: parseFloat(data.rate || 0),
+            amount: parseFloat(data.amount || 0),
+            po: data.po_code || ""
+        };
+        rows.push(newRow);
+        renderTable();
+        populateFilterDropdowns();
+    }
 
-    // Load from Google Sheet and sync rows
+    // ---- LOAD FROM GOOGLE SHEET ----
     async function loadFromGoogle() {
         const url = "https://script.google.com/macros/s/AKfycbxuKB739oBJnVgIAR56Uj7NtQHzOxNLK5xe_POv3mMC1ISKL5XkUqPCU-rqM32UIsN6/exec";
         try {
             const res = await fetch(url);
             const data = await res.json();
-            if (Array.isArray(data)) {
+            if (Array.isArray(data) && data.length > 0) {
                 rows = data.map(r => ({
                     work_date: r.work_date || "",
                     client: norm(r.client_name),
@@ -758,7 +703,9 @@ function formatDateForExcel(dateStr) {
                     amount: Number(r.amount || 0),
                     po: norm(r.po_code || "")
                 }));
-            } else { rows = []; }
+            } else {
+                rows = [];
+            }
         } catch(e) {
             console.warn("Could not load from Google, starting fresh");
             rows = [];
@@ -767,118 +714,160 @@ function formatDateForExcel(dateStr) {
         populateFilterDropdowns();
     }
 
-    // ---- EXPORT EXCEL ----
+    // ---- EXPORT EXCEL (Database Format) ----
     function exportExcel() {
         if (typeof XLSX === "undefined") { alert("Excel lib missing"); return; }
         const filtered = getFilteredRows();
         if (filtered.length === 0) { alert("No data to export"); return; }
+        
+        // Map to database column structure
         const exportData = filtered.map(r => ({
-            Date: r.work_date, Client: r.client, Contractor: r.contractor,
-            Crane_Type: r.crane_type, Crane_No: r.crane_no, Assign_Sir: r.assign,
-            In_Time: r.in_time, Out_Time: r.out_time, Lunch_Min: r.lunch,
-            Total_Hours: r.total_hours, Unit: r.unit, Rate: r.rate, Amount: r.amount, PO: r.po
+            work_date: r.work_date,
+            client_name: r.client,
+            contractor_name: r.contractor,
+            crane_type: r.crane_type,
+            po_code: r.po,
+            crane_number: r.crane_no,
+            assign_sir: r.assign,
+            in_time: formatTimeForExport(r.in_time),
+            out_time: formatTimeForExport(r.out_time),
+            lunch_minutes: r.lunch,
+            total_hours: r.total_hours,
+            unit_type: r.unit,
+            rate: r.rate,
+            amount: r.amount,
+            created_at: new Date().toISOString()
         }));
+        
         const ws = XLSX.utils.json_to_sheet(exportData);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Worksheets");
-        XLSX.writeFile(wb, `Bhavishya_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
+        XLSX.utils.book_append_sheet(wb, ws, "Crane_Worksheets");
+        
+        const timestamp = new Date().toISOString().slice(0,19).replace(/:/g, '-');
+        XLSX.writeFile(wb, `Bhavishya_Worksheet_${timestamp}.xlsx`);
+        alert(`✅ Exported ${filtered.length} records to Excel`);
+    }
+    
+    function formatTimeForExport(timeVal) {
+        if (!timeVal) return "";
+        let timeStr = String(timeVal).trim();
+        if (timeStr.match(/^\d{2}:\d{2}$/)) return timeStr + ":00";
+        if (timeStr.match(/^\d{2}:\d{2}:\d{2}$/)) return timeStr;
+        return timeStr;
     }
 
-    // ============== FIXED PDF GENERATION - NO OVERLAP ==============
+    // ---- EXPORT CSV (Database Import Format) ----
+    function exportCSV() {
+        const filtered = getFilteredRows();
+        if (filtered.length === 0) { alert("No data to export"); return; }
+        
+        const headers = [
+            "work_date", "client_name", "contractor_name", "crane_type", 
+            "po_code", "crane_number", "assign_sir", "in_time", "out_time",
+            "lunch_minutes", "total_hours", "unit_type", "rate", "amount", "created_at"
+        ];
+        
+        const csvRows = [headers.join(",")];
+        
+        filtered.forEach(r => {
+            const row = [
+                r.work_date,
+                `"${r.client}"`,
+                `"${r.contractor}"`,
+                r.crane_type,
+                r.po,
+                r.crane_no,
+                `"${r.assign}"`,
+                formatTimeForExport(r.in_time),
+                formatTimeForExport(r.out_time),
+                r.lunch,
+                r.total_hours,
+                r.unit,
+                r.rate,
+                r.amount,
+                new Date().toISOString()
+            ];
+            csvRows.push(row.join(","));
+        });
+        
+        const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `Bhavishya_Export_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        alert(`✅ Exported ${filtered.length} records to CSV for database import`);
+    }
+
+    // ---- PDF GENERATION ----
     async function generatePDF() {
         const { jsPDF } = window.jspdf;
         const filtered = getFilteredRows();
         if (filtered.length === 0) { alert("No records to export"); return; }
         
-        // Create landscape A4
         const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        const pageWidth = doc.internal.pageSize.getWidth();   // ~297mm
+        const pageWidth = doc.internal.pageSize.getWidth();
         const marginLeft = 8;
-        const marginRight = 8;
-        const usableWidth = pageWidth - marginLeft - marginRight;
+        const usableWidth = pageWidth - marginLeft - 8;
         
-        // Define column headers and proportional widths (total 100%)
         const columns = [
-            { header: "Date", key: "date", width: 10 },
-            { header: "Client", key: "client", width: 12 },
-            { header: "Contractor", key: "contractor", width: 12 },
-            { header: "Crane Type", key: "craneType", width: 10 },
-            { header: "Crane No", key: "craneNo", width: 11 },
-            { header: "Assign", key: "assign", width: 10 },
-            { header: "In", key: "in", width: 7 },
-            { header: "Out", key: "out", width: 7 },
-            { header: "Lunch", key: "lunch", width: 7 },
-            { header: "Hours", key: "hours", width: 8 },
-            { header: "Unit", key: "unit", width: 8 },
-            { header: "Rate", key: "rate", width: 9 },
-            { header: "Amount", key: "amount", width: 11 },
-            { header: "PO", key: "po", width: 10 }
+            { header: "Date", width: 12 }, { header: "Client", width: 15 },
+            { header: "Contractor", width: 15 }, { header: "Crane Type", width: 12 },
+            { header: "Crane No", width: 12 }, { header: "Assign", width: 12 },
+            { header: "In", width: 10 }, { header: "Out", width: 10 },
+            { header: "Lunch", width: 8 }, { header: "Hours", width: 10 },
+            { header: "Unit", width: 8 }, { header: "Rate", width: 10 },
+            { header: "Amount", width: 12 }, { header: "PO", width: 12 }
         ];
         
-        // Calculate exact column positions based on usableWidth
         let totalPercent = columns.reduce((sum, col) => sum + col.width, 0);
-        let colX = [];
+        let colPositions = [];
         let currentX = marginLeft;
         for (let i = 0; i < columns.length; i++) {
             let colW = (columns[i].width / totalPercent) * usableWidth;
-            colX.push({ x: currentX, width: colW });
+            colPositions.push({ x: currentX, width: colW });
             currentX += colW;
         }
         
         const rowHeight = 7;
         let y = 20;
         
-        // Helper to draw header row
         function drawHeader(yPos) {
             doc.setFontSize(9);
             doc.setFont(undefined, "bold");
             for (let i = 0; i < columns.length; i++) {
-                let xPos = colX[i].x;
-                let w = colX[i].width;
-                doc.rect(xPos, yPos, w, rowHeight);
-                doc.text(columns[i].header, xPos + 1, yPos + 5);
+                doc.rect(colPositions[i].x, yPos, colPositions[i].width, rowHeight);
+                doc.text(columns[i].header, colPositions[i].x + 1, yPos + 5);
             }
         }
         
-        // Helper to draw data row
         function drawDataRow(rowData, yPos) {
             doc.setFontSize(8);
             doc.setFont(undefined, "normal");
-            for (let i = 0; i < columns.length; i++) {
-                let xPos = colX[i].x;
-                let w = colX[i].width;
-                let cellText = rowData[i] !== undefined ? String(rowData[i]) : "";
-                // Truncate long text to avoid overflow
+            for (let i = 0; i < rowData.length; i++) {
+                let cellText = String(rowData[i] || "");
                 if (cellText.length > 18) cellText = cellText.substring(0, 15) + "..";
-                doc.rect(xPos, yPos, w, rowHeight);
-                doc.text(cellText, xPos + 1, yPos + 5);
+                doc.rect(colPositions[i].x, yPos, colPositions[i].width, rowHeight);
+                doc.text(cellText, colPositions[i].x + 1, yPos + 5);
             }
         }
         
-        // Title
         doc.setFontSize(14);
         doc.setFont(undefined, "bold");
         doc.text("BHAVISHYA ENTERPRISE - CRANE WORKSHEET", pageWidth / 2, 12, { align: "center" });
-        doc.setFontSize(8);
-        doc.setFont(undefined, "normal");
-        let dateRange = "";
-        let fromDate = document.getElementById("pdf_from").value;
-        let toDate = document.getElementById("pdf_to").value;
-        if (fromDate || toDate) dateRange = `Period: ${fromDate || "START"} to ${toDate || "TODAY"}`;
-        else dateRange = `All Records (${filtered.length} entries)`;
-        doc.text(dateRange, pageWidth / 2, 18, { align: "center" });
         
         y = 26;
         drawHeader(y);
         y += rowHeight;
         
-        // summaries for footer
         let hydra = 0, faranaH = 0, faranaD = 0, totalAmt = 0;
         
-        // Loop rows with page break control
         for (let idx = 0; idx < filtered.length; idx++) {
             const r = filtered[idx];
-            // Check if we need new page (leaving 25mm for footer)
             if (y > 185) {
                 doc.addPage();
                 y = 18;
@@ -887,24 +876,13 @@ function formatDateForExcel(dateStr) {
             }
             
             let rowCells = [
-                formatDate(r.work_date),
-                r.client,
-                r.contractor,
-                r.crane_type,
-                r.crane_no,
-                r.assign,
-                formatTime(r.in_time),
-                formatTime(r.out_time),
-                r.lunch,
-                r.total_hours.toFixed(1),
-                r.unit,
-                r.rate,
-                r.amount.toFixed(2),
-                r.po
+                formatDate(r.work_date), r.client, r.contractor, r.crane_type,
+                r.crane_no, r.assign, formatTime(r.in_time), formatTime(r.out_time),
+                r.lunch, r.total_hours.toFixed(2), r.unit, r.rate,
+                r.amount.toFixed(2), r.po
             ];
             drawDataRow(rowCells, y);
             
-            // accumulate summaries
             totalAmt += r.amount;
             if (r.po === "9119720043") hydra += r.total_hours;
             if (r.po === "9719720185") faranaH += r.total_hours;
@@ -913,11 +891,10 @@ function formatDateForExcel(dateStr) {
             y += rowHeight;
         }
         
-        // Summary footer on last page
         y += 4;
         doc.setFontSize(9);
         doc.setFont(undefined, "bold");
-        doc.text("SUMMARY (Filtered Data):", marginLeft, y);
+        doc.text("SUMMARY:", marginLeft, y);
         y += 6;
         doc.setFontSize(8);
         doc.setFont(undefined, "normal");
@@ -927,20 +904,20 @@ function formatDateForExcel(dateStr) {
         y += 6;
         doc.setFont(undefined, "bold");
         doc.text(`TOTAL AMOUNT: ₹ ${totalAmt.toFixed(2)}`, marginLeft, y);
-        y += 8;
-        doc.setFontSize(7);
-        doc.setFont(undefined, "italic");
-        doc.text(`Generated on: ${new Date().toLocaleString()}`, marginLeft, y);
         
-        // Save PDF
         doc.save(`Bhavishya_Report_${new Date().toISOString().slice(0,10)}.pdf`);
     }
 
     function clearAll() {
-        if(confirm("Delete ALL records?")) { rows = []; renderTable(); populateFilterDropdowns(); }
+        if(confirm("Delete ALL records?")) { 
+            rows = []; 
+            renderTable(); 
+            populateFilterDropdowns();
+            alert("All records cleared!");
+        }
     }
 
-    // attach filter events
+    // Event listeners
     function attachFilters() {
         ["pdf_contractor","pdf_assign","pdf_crane_no","pdf_crane_type","pdf_from","pdf_to"].forEach(id => {
             let el = document.getElementById(id);
@@ -948,7 +925,6 @@ function formatDateForExcel(dateStr) {
         });
     }
     
-    // live calculation
     document.querySelectorAll("#in_time, #out_time, #lunch, #rate_type, #rate, #client, #crane_type").forEach(el => {
         if(el) el.addEventListener("input", () => calculateAndUpdate());
     });
