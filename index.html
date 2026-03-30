@@ -769,20 +769,64 @@ function formatDateForExcel(dateStr) {
 
     // ---- EXPORT EXCEL ----
     function exportExcel() {
-        if (typeof XLSX === "undefined") { alert("Excel lib missing"); return; }
-        const filtered = getFilteredRows();
-        if (filtered.length === 0) { alert("No data to export"); return; }
-        const exportData = filtered.map(r => ({
-            Date: r.work_date, Client: r.client, Contractor: r.contractor,
-            Crane_Type: r.crane_type, Crane_No: r.crane_no, Assign_Sir: r.assign,
-            In_Time: r.in_time, Out_Time: r.out_time, Lunch_Min: r.lunch,
-            Total_Hours: r.total_hours, Unit: r.unit, Rate: r.rate, Amount: r.amount, PO: r.po
-        }));
-        const ws = XLSX.utils.json_to_sheet(exportData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Worksheets");
-        XLSX.writeFile(wb, `Bhavishya_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
+    if (typeof XLSX === "undefined") {
+        alert("Excel library missing");
+        return;
     }
+
+    const filtered = getFilteredRows();
+    if (filtered.length === 0) {
+        alert("No data to export");
+        return;
+    }
+
+    // ✅ MATCH GOOGLE SHEET STRUCTURE EXACTLY
+    const exportData = filtered.map(r => ({
+        work_date: r.work_date,
+        client_name: r.client,
+        contractor_name: r.contractor,
+        crane_type: r.crane_type,
+        po_code: r.po,
+        crane_number: r.crane_no,
+        assign_sir: r.assign,
+        in_time: formatTime(r.in_time),
+        out_time: formatTime(r.out_time),
+        lunch_minutes: r.lunch,
+        total_hours: r.total_hours,
+        unit_type: r.unit,
+        rate: r.rate,
+        amount: r.amount,
+        source_file: "WEB_EXPORT",
+        created_at: new Date().toISOString()
+    }));
+
+    // ✅ KEEP COLUMN ORDER SAME
+    const headers = [
+        "work_date",
+        "client_name",
+        "contractor_name",
+        "crane_type",
+        "po_code",
+        "crane_number",
+        "assign_sir",
+        "in_time",
+        "out_time",
+        "lunch_minutes",
+        "total_hours",
+        "unit_type",
+        "rate",
+        "amount",
+        "source_file",
+        "created_at"
+    ];
+
+    const ws = XLSX.utils.json_to_sheet(exportData, { header: headers });
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Worksheet");
+
+    XLSX.writeFile(wb, `Bhavishya_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
 
     // ============== FIXED PDF GENERATION - NO OVERLAP ==============
     async function generatePDF() {
