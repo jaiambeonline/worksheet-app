@@ -3,221 +3,44 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Bhavishya Enterprise - Crane Worksheet (Fixed Filters)</title>
+<title>Bhavishya Enterprise - Crane Worksheet</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-* {
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Poppins', sans-serif;
-    background: #f1f5f9;
-    margin: 0;
-    padding: 16px 12px;
-}
-
-.app {
-    max-width: 420px;
-    margin: 0 auto;
-}
-
-.card {
-    background: white;
-    padding: 18px 16px;
-    border-radius: 24px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-    margin-bottom: 18px;
-    transition: all 0.2s;
-}
-
-.header {
-    background: linear-gradient(135deg, #1e3a8a, #0f2b6d);
-    color: white;
-    text-align: center;
-    padding: 20px 16px;
-    border-radius: 28px;
-}
-
-.header h2 {
-    margin: 0;
-    font-size: 1.4rem;
-    letter-spacing: -0.3px;
-}
-
-.header p {
-    margin: 5px 0;
-    font-size: 0.75rem;
-    opacity: 0.9;
-}
-
-input, select {
-    width: 100%;
-    padding: 12px 14px;
-    margin: 8px 0;
-    border-radius: 16px;
-    border: 1px solid #cbd5e1;
-    background: #ffffff;
-    font-size: 0.85rem;
-    font-family: inherit;
-    transition: 0.2s;
-}
-
-input:focus, select:focus {
-    outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-}
-
-button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 12px;
-    border: none;
-    border-radius: 40px;
-    font-weight: 600;
-    font-size: 0.85rem;
-    cursor: pointer;
-    font-family: inherit;
-    transition: all 0.2s;
-    background: #eef2ff;
-    color: #1e3a8a;
-}
-
-button.primary {
-    background: #2563eb;
-    color: white;
-    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
-}
-
-button.danger {
-    background: #dc2626;
-    color: white;
-}
-
-button.secondary {
-    background: #f1f5f9;
-    color: #1f2937;
-    border: 1px solid #cbd5e1;
-}
-
-.summary-box {
-    background: #eef2ff;
-    padding: 14px;
-    border-radius: 24px;
-    font-weight: 600;
-    font-size: 0.8rem;
-    text-align: center;
-    color: #0f2b6d;
-    margin-bottom: 14px;
-}
-
-.table-container {
-    max-height: 320px;
-    overflow-y: auto;
-    border-radius: 20px;
-    border: 1px solid #e2e8f0;
-    background: white;
-    margin-top: 12px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.7rem;
-    min-width: 700px;
-}
-
-th {
-    background: #1e3a8a;
-    color: white;
-    padding: 12px 6px;
-    position: sticky;
-    top: 0;
-    font-weight: 600;
-    font-size: 0.7rem;
-}
-
-td {
-    padding: 8px 5px;
-    border-bottom: 1px solid #e2e8f0;
-    color: #1e293b;
-}
-
-tr:nth-child(even) {
-    background: #f8fafc;
-}
-
-.filter-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 18px;
-    align-items: flex-end;
-}
-
-.filter-group {
-    flex: 1 1 160px;
-}
-
-.filter-group label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: #334155;
-    display: block;
-    margin-bottom: 4px;
-}
-
-.filter-group select, .filter-group input {
-    margin: 0;
-    padding: 8px 10px;
-    font-size: 0.8rem;
-}
-
-.date-group {
-    flex: 1 1 140px;
-}
-
+* { box-sizing: border-box; }
+body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; padding: 16px 12px; }
+.app { max-width: 420px; margin: 0 auto; }
+.card { background: white; padding: 18px 16px; border-radius: 24px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05); margin-bottom: 18px; }
+.header { background: linear-gradient(135deg, #1e3a8a, #0f2b6d); color: white; text-align: center; padding: 20px 16px; border-radius: 28px; }
+.header h2 { margin: 0; font-size: 1.4rem; }
+.header p { margin: 5px 0; font-size: 0.75rem; opacity: 0.9; }
+input, select { width: 100%; padding: 12px 14px; margin: 8px 0; border-radius: 16px; border: 1px solid #cbd5e1; font-size: 0.85rem; font-family: inherit; }
+input:focus, select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.2); }
+button { width: 100%; padding: 12px; margin-top: 12px; border: none; border-radius: 40px; font-weight: 600; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: 0.2s; }
+button.primary { background: #2563eb; color: white; }
+button.danger { background: #dc2626; color: white; }
+button.secondary { background: #f1f5f9; color: #1f2937; border: 1px solid #cbd5e1; }
+button.success { background: #16a34a; color: white; }
+.summary-box { background: #eef2ff; padding: 14px; border-radius: 24px; font-weight: 600; font-size: 0.8rem; text-align: center; color: #0f2b6d; margin-bottom: 14px; }
+.table-container { max-height: 320px; overflow-y: auto; border-radius: 20px; border: 1px solid #e2e8f0; background: white; margin-top: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.7rem; min-width: 700px; }
+th { background: #1e3a8a; color: white; padding: 12px 6px; position: sticky; top: 0; font-weight: 600; }
+td { padding: 8px 5px; border-bottom: 1px solid #e2e8f0; }
+tr:nth-child(even) { background: #f8fafc; }
+.filter-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; align-items: flex-end; }
+.filter-group { flex: 1 1 160px; }
+.filter-group label { font-size: 0.7rem; font-weight: 600; color: #334155; display: block; margin-bottom: 4px; }
+.filter-group select, .filter-group input { margin: 0; padding: 8px 10px; font-size: 0.8rem; }
+.date-group { flex: 1 1 140px; }
+.button-group { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+.button-group button { flex: 1; margin-top: 0; }
 @media (min-width: 760px) {
-    .app {
-        max-width: 1280px;
-    }
-    .dashboard-grid {
-        display: grid;
-        grid-template-columns: 380px 1fr;
-        gap: 22px;
-        align-items: start;
-    }
-    table {
-        font-size: 0.8rem;
-        min-width: auto;
-    }
-    th, td {
-        padding: 10px 8px;
-    }
-    .filter-row {
-        flex-wrap: nowrap;
-    }
+    .app { max-width: 1280px; }
+    .dashboard-grid { display: grid; grid-template-columns: 380px 1fr; gap: 22px; align-items: start; }
+    table { font-size: 0.8rem; min-width: auto; }
+    th, td { padding: 10px 8px; }
+    .filter-row { flex-wrap: nowrap; }
 }
-
-.error-message {
-    color: #dc2626;
-    background: #fee2e2;
-    padding: 8px;
-    border-radius: 40px;
-    text-align: center;
-    font-size: 0.75rem;
-    margin-top: 12px;
-    display: none;
-}
-
-.badge {
-    background: #d9f99d;
-    color: #365314;
-    font-size: 0.7rem;
-    padding: 2px 8px;
-    border-radius: 40px;
-}
+.error-message { color: #dc2626; background: #fee2e2; padding: 8px; border-radius: 40px; text-align: center; font-size: 0.75rem; margin-top: 12px; display: none; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -229,10 +52,7 @@ tr:nth-child(even) {
     <div id="loginScreen" class="card" style="text-align:center;">
         <div style="font-weight:800; font-size:22px; margin-bottom:12px;">🏗️ BHAVISHYA ENTERPRISE</div>
         <div style="font-size:12px; color:#334155; margin:8px 0;">
-            Shop No 5, T M Park, Mukund Parnera<br>
-            Valsad - 396020<br>
-            📞 8866995757<br>
-            ✉️ bhavishyaenterprisevalsad@gmail.com
+            Shop No 5, T M Park, Mukund Parnera<br>Valsad - 396020<br>📞 8866995757<br>✉️ bhavishyaenterprisevalsad@gmail.com
         </div>
         <h3 style="margin:20px 0 10px;">🔐 Login</h3>
         <input type="password" id="password" placeholder="Enter Password" style="text-align:center;">
@@ -240,7 +60,7 @@ tr:nth-child(even) {
         <div id="errorMsg" class="error-message">❌ Incorrect Password</div>
     </div>
 
-    <!-- MAIN APP (hidden initially) -->
+    <!-- MAIN APP -->
     <div id="mainApp" style="display:none;">
         <div class="card header">
             <h2>🏗️ BHAVISHYA ENTERPRISE</h2>
@@ -250,29 +70,22 @@ tr:nth-child(even) {
         </div>
 
         <div class="dashboard-grid">
-            <!-- LEFT: ENTRY FORM -->
             <div class="card">
                 <h3 style="margin:0 0 12px 0;">📋 Worksheet Entry</h3>
                 <input type="date" id="work_date">
                 <input id="client" placeholder="Client Name" autocomplete="off">
                 <input id="contractor" placeholder="Contractor Name" autocomplete="off">
-                <select id="crane_type">
-                    <option>HYDRA</option>
-                    <option>FARANA</option>
-                </select>
+                <select id="crane_type"><option>HYDRA</option><option>FARANA</option></select>
                 <select id="crane_no">
                     <option>GJ15SV1249</option><option>GJ15SV1677</option><option>GJ15SV1316</option>
                     <option>GJ15SV0869</option><option>GJ15SV1112</option><option>GJ15SV1569</option>
                     <option>GJ15SV0443</option><option>GJ15BB8456</option>
                 </select>
-                <input id="assign" placeholder="Assign Sir (e.g., Viral, Mukesh)" autocomplete="off">
+                <input id="assign" placeholder="Assign Sir" autocomplete="off">
                 <input type="time" id="in_time">
                 <input type="time" id="out_time">
                 <input type="number" id="lunch" value="0" placeholder="Lunch (minutes)">
-                <select id="rate_type">
-                    <option>Hourly</option>
-                    <option>Fixed</option>
-                </select>
+                <select id="rate_type"><option>Hourly</option><option>Fixed</option></select>
                 <input type="number" id="rate" placeholder="Rate (₹)">
                 <input id="total_hours" placeholder="Total Hours" readonly style="background:#f1f5f9;">
                 <input id="unit" placeholder="Unit" readonly style="background:#f1f5f9;">
@@ -281,55 +94,26 @@ tr:nth-child(even) {
                 <button class="primary" onclick="saveToGoogle()" style="background:#0f3b2c;">📤 Save To Google Sheet</button>
             </div>
 
-            <!-- RIGHT: TABLE + FILTERS -->
             <div class="card">
                 <h4 style="margin:0 0 12px 0;">🔍 Filter Records</h4>
                 <div class="filter-row">
-                    <div class="filter-group">
-                        <label>👤 Contractor</label>
-                        <select id="pdf_contractor"><option value="">ALL</option></select>
-                    </div>
-                    <div class="filter-group">
-                        <label>👨‍💼 Assign Sir</label>
-                        <select id="pdf_assign"><option value="">ALL</option></select>
-                    </div>
-                    <div class="filter-group">
-                        <label>🚛 Crane No</label>
-                        <select id="pdf_crane_no"><option value="">ALL</option></select>
-                    </div>
-                    <div class="filter-group">
-                        <label>🏗️ Crane Type</label>
-                        <select id="pdf_crane_type"><option value="">ALL</option><option>HYDRA</option><option>FARANA</option></select>
-                    </div>
-                    <div class="filter-group date-group">
-                        <label>📅 From Date</label>
-                        <input type="date" id="pdf_from">
-                    </div>
-                    <div class="filter-group date-group">
-                        <label>📅 To Date</label>
-                        <input type="date" id="pdf_to">
-                    </div>
+                    <div class="filter-group"><label>👤 Contractor</label><select id="pdf_contractor"><option value="">ALL</option></select></div>
+                    <div class="filter-group"><label>👨‍💼 Assign Sir</label><select id="pdf_assign"><option value="">ALL</option></select></div>
+                    <div class="filter-group"><label>🚛 Crane No</label><select id="pdf_crane_no"><option value="">ALL</option></select></div>
+                    <div class="filter-group"><label>🏗️ Crane Type</label><select id="pdf_crane_type"><option value="">ALL</option><option>HYDRA</option><option>FARANA</option></select></div>
+                    <div class="filter-group date-group"><label>📅 From Date</label><input type="date" id="pdf_from"></div>
+                    <div class="filter-group date-group"><label>📅 To Date</label><input type="date" id="pdf_to"></div>
                 </div>
-
-                <div class="summary-box" id="summary">
-                    HYDRA HRS: 0 | FARANA HRS: 0 | FARANA DAYS: 0 | TOTAL ₹: 0
-                </div>
-
+                <div class="summary-box" id="summary">HYDRA HRS: 0 | FARANA HRS: 0 | FARANA DAYS: 0 | TOTAL ₹: 0</div>
                 <div class="table-container">
                     <table id="worksheetTable">
-                        <thead>
-                            <tr>
-                                <th>Date</th><th>Client</th><th>Contractor</th><th>Crane Type</th><th>Crane No</th>
-                                <th>Assign Sir</th><th>In</th><th>Out</th><th>Lunch</th><th>Hours</th>
-                                <th>Unit</th><th>Rate</th><th>Amount</th><th>PO</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>Date</th><th>Client</th><th>Contractor</th><th>Crane Type</th><th>Crane No</th><th>Assign Sir</th><th>In</th><th>Out</th><th>Lunch</th><th>Hours</th><th>Unit</th><th>Rate</th><th>Amount</th><th>PO</th></thead>
                         <tbody id="tableBody"></tbody>
                     </table>
                 </div>
-
-                <div style="display: flex; gap: 12px; margin-top: 16px;">
+                <div class="button-group">
                     <button class="primary" onclick="exportExcel()">📎 Export Excel</button>
+                    <button class="success" onclick="exportCSV()">📊 Export CSV</button>
                     <button class="primary" onclick="generatePDF()">📄 Export PDF</button>
                     <button class="danger" onclick="clearAll()">🗑️ Clear All</button>
                 </div>
@@ -339,285 +123,87 @@ tr:nth-child(even) {
 </div>
 
 <script>
-    // ----------------------------- PASSWORD -------------------------
-    const APP_PASSWORD = "bhavishya123";
-    function login() {
-        const pass = document.getElementById("password").value;
-        if(pass === APP_PASSWORD) {
-            document.getElementById("loginScreen").style.display = "none";
-            document.getElementById("mainApp").style.display = "block";
-            loadFromGoogle();  // load existing data after login
-        } else {
-            const errDiv = document.getElementById("errorMsg");
-            errDiv.style.display = "block";
-            setTimeout(() => errDiv.style.display = "none", 2000);
-        }
-    }
-    function logout() {
-        document.getElementById("mainApp").style.display = "none";
-        document.getElementById("loginScreen").style.display = "block";
-    }
+// Password
+const APP_PASSWORD = "bhavishya123";
+let rows = [];
 
-    // Global rows array
-    let rows = [];
+function norm(v) { return (v || "").toString().trim().toUpperCase(); }
+function cleanStr(v) { return (v || "").toString().trim(); }
 
-    // Helper: normalize text for comparison and unique filters
-    function norm(v) { return (v || "").toString().trim().toUpperCase(); }
-    function cleanStr(v) { return (v || "").toString().trim(); }
-
-    // ---------- CALCULATION (Hourly / Fixed + Atul special logic) ----------
-    function calculateAndUpdate() {
-        let client = document.getElementById("client").value.trim().toUpperCase();
-        let crane = document.getElementById("crane_type").value;
-        let inTime = document.getElementById("in_time").value;
-        let outTime = document.getElementById("out_time").value;
-        let lunch = parseFloat(document.getElementById("lunch").value || 0);
-        let rateType = document.getElementById("rate_type").value;
-        let rateField = document.getElementById("rate");
-
-        if (!inTime || !outTime) {
-            document.getElementById("total_hours").value = "";
-            document.getElementById("unit").value = "";
-            document.getElementById("amount").value = "";
-            return { po: "" };
-        }
-
-        let inDate = new Date("1970-01-01T" + inTime);
-        let outDate = new Date("1970-01-01T" + outTime);
-        if (outDate < inDate) outDate.setDate(outDate.getDate() + 1);
-        let hours = (outDate - inDate) / (1000 * 60 * 60);
-        hours = hours - (lunch / 60);
-        hours = Math.max(hours, 0);
-
-        let amount = 0;
-        let unit = "";
-        let po = "";
-
-        // ATUL LTD special logic
-        if (client === "ATUL LTD") {
-            rateField.readOnly = true;
-            if (crane === "HYDRA") {
-                rateField.value = 750;
-                unit = "HOURS";
-                amount = hours * 750;
-                po = "9119720043";
-            } else if (crane === "FARANA") {
-                if (hours < 7) {
-                    rateField.value = 1500;
-                    unit = "HOURS";
-                    amount = hours * 1500;
-                    po = "9719720185";
-                } else {
-                    rateField.value = 10000;
-                    unit = "DAY";
-                    amount = 10000;
-                    po = "9719720186";
-                }
-            }
-        } else {
-            rateField.readOnly = false;
-            let rate = parseFloat(rateField.value || 0);
-            if (rateType === "Hourly") {
-                unit = "HOURS";
-                amount = hours * rate;
-            } else {
-                unit = "FIXED";
-                amount = rate;
-            }
-            po = "";
-        }
-
-        document.getElementById("total_hours").value = hours.toFixed(2);
-        document.getElementById("unit").value = unit;
-        document.getElementById("amount").value = amount.toFixed(2);
-        return { po, hours, amount, unit };
-    }
-
-    // ---------- ADD ROW (push into rows) ----------
-    function addRow() {
-        let work_date = document.getElementById("work_date").value;
-        if (!work_date) { alert("Please select work date"); return; }
-        let client = cleanStr(document.getElementById("client").value);
-        if (!client) { alert("Client name required"); return; }
-
-        let calc = calculateAndUpdate();
-        // Inside addRow() function, ensure time values are stored properly:
-        let newRow = {
-            work_date: work_date,
-            client: norm(client),
-            contractor: norm(cleanStr(document.getElementById("contractor").value)),
-            crane_type: document.getElementById("crane_type").value,
-            crane_no: document.getElementById("crane_no").value,
-            assign: norm(cleanStr(document.getElementById("assign").value)),
-            // IMPORTANT: Store time exactly as entered (HH:MM format)
-            in_time: document.getElementById("in_time").value,  // This gives "13:30"
-            out_time: document.getElementById("out_time").value, // This gives "17:30"
-            lunch: parseFloat(document.getElementById("lunch").value || 0),
-            total_hours: parseFloat(document.getElementById("total_hours").value || 0),
-            unit: document.getElementById("unit").value,
-            rate: parseFloat(document.getElementById("rate").value || 0),
-            amount: parseFloat(document.getElementById("amount").value || 0),
-            po: calc.po || ""
-        };
-        rows.push(newRow);
-        renderTable();            // re-render with active filters
-        populateFilterDropdowns(); // update contractor/assign sir options dynamically
-        clearFormFields();        // optional: reset form but keep date?
-    }
-
-    function clearFormFields() {
-        document.getElementById("client").value = "";
-        document.getElementById("contractor").value = "";
-        document.getElementById("assign").value = "";
-        document.getElementById("in_time").value = "";
-        document.getElementById("out_time").value = "";
-        document.getElementById("lunch").value = "0";
-        document.getElementById("rate").value = "";
-        document.getElementById("total_hours").value = "";
-        document.getElementById("unit").value = "";
-        document.getElementById("amount").value = "";
-        document.getElementById("rate_type").value = "Hourly";
-        // keep crane_type and crane_no as default but can be reset
-    }
-
-    // ---------- FILTER LOGIC (FIXED: uses case-insensitive exact match for contractor & assign) ----------
-    function getFilteredRows() {
-        const contractorFilter = document.getElementById("pdf_contractor").value;
-        const assignFilter = document.getElementById("pdf_assign").value;
-        const craneNoFilter = document.getElementById("pdf_crane_no").value;
-        const craneTypeFilter = document.getElementById("pdf_crane_type").value;
-        const fromDate = document.getElementById("pdf_from").value;
-        const toDate = document.getElementById("pdf_to").value;
-
-        return rows.filter(r => {
-            // Contractor filter: if filter value is non-empty, compare normalized value
-            if (contractorFilter && norm(r.contractor) !== norm(contractorFilter)) return false;
-            // Assign Sir filter: critical fix - match exactly normalized assign field
-            if (assignFilter && norm(r.assign) !== norm(assignFilter)) return false;
-            // Crane No filter
-            if (craneNoFilter && norm(r.crane_no) !== norm(craneNoFilter)) return false;
-            // Crane type filter
-            if (craneTypeFilter && norm(r.crane_type) !== norm(craneTypeFilter)) return false;
-            // Date range
-            if (fromDate) {
-                let rowDate = new Date(r.work_date);
-                let from = new Date(fromDate);
-                if (rowDate < from) return false;
-            }
-            if (toDate) {
-                let rowDate = new Date(r.work_date);
-                let to = new Date(toDate);
-                to.setHours(23,59,59);
-                if (rowDate > to) return false;
-            }
-            return true;
-        });
-    }
-
-   // ============== DATE & TIME FORMATTING BLOCK ==============
-// Replace all existing formatDate and formatTime functions with these
-
-function formatDate(dateStr) {
-    if (!dateStr) return "";
-    try {
-        let d;
-        // Handle YYYY-MM-DD format (from input date)
-        if (typeof dateStr === 'string' && dateStr.match(/^\d{4}-\d{2}-\d{2}/)) {
-            d = new Date(dateStr);
-        }
-        // Handle DD/MM/YYYY format
-        else if (typeof dateStr === 'string' && dateStr.includes('/')) {
-            let parts = dateStr.split('/');
-            if (parts.length === 3) {
-                d = new Date(parts[2], parts[1] - 1, parts[0]);
-            } else {
-                d = new Date(dateStr);
-            }
-        }
-        else {
-            d = new Date(dateStr);
-        }
-        
-        if (isNaN(d.getTime())) return dateStr;
-        
-        let day = d.getDate().toString().padStart(2, '0');
-        let month = (d.getMonth() + 1).toString().padStart(2, '0');
-        let year = d.getFullYear();
-        return `${day}/${month}/${year}`;
-    } catch(e) {
+// ============== DATE PARSING - CONVERT ANY DATE FORMAT TO YYYY-MM-DD ==============
+function parseDateToYYYYMMDD(dateValue) {
+    if (!dateValue) return "";
+    
+    let dateStr = String(dateValue).trim();
+    
+    // Format 1: Already YYYY-MM-DD
+    if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
         return dateStr;
     }
-}
-
-// ============== FIXED TIME FORMATTING ==============
-function formatTime(timeVal) {
-    if (!timeVal) return "";
     
-    try {
-        // If timeVal is empty or undefined
-        if (!timeVal || timeVal === "") return "";
-        
-        // Convert to string and trim
-        let timeStr = String(timeVal).trim();
-        
-        // If it's already in HH:MM format (like "13:30")
-        if (timeStr.match(/^\d{2}:\d{2}$/)) {
-            return timeStr;
-        }
-        
-        // If it's in HH:MM:SS format (like "13:30:00")
-        if (timeStr.match(/^\d{2}:\d{2}:\d{2}$/)) {
-            let parts = timeStr.split(':');
-            return `${parts[0]}:${parts[1]}`;
-        }
-        
-        // Handle ISO format with T (like "2024-01-01T13:30:00")
-        if (timeStr.includes('T')) {
-            let timePart = timeStr.split('T')[1];
-            let parts = timePart.split(':');
-            if (parts.length >= 2) {
-                return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
-            }
-        }
-        
-        // Handle time as number (seconds or milliseconds)
-        if (!isNaN(parseFloat(timeStr)) && isFinite(timeStr)) {
-            let totalMinutes = parseFloat(timeStr);
-            let hours = Math.floor(totalMinutes / 60);
-            let minutes = Math.floor(totalMinutes % 60);
-            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-        }
-        
-        // If it's a Date object
-        if (timeVal instanceof Date && !isNaN(timeVal)) {
-            let hours = timeVal.getHours().toString().padStart(2, '0');
-            let minutes = timeVal.getMinutes().toString().padStart(2, '0');
-            return `${hours}:${minutes}`;
-        }
-        
-        // Try to parse as time string
-        let timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
-        if (timeMatch) {
-            let hours = timeMatch[1].padStart(2, '0');
-            let minutes = timeMatch[2];
-            return `${hours}:${minutes}`;
-        }
-        
-        // Last resort - return first 5 characters if they look like time
-        if (timeStr.length >= 5 && timeStr[2] === ':') {
-            return timeStr.substring(0, 5);
-        }
-        
-        return timeStr;
-        
-    } catch(e) {
-        console.warn("Time formatting error:", e);
-        return String(timeVal || "");
+    // Format 2: DD/MM/YYYY or DD-MM-YYYY
+    if (dateStr.match(/^\d{2}[\/-]\d{2}[\/-]\d{4}$/)) {
+        let parts = dateStr.split(/[\/-]/);
+        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
     }
+    
+    // Format 3: MM/DD/YYYY
+    if (dateStr.match(/^\d{1,2}\/\d{1,2}\/\d{4}$/)) {
+        let parts = dateStr.split('/');
+        // Check if it's likely MM/DD/YYYY
+        if (parseInt(parts[0]) <= 12) {
+            return `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
+        }
+    }
+    
+    // Format 4: Try parsing with Date object
+    try {
+        let d = new Date(dateStr);
+        if (!isNaN(d.getTime())) {
+            let year = d.getFullYear();
+            let month = (d.getMonth() + 1).toString().padStart(2, '0');
+            let day = d.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+    } catch(e) {}
+    
+    return dateStr;
 }
 
-// For Excel export - ensure dates are in proper format
-function formatDateForExcel(dateStr) {
+// ============== TIME PARSING - HANDLES BOTH FORMATS ==============
+function parseTimeToHHMM(timeValue) {
+    if (!timeValue) return "";
+    let timeStr = String(timeValue).trim();
+    
+    // Format 1: HH:MM (perfect)
+    if (timeStr.match(/^\d{2}:\d{2}$/)) return timeStr;
+    
+    // Format 2: HH:MM:SS
+    if (timeStr.match(/^\d{2}:\d{2}:\d{2}$/)) {
+        let parts = timeStr.split(':');
+        return `${parts[0]}:${parts[1]}`;
+    }
+    
+    // Format 3: Datetime format like "1899-12-30T08:08:50.000Z"
+    if (timeStr.includes('T') || timeStr.includes('Z')) {
+        try {
+            let dateObj = new Date(timeStr);
+            if (!isNaN(dateObj.getTime())) {
+                let hours = dateObj.getUTCHours().toString().padStart(2, '0');
+                let minutes = dateObj.getUTCMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
+            }
+        } catch(e) {}
+    }
+    
+    // Format 4: Any HH:MM pattern
+    let timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
+    if (timeMatch) return `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
+    
+    return "";
+}
+
+function formatDateForDisplay(dateStr) {
     if (!dateStr) return "";
     try {
         let d = new Date(dateStr);
@@ -626,161 +212,362 @@ function formatDateForExcel(dateStr) {
         let month = (d.getMonth() + 1).toString().padStart(2, '0');
         let year = d.getFullYear();
         return `${day}/${month}/${year}`;
-    } catch(e) {
-        return dateStr;
+    } catch(e) { return dateStr; }
+}
+
+function formatTimeDisplay(timeVal) {
+    if (!timeVal) return "";
+    let timeStr = String(timeVal).trim();
+    if (timeStr.match(/^\d{2}:\d{2}$/)) return timeStr;
+    if (timeStr.match(/^\d{2}:\d{2}:\d{2}$/)) {
+        let parts = timeStr.split(':');
+        return `${parts[0]}:${parts[1]}`;
+    }
+    let timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
+    if (timeMatch) return `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
+    return timeStr;
+}
+
+// ============== SORT ROWS BY DATE (NEWEST FIRST OR OLDEST FIRST) ==============
+function sortRowsByDate(rowsArray) {
+    return [...rowsArray].sort((a, b) => {
+        let dateA = new Date(a.work_date);
+        let dateB = new Date(b.work_date);
+        // Sort by date descending (newest first) - change to dateA - dateB for oldest first
+        return dateB - dateA;
+    });
+}
+
+// ---------- CALCULATION ----------
+function calculateAndUpdate() {
+    let client = document.getElementById("client").value.trim().toUpperCase();
+    let crane = document.getElementById("crane_type").value;
+    let inTime = document.getElementById("in_time").value;
+    let outTime = document.getElementById("out_time").value;
+    let lunch = parseFloat(document.getElementById("lunch").value || 0);
+    let rateType = document.getElementById("rate_type").value;
+    let rateField = document.getElementById("rate");
+
+    if (!inTime || !outTime) {
+        document.getElementById("total_hours").value = "";
+        document.getElementById("unit").value = "";
+        document.getElementById("amount").value = "";
+        return { po: "" };
+    }
+
+    let inDate = new Date("1970-01-01T" + inTime);
+    let outDate = new Date("1970-01-01T" + outTime);
+    if (outDate < inDate) outDate.setDate(outDate.getDate() + 1);
+    let hours = (outDate - inDate) / (1000 * 60 * 60);
+    hours = hours - (lunch / 60);
+    hours = Math.max(hours, 0);
+
+    let amount = 0, unit = "", po = "";
+
+    if (client === "ATUL LTD") {
+        rateField.readOnly = true;
+        if (crane === "HYDRA") {
+            rateField.value = 750;
+            unit = "HOURS";
+            amount = hours * 750;
+            po = "9119720043";
+        } else if (crane === "FARANA") {
+            if (hours < 7) {
+                rateField.value = 1500;
+                unit = "HOURS";
+                amount = hours * 1500;
+                po = "9719720185";
+            } else {
+                rateField.value = 10000;
+                unit = "DAY";
+                amount = 10000;
+                po = "9719720186";
+            }
+        }
+    } else {
+        rateField.readOnly = false;
+        let rate = parseFloat(rateField.value || 0);
+        if (rateType === "Hourly") {
+            unit = "HOURS";
+            amount = hours * rate;
+        } else {
+            unit = "FIXED";
+            amount = rate;
+        }
+        po = "";
+    }
+
+    document.getElementById("total_hours").value = hours.toFixed(2);
+    document.getElementById("unit").value = unit;
+    document.getElementById("amount").value = amount.toFixed(2);
+    return { po, hours, amount, unit };
+}
+
+// ---------- ADD ROW ----------
+function addRow() {
+    let work_date = document.getElementById("work_date").value;
+    if (!work_date) { alert("Please select work date"); return; }
+    let client = cleanStr(document.getElementById("client").value);
+    if (!client) { alert("Client name required"); return; }
+    
+    let inTime = document.getElementById("in_time").value;
+    let outTime = document.getElementById("out_time").value;
+    if (!inTime || !outTime) { alert("Please select both In Time and Out Time"); return; }
+
+    let calc = calculateAndUpdate();
+    
+    let newRow = {
+        work_date: work_date,
+        client: norm(client),
+        contractor: norm(cleanStr(document.getElementById("contractor").value)),
+        crane_type: document.getElementById("crane_type").value,
+        crane_no: document.getElementById("crane_no").value,
+        assign: norm(cleanStr(document.getElementById("assign").value)),
+        in_time: inTime,
+        out_time: outTime,
+        lunch: parseFloat(document.getElementById("lunch").value || 0),
+        total_hours: parseFloat(document.getElementById("total_hours").value || 0),
+        unit: document.getElementById("unit").value,
+        rate: parseFloat(document.getElementById("rate").value || 0),
+        amount: parseFloat(document.getElementById("amount").value || 0),
+        po: calc.po || ""
+    };
+    
+    rows.push(newRow);
+    // Sort rows after adding
+    rows = sortRowsByDate(rows);
+    renderTable();
+    populateFilterDropdowns();
+    
+    document.getElementById("client").value = "";
+    document.getElementById("contractor").value = "";
+    document.getElementById("assign").value = "";
+    document.getElementById("in_time").value = "";
+    document.getElementById("out_time").value = "";
+    document.getElementById("lunch").value = "0";
+    document.getElementById("rate").value = "";
+}
+
+function getFilteredRows() {
+    const contractorFilter = document.getElementById("pdf_contractor").value;
+    const assignFilter = document.getElementById("pdf_assign").value;
+    const craneNoFilter = document.getElementById("pdf_crane_no").value;
+    const craneTypeFilter = document.getElementById("pdf_crane_type").value;
+    const fromDate = document.getElementById("pdf_from").value;
+    const toDate = document.getElementById("pdf_to").value;
+
+    let filtered = rows.filter(r => {
+        if (contractorFilter && norm(r.contractor) !== norm(contractorFilter)) return false;
+        if (assignFilter && norm(r.assign) !== norm(assignFilter)) return false;
+        if (craneNoFilter && norm(r.crane_no) !== norm(craneNoFilter)) return false;
+        if (craneTypeFilter && norm(r.crane_type) !== norm(craneTypeFilter)) return false;
+        if (fromDate) {
+            let rowDate = new Date(r.work_date);
+            let from = new Date(fromDate);
+            if (rowDate < from) return false;
+        }
+        if (toDate) {
+            let rowDate = new Date(r.work_date);
+            let to = new Date(toDate);
+            to.setHours(23,59,59);
+            if (rowDate > to) return false;
+        }
+        return true;
+    });
+    
+    // Sort filtered results by date
+    return sortRowsByDate(filtered);
+}
+
+function renderTable() {
+    const filtered = getFilteredRows();
+    const tbody = document.getElementById("tableBody");
+    if (!tbody) return;
+
+    tbody.innerHTML = filtered.map(r => `
+        <tr>
+            <td>${formatDateForDisplay(r.work_date)}</td>
+            <td>${r.client}</td>
+            <td>${r.contractor}</td>
+            <td>${r.crane_type}</td>
+            <td>${r.crane_no}</td>
+            <td>${r.assign}</td>
+            <td>${formatTimeDisplay(r.in_time)}</td>
+            <td>${formatTimeDisplay(r.out_time)}</td>
+            <td>${r.lunch}</td>
+            <td>${r.total_hours}</td>
+            <td>${r.unit}</td>
+            <td>${r.rate}</td>
+            <td>${r.amount.toFixed(2)}</td>
+            <td>${r.po}</td>
+        </tr>
+    `).join("");
+
+    let hydra = 0, faranaH = 0, faranaD = 0, totalAmt = 0;
+    filtered.forEach(r => {
+        totalAmt += (r.amount || 0);
+        if (r.po === "9119720043") hydra += (r.total_hours || 0);
+        if (r.po === "9719720185") faranaH += (r.total_hours || 0);
+        if (r.po === "9719720186") faranaD += 1;
+    });
+    document.getElementById("summary").innerHTML = `HYDRA HRS: ${hydra.toFixed(2)} | FARANA HRS: ${faranaH.toFixed(2)} | FARANA DAYS: ${faranaD} | TOTAL ₹: ${totalAmt.toFixed(2)}`;
+}
+
+function populateFilterDropdowns() {
+    const contractors = [...new Set(rows.map(r => r.contractor).filter(v => v && v !== ""))];
+    const assignList = [...new Set(rows.map(r => r.assign).filter(v => v && v !== ""))];
+    const craneNos = [...new Set(rows.map(r => r.crane_no).filter(v => v && v !== ""))];
+
+    const contractorSelect = document.getElementById("pdf_contractor");
+    const assignSelect = document.getElementById("pdf_assign");
+    const craneNoSelect = document.getElementById("pdf_crane_no");
+
+    if (contractorSelect) {
+        let currentVal = contractorSelect.value;
+        contractorSelect.innerHTML = '<option value="">ALL</option>';
+        contractors.forEach(c => { contractorSelect.innerHTML += `<option value="${c}">${c}</option>`; });
+        if (currentVal && contractors.includes(currentVal)) contractorSelect.value = currentVal;
+        else contractorSelect.value = "";
+    }
+
+    if (assignSelect) {
+        let currentAssign = assignSelect.value;
+        assignSelect.innerHTML = '<option value="">ALL</option>';
+        assignList.forEach(a => { assignSelect.innerHTML += `<option value="${a}">${a}</option>`; });
+        if (currentAssign && assignList.includes(currentAssign)) assignSelect.value = currentAssign;
+        else assignSelect.value = "";
+    }
+
+    if (craneNoSelect) {
+        let currentCrane = craneNoSelect.value;
+        craneNoSelect.innerHTML = '<option value="">ALL</option>';
+        craneNos.forEach(cn => { craneNoSelect.innerHTML += `<option value="${cn}">${cn}</option>`; });
+        if (currentCrane && craneNos.includes(currentCrane)) craneNoSelect.value = currentCrane;
+        else craneNoSelect.value = "";
     }
 }
-    // Render table based on active filters
-    function renderTable() {
-        const filtered = getFilteredRows();
-        const tbody = document.getElementById("tableBody");
-        if (!tbody) return;
 
-        tbody.innerHTML = filtered.map(r => `
-            <tr>
-                <td>${formatDate(r.work_date)}</td>
-                <td>${r.client}</td>
-                <td>${r.contractor}</td>
-                <td>${r.crane_type}</td>
-                <td>${r.crane_no}</td>
-                <td>${r.assign}</td>
-                <td>${formatTime(r.in_time)}</td>
-                <td>${formatTime(r.out_time)}</td>
-                <td>${r.lunch}</td>
-                <td>${r.total_hours}</td>
-                <td>${r.unit}</td>
-                <td>${r.rate}</td>
-                <td>${r.amount.toFixed(2)}</td>
-                <td>${r.po}</td>
-            </tr>
-        `).join("");
-
-        // Summary based on filtered rows only
-        let hydra = 0, faranaH = 0, faranaD = 0, totalAmt = 0;
-        filtered.forEach(r => {
-            totalAmt += (r.amount || 0);
-            if (r.po === "9119720043") hydra += (r.total_hours || 0);
-            if (r.po === "9719720185") faranaH += (r.total_hours || 0);
-            if (r.po === "9719720186") faranaD += 1;
-        });
-        document.getElementById("summary").innerHTML = 
-            `HYDRA HRS: ${hydra.toFixed(2)} | FARANA HRS: ${faranaH.toFixed(2)} | FARANA DAYS: ${faranaD} | TOTAL ₹: ${totalAmt.toFixed(2)}`;
+// ---- LOGIN FUNCTION ----
+function login() {
+    const pass = document.getElementById("password").value;
+    if(pass === APP_PASSWORD) {
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("mainApp").style.display = "block";
+        loadFromGoogle();
+    } else {
+        const errDiv = document.getElementById("errorMsg");
+        errDiv.style.display = "block";
+        setTimeout(() => errDiv.style.display = "none", 2000);
     }
+}
 
-    // Populate dynamic filter dropdowns (contractor & assign sir & crane no) based on actual rows
-    function populateFilterDropdowns() {
-        // unique values for contractor (normalized but display original case from rows? we show stored value)
-        const contractors = [...new Set(rows.map(r => r.contractor).filter(v => v && v !== ""))];
-        const assignList = [...new Set(rows.map(r => r.assign).filter(v => v && v !== ""))];
-        const craneNos = [...new Set(rows.map(r => r.crane_no).filter(v => v && v !== ""))];
+function logout() {
+    document.getElementById("mainApp").style.display = "none";
+    document.getElementById("loginScreen").style.display = "block";
+}
 
-        const contractorSelect = document.getElementById("pdf_contractor");
-        const assignSelect = document.getElementById("pdf_assign");
-        const craneNoSelect = document.getElementById("pdf_crane_no");
-
-        if (contractorSelect) {
-            let currentVal = contractorSelect.value;
-            contractorSelect.innerHTML = '<option value="">ALL</option>';
-            contractors.forEach(c => { contractorSelect.innerHTML += `<option value="${c}">${c}</option>`; });
-            if (currentVal && contractors.includes(currentVal)) contractorSelect.value = currentVal;
-            else contractorSelect.value = "";
+// ---- SAVE TO GOOGLE SHEET ----
+async function saveToGoogle() {
+    const calc = calculateAndUpdate();
+    
+    const data = {
+        work_date: document.getElementById("work_date").value,
+        client_name: document.getElementById("client").value,
+        contractor_name: document.getElementById("contractor").value,
+        crane_type: document.getElementById("crane_type").value,
+        po_code: calc.po || "",
+        crane_number: document.getElementById("crane_no").value,
+        assign_sir: document.getElementById("assign").value,
+        in_time: document.getElementById("in_time").value,
+        out_time: document.getElementById("out_time").value,
+        lunch_minutes: document.getElementById("lunch").value,
+        total_hours: document.getElementById("total_hours").value,
+        unit_type: document.getElementById("unit").value,
+        rate: document.getElementById("rate").value,
+        amount: document.getElementById("amount").value,
+        source_file: "Bhavishya_" + new Date().toISOString().split("T")[0],
+        created_at: new Date().toISOString()
+    };
+    
+    const url = "https://script.google.com/macros/s/AKfycbxuKB739oBJnVgIAR56Uj7NtQHzOxNLK5xe_POv3mMC1ISKL5XkUqPCU-rqM32UIsN6/exec";
+    try {
+        const response = await fetch(url, { method: "POST", body: JSON.stringify(data) });
+        const result = await response.json();
+        if (result.status === "success") {
+            alert("✅ Saved to Google Sheet!");
+            addRowAfterSave(data);
+        } else {
+            alert("⚠️ Error: " + (result.message || "Unknown"));
         }
-
-        if (assignSelect) {
-            let currentAssign = assignSelect.value;
-            assignSelect.innerHTML = '<option value="">ALL</option>';
-            assignList.forEach(a => { assignSelect.innerHTML += `<option value="${a}">${a}</option>`; });
-            if (currentAssign && assignList.includes(currentAssign)) assignSelect.value = currentAssign;
-            else assignSelect.value = "";
-        }
-
-        if (craneNoSelect) {
-            let currentCrane = craneNoSelect.value;
-            craneNoSelect.innerHTML = '<option value="">ALL</option>';
-            craneNos.forEach(cn => { craneNoSelect.innerHTML += `<option value="${cn}">${cn}</option>`; });
-            if (currentCrane && craneNos.includes(currentCrane)) craneNoSelect.value = currentCrane;
-            else craneNoSelect.value = "";
-        }
+    } catch (error) {
+        alert("❌ Connection Error");
     }
+}
 
-    // ---- GOOGLE SHEET SAVE ----
-    async function saveToGoogle() {
-        const calc = calculateAndUpdate();
-        const todayFileName = "Bhavishya_" + new Date().toISOString().split("T")[0];
-        const data = {
-            work_date: document.getElementById("work_date").value,
-            client_name: document.getElementById("client").value,
-            contractor_name: document.getElementById("contractor").value,
-            crane_type: document.getElementById("crane_type").value,
-            po_code: calc.po || "",
-            crane_number: document.getElementById("crane_no").value,
-            assign_sir: document.getElementById("assign").value,
-            in_time: document.getElementById("in_time").value,
-            out_time: document.getElementById("out_time").value,
-            lunch_minutes: document.getElementById("lunch").value,
-            total_hours: document.getElementById("total_hours").value,
-            unit_type: document.getElementById("unit").value,
-            rate: document.getElementById("rate").value,
-            amount: document.getElementById("amount").value,
-            source_file: todayFileName
-        };
-        const url = "https://script.google.com/macros/s/AKfycbxuKB739oBJnVgIAR56Uj7NtQHzOxNLK5xe_POv3mMC1ISKL5XkUqPCU-rqM32UIsN6/exec";
-        try {
-            const response = await fetch(url, { method: "POST", body: JSON.stringify(data) });
-            const result = await response.json();
-            if (result.status === "success") alert("✅ Saved to Google Sheet!");
-            else alert("⚠️ Error: " + (result.message || "Unknown"));
-        } catch (error) {
-            alert("❌ Connection Error");
+function addRowAfterSave(data) {
+    let newRow = {
+        work_date: data.work_date,
+        client: norm(data.client_name),
+        contractor: norm(data.contractor_name),
+        crane_type: data.crane_type,
+        crane_no: data.crane_number,
+        assign: norm(data.assign_sir),
+        in_time: data.in_time,
+        out_time: data.out_time,
+        lunch: parseFloat(data.lunch_minutes || 0),
+        total_hours: parseFloat(data.total_hours || 0),
+        unit: data.unit_type,
+        rate: parseFloat(data.rate || 0),
+        amount: parseFloat(data.amount || 0),
+        po: data.po_code || ""
+    };
+    rows.push(newRow);
+    rows = sortRowsByDate(rows);
+    renderTable();
+    populateFilterDropdowns();
+}
+
+// ---- LOAD FROM GOOGLE SHEET ----
+async function loadFromGoogle() {
+    const url = "https://script.google.com/macros/s/AKfycbxuKB739oBJnVgIAR56Uj7NtQHzOxNLK5xe_POv3mMC1ISKL5XkUqPCU-rqM32UIsN6/exec";
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        if (Array.isArray(data) && data.length > 0) {
+            rows = data.map(r => ({
+                work_date: parseDateToYYYYMMDD(r.work_date),
+                client: norm(r.client_name),
+                contractor: norm(r.contractor_name),
+                crane_type: norm(r.crane_type),
+                crane_no: norm(r.crane_number),
+                assign: norm(r.assign_sir),
+                in_time: parseTimeToHHMM(r.in_time),
+                out_time: parseTimeToHHMM(r.out_time),
+                lunch: Number(r.lunch_minutes || 0),
+                total_hours: Number(r.total_hours || 0),
+                unit: norm(r.unit_type),
+                rate: Number(r.rate || 0),
+                amount: Number(r.amount || 0),
+                po: norm(r.po_code || "")
+            }));
+            // Sort rows by date after loading
+            rows = sortRowsByDate(rows);
+            renderTable();
+            populateFilterDropdowns();
         }
+    } catch(e) {
+        console.error("Failed to load from Google:", e);
+        rows = [];
     }
+}
 
-    // Load from Google Sheet and sync rows
-    async function loadFromGoogle() {
-        const url = "https://script.google.com/macros/s/AKfycbxuKB739oBJnVgIAR56Uj7NtQHzOxNLK5xe_POv3mMC1ISKL5XkUqPCU-rqM32UIsN6/exec";
-        try {
-            const res = await fetch(url);
-            const data = await res.json();
-            if (Array.isArray(data)) {
-                rows = data.map(r => ({
-                    work_date: r.work_date || "",
-                    client: norm(r.client_name),
-                    contractor: norm(r.contractor_name),
-                    crane_type: norm(r.crane_type),
-                    crane_no: norm(r.crane_number),
-                    assign: norm(r.assign_sir),
-                    in_time: r.in_time || "",
-                    out_time: r.out_time || "",
-                    lunch: Number(r.lunch_minutes || 0),
-                    total_hours: Number(r.total_hours || 0),
-                    unit: norm(r.unit_type),
-                    rate: Number(r.rate || 0),
-                    amount: Number(r.amount || 0),
-                    po: norm(r.po_code || "")
-                }));
-            } else { rows = []; }
-        } catch(e) {
-            console.warn("Could not load from Google, starting fresh");
-            rows = [];
-        }
-        renderTable();
-        populateFilterDropdowns();
-    }
-
-    // ---- EXPORT EXCEL ----
-    function exportExcel() {
-    if (typeof XLSX === "undefined") {
-        alert("Excel library missing");
-        return;
-    }
-
+// ---- EXPORT FUNCTIONS ----
+function exportExcel() {
+    if (typeof XLSX === "undefined") { alert("Excel lib missing"); return; }
     const filtered = getFilteredRows();
-    if (filtered.length === 0) {
-        alert("No data to export");
-        return;
-    }
-
-    // ✅ MATCH GOOGLE SHEET STRUCTURE EXACTLY
+    if (filtered.length === 0) { alert("No data to export"); return; }
+    
     const exportData = filtered.map(r => ({
         work_date: r.work_date,
         client_name: r.client,
@@ -789,218 +576,163 @@ function formatDateForExcel(dateStr) {
         po_code: r.po,
         crane_number: r.crane_no,
         assign_sir: r.assign,
-        in_time: formatTime(r.in_time),
-        out_time: formatTime(r.out_time),
+        in_time: r.in_time,
+        out_time: r.out_time,
         lunch_minutes: r.lunch,
         total_hours: r.total_hours,
         unit_type: r.unit,
         rate: r.rate,
-        amount: r.amount,
-        source_file: "WEB_EXPORT",
-        created_at: new Date().toISOString()
+        amount: r.amount
     }));
-
-    // ✅ KEEP COLUMN ORDER SAME
-    const headers = [
-        "work_date",
-        "client_name",
-        "contractor_name",
-        "crane_type",
-        "po_code",
-        "crane_number",
-        "assign_sir",
-        "in_time",
-        "out_time",
-        "lunch_minutes",
-        "total_hours",
-        "unit_type",
-        "rate",
-        "amount",
-        "source_file",
-        "created_at"
-    ];
-
-    const ws = XLSX.utils.json_to_sheet(exportData, { header: headers });
-
+    
+    const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Worksheet");
-
+    XLSX.utils.book_append_sheet(wb, ws, "Crane_Worksheets");
     XLSX.writeFile(wb, `Bhavishya_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
+    alert(`✅ Exported ${filtered.length} records`);
 }
 
-    // ============== FIXED PDF GENERATION - NO OVERLAP ==============
-    async function generatePDF() {
-        const { jsPDF } = window.jspdf;
-        const filtered = getFilteredRows();
-        if (filtered.length === 0) { alert("No records to export"); return; }
-        
-        // Create landscape A4
-        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        const pageWidth = doc.internal.pageSize.getWidth();   // ~297mm
-        const marginLeft = 8;
-        const marginRight = 8;
-        const usableWidth = pageWidth - marginLeft - marginRight;
-        
-        // Define column headers and proportional widths (total 100%)
-        const columns = [
-            { header: "Date", key: "date", width: 10 },
-            { header: "Client", key: "client", width: 12 },
-            { header: "Contractor", key: "contractor", width: 12 },
-            { header: "Crane Type", key: "craneType", width: 10 },
-            { header: "Crane No", key: "craneNo", width: 11 },
-            { header: "Assign", key: "assign", width: 10 },
-            { header: "In", key: "in", width: 7 },
-            { header: "Out", key: "out", width: 7 },
-            { header: "Lunch", key: "lunch", width: 7 },
-            { header: "Hours", key: "hours", width: 8 },
-            { header: "Unit", key: "unit", width: 8 },
-            { header: "Rate", key: "rate", width: 9 },
-            { header: "Amount", key: "amount", width: 11 },
-            { header: "PO", key: "po", width: 10 }
-        ];
-        
-        // Calculate exact column positions based on usableWidth
-        let totalPercent = columns.reduce((sum, col) => sum + col.width, 0);
-        let colX = [];
-        let currentX = marginLeft;
-        for (let i = 0; i < columns.length; i++) {
-            let colW = (columns[i].width / totalPercent) * usableWidth;
-            colX.push({ x: currentX, width: colW });
-            currentX += colW;
-        }
-        
-        const rowHeight = 7;
-        let y = 20;
-        
-        // Helper to draw header row
-        function drawHeader(yPos) {
-            doc.setFontSize(9);
-            doc.setFont(undefined, "bold");
-            for (let i = 0; i < columns.length; i++) {
-                let xPos = colX[i].x;
-                let w = colX[i].width;
-                doc.rect(xPos, yPos, w, rowHeight);
-                doc.text(columns[i].header, xPos + 1, yPos + 5);
-            }
-        }
-        
-        // Helper to draw data row
-        function drawDataRow(rowData, yPos) {
-            doc.setFontSize(8);
-            doc.setFont(undefined, "normal");
-            for (let i = 0; i < columns.length; i++) {
-                let xPos = colX[i].x;
-                let w = colX[i].width;
-                let cellText = rowData[i] !== undefined ? String(rowData[i]) : "";
-                // Truncate long text to avoid overflow
-                if (cellText.length > 18) cellText = cellText.substring(0, 15) + "..";
-                doc.rect(xPos, yPos, w, rowHeight);
-                doc.text(cellText, xPos + 1, yPos + 5);
-            }
-        }
-        
-        // Title
-        doc.setFontSize(14);
-        doc.setFont(undefined, "bold");
-        doc.text("BHAVISHYA ENTERPRISE - CRANE WORKSHEET", pageWidth / 2, 12, { align: "center" });
-        doc.setFontSize(8);
-        doc.setFont(undefined, "normal");
-        let dateRange = "";
-        let fromDate = document.getElementById("pdf_from").value;
-        let toDate = document.getElementById("pdf_to").value;
-        if (fromDate || toDate) dateRange = `Period: ${fromDate || "START"} to ${toDate || "TODAY"}`;
-        else dateRange = `All Records (${filtered.length} entries)`;
-        doc.text(dateRange, pageWidth / 2, 18, { align: "center" });
-        
-        y = 26;
-        drawHeader(y);
-        y += rowHeight;
-        
-        // summaries for footer
-        let hydra = 0, faranaH = 0, faranaD = 0, totalAmt = 0;
-        
-        // Loop rows with page break control
-        for (let idx = 0; idx < filtered.length; idx++) {
-            const r = filtered[idx];
-            // Check if we need new page (leaving 25mm for footer)
-            if (y > 185) {
-                doc.addPage();
-                y = 18;
-                drawHeader(y);
-                y += rowHeight;
-            }
-            
-            let rowCells = [
-                formatDate(r.work_date),
-                r.client,
-                r.contractor,
-                r.crane_type,
-                r.crane_no,
-                r.assign,
-                formatTime(r.in_time),
-                formatTime(r.out_time),
-                r.lunch,
-                r.total_hours.toFixed(1),
-                r.unit,
-                r.rate,
-                r.amount.toFixed(2),
-                r.po
-            ];
-            drawDataRow(rowCells, y);
-            
-            // accumulate summaries
-            totalAmt += r.amount;
-            if (r.po === "9119720043") hydra += r.total_hours;
-            if (r.po === "9719720185") faranaH += r.total_hours;
-            if (r.po === "9719720186") faranaD += 1;
-            
-            y += rowHeight;
-        }
-        
-        // Summary footer on last page
-        y += 4;
-        doc.setFontSize(9);
-        doc.setFont(undefined, "bold");
-        doc.text("SUMMARY (Filtered Data):", marginLeft, y);
-        y += 6;
-        doc.setFontSize(8);
-        doc.setFont(undefined, "normal");
-        doc.text(`HYDRA HOURS: ${hydra.toFixed(2)} hrs`, marginLeft, y);
-        doc.text(`FARANA HOURS: ${faranaH.toFixed(2)} hrs`, marginLeft + 55, y);
-        doc.text(`FARANA DAYS: ${faranaD}`, marginLeft + 110, y);
-        y += 6;
-        doc.setFont(undefined, "bold");
-        doc.text(`TOTAL AMOUNT: ₹ ${totalAmt.toFixed(2)}`, marginLeft, y);
-        y += 8;
-        doc.setFontSize(7);
-        doc.setFont(undefined, "italic");
-        doc.text(`Generated on: ${new Date().toLocaleString()}`, marginLeft, y);
-        
-        // Save PDF
-        doc.save(`Bhavishya_Report_${new Date().toISOString().slice(0,10)}.pdf`);
-    }
-
-    function clearAll() {
-        if(confirm("Delete ALL records?")) { rows = []; renderTable(); populateFilterDropdowns(); }
-    }
-
-    // attach filter events
-    function attachFilters() {
-        ["pdf_contractor","pdf_assign","pdf_crane_no","pdf_crane_type","pdf_from","pdf_to"].forEach(id => {
-            let el = document.getElementById(id);
-            if(el) el.addEventListener("change", () => renderTable());
-        });
-    }
+function exportCSV() {
+    const filtered = getFilteredRows();
+    if (filtered.length === 0) { alert("No data to export"); return; }
     
-    // live calculation
-    document.querySelectorAll("#in_time, #out_time, #lunch, #rate_type, #rate, #client, #crane_type").forEach(el => {
-        if(el) el.addEventListener("input", () => calculateAndUpdate());
+    const headers = ["work_date", "client_name", "contractor_name", "crane_type", "po_code", "crane_number", "assign_sir", "in_time", "out_time", "lunch_minutes", "total_hours", "unit_type", "rate", "amount"];
+    const csvRows = [headers.join(",")];
+    
+    filtered.forEach(r => {
+        const row = [
+            r.work_date, `"${r.client}"`, `"${r.contractor}"`, r.crane_type, r.po, r.crane_no,
+            `"${r.assign}"`, r.in_time, r.out_time, r.lunch, r.total_hours, r.unit, r.rate, r.amount
+        ];
+        csvRows.push(row.join(","));
     });
     
-    window.onload = () => {
-        attachFilters();
-        document.getElementById("rate")?.addEventListener("input", () => calculateAndUpdate());
-    };
+    const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Bhavishya_Export_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    alert(`✅ Exported ${filtered.length} records to CSV`);
+}
+
+// ---- PDF GENERATION ----
+async function generatePDF() {
+    const { jsPDF } = window.jspdf;
+    const filtered = getFilteredRows();
+    if (filtered.length === 0) { alert("No records to export"); return; }
+    
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const marginLeft = 8;
+    const usableWidth = pageWidth - marginLeft - 8;
+    
+    const columns = [
+        { header: "Date", width: 12 }, { header: "Client", width: 15 }, { header: "Contractor", width: 15 },
+        { header: "Crane Type", width: 12 }, { header: "Crane No", width: 12 }, { header: "Assign", width: 12 },
+        { header: "In", width: 10 }, { header: "Out", width: 10 }, { header: "Lunch", width: 8 },
+        { header: "Hours", width: 10 }, { header: "Unit", width: 8 }, { header: "Rate", width: 10 },
+        { header: "Amount", width: 12 }, { header: "PO", width: 12 }
+    ];
+    
+    let totalPercent = columns.reduce((sum, col) => sum + col.width, 0);
+    let colPositions = [];
+    let currentX = marginLeft;
+    for (let i = 0; i < columns.length; i++) {
+        let colW = (columns[i].width / totalPercent) * usableWidth;
+        colPositions.push({ x: currentX, width: colW });
+        currentX += colW;
+    }
+    
+    const rowHeight = 7;
+    let y = 20;
+    
+    function drawHeader(yPos) {
+        doc.setFontSize(9);
+        doc.setFont(undefined, "bold");
+        for (let i = 0; i < columns.length; i++) {
+            doc.rect(colPositions[i].x, yPos, colPositions[i].width, rowHeight);
+            doc.text(columns[i].header, colPositions[i].x + 1, yPos + 5);
+        }
+    }
+    
+    function drawDataRow(rowData, yPos) {
+        doc.setFontSize(8);
+        doc.setFont(undefined, "normal");
+        for (let i = 0; i < rowData.length; i++) {
+            let cellText = String(rowData[i] || "");
+            if (cellText.length > 18) cellText = cellText.substring(0, 15) + "..";
+            doc.rect(colPositions[i].x, yPos, colPositions[i].width, rowHeight);
+            doc.text(cellText, colPositions[i].x + 1, yPos + 5);
+        }
+    }
+    
+    doc.setFontSize(14);
+    doc.setFont(undefined, "bold");
+    doc.text("BHAVISHYA ENTERPRISE - CRANE WORKSHEET", pageWidth / 2, 12, { align: "center" });
+    
+    y = 26;
+    drawHeader(y);
+    y += rowHeight;
+    
+    let hydra = 0, faranaH = 0, faranaD = 0, totalAmt = 0;
+    
+    for (let idx = 0; idx < filtered.length; idx++) {
+        const r = filtered[idx];
+        if (y > 185) { doc.addPage(); y = 18; drawHeader(y); y += rowHeight; }
+        
+        let rowCells = [
+            formatDateForDisplay(r.work_date), r.client, r.contractor, r.crane_type, r.crane_no, r.assign,
+            formatTimeDisplay(r.in_time), formatTimeDisplay(r.out_time), r.lunch,
+            r.total_hours.toFixed(2), r.unit, r.rate, r.amount.toFixed(2), r.po
+        ];
+        drawDataRow(rowCells, y);
+        
+        totalAmt += r.amount;
+        if (r.po === "9119720043") hydra += r.total_hours;
+        if (r.po === "9719720185") faranaH += r.total_hours;
+        if (r.po === "9719720186") faranaD += 1;
+        y += rowHeight;
+    }
+    
+    y += 4;
+    doc.setFontSize(9);
+    doc.setFont(undefined, "bold");
+    doc.text("SUMMARY:", marginLeft, y);
+    y += 6;
+    doc.setFontSize(8);
+    doc.text(`HYDRA HOURS: ${hydra.toFixed(2)} hrs`, marginLeft, y);
+    doc.text(`FARANA HOURS: ${faranaH.toFixed(2)} hrs`, marginLeft + 55, y);
+    doc.text(`FARANA DAYS: ${faranaD}`, marginLeft + 110, y);
+    y += 6;
+    doc.setFont(undefined, "bold");
+    doc.text(`TOTAL AMOUNT: ₹ ${totalAmt.toFixed(2)}`, marginLeft, y);
+    
+    doc.save(`Bhavishya_Report_${new Date().toISOString().slice(0,10)}.pdf`);
+}
+
+function clearAll() {
+    if(confirm("Delete ALL records?")) { rows = []; renderTable(); populateFilterDropdowns(); alert("All records cleared!"); }
+}
+
+function attachFilters() {
+    ["pdf_contractor","pdf_assign","pdf_crane_no","pdf_crane_type","pdf_from","pdf_to"].forEach(id => {
+        let el = document.getElementById(id);
+        if(el) el.addEventListener("change", () => renderTable());
+    });
+}
+
+document.querySelectorAll("#in_time, #out_time, #lunch, #rate_type, #rate, #client, #crane_type").forEach(el => {
+    if(el) el.addEventListener("input", () => calculateAndUpdate());
+});
+
+window.onload = () => {
+    attachFilters();
+    document.getElementById("rate")?.addEventListener("input", () => calculateAndUpdate());
+};
 </script>
 </body>
 </html>
