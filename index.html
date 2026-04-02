@@ -79,7 +79,7 @@ tr:nth-child(even) { background: #f8fafc; }
                 <select id="crane_no">
                     <option>GJ15SV1249</option><option>GJ15SV1677</option><option>GJ15SV1316</option>
                     <option>GJ15SV0869</option><option>GJ15SV1112</option><option>GJ15SV1569</option>
-                    <option>GJ15SV0443</option><option>GJ15BB8456</option>
+                    <option>GJ15SV0443</option><option>GJ15BB8456</option><option>GJ15SV0726</option>
                 </select>
                 <input id="assign" placeholder="Assign Sir" autocomplete="off">
                 <input type="time" id="in_time">
@@ -133,41 +133,27 @@ function cleanStr(v) { return (v || "").toString().trim(); }
 // ============== DATE PARSING - CONVERT ANY DATE FORMAT TO YYYY-MM-DD ==============
 function parseDateToYYYYMMDD(dateValue) {
     if (!dateValue) return "";
-    
+
     let dateStr = String(dateValue).trim();
-    
-    // Format 1: Already YYYY-MM-DD
+
+    // Always treat as DD/MM/YYYY or DD-MM-YYYY
+    if (dateStr.match(/^\d{2}[\/-]\d{2}[\/-]\d{4}$/)) {
+        let parts = dateStr.split(/[\/-]/);
+        return `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+    }
+
+    // Already YYYY-MM-DD
     if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
         return dateStr;
     }
-    
-    // Format 2: DD/MM/YYYY or DD-MM-YYYY
-    if (dateStr.match(/^\d{2}[\/-]\d{2}[\/-]\d{4}$/)) {
-        let parts = dateStr.split(/[\/-]/);
-        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+
+    // fallback
+    let d = new Date(dateStr);
+    if (!isNaN(d.getTime())) {
+        return d.toISOString().split("T")[0];
     }
-    
-    // Format 3: MM/DD/YYYY
-    if (dateStr.match(/^\d{1,2}\/\d{1,2}\/\d{4}$/)) {
-        let parts = dateStr.split('/');
-        // Check if it's likely MM/DD/YYYY
-        if (parseInt(parts[0]) <= 12) {
-            return `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
-        }
-    }
-    
-    // Format 4: Try parsing with Date object
-    try {
-        let d = new Date(dateStr);
-        if (!isNaN(d.getTime())) {
-            let year = d.getFullYear();
-            let month = (d.getMonth() + 1).toString().padStart(2, '0');
-            let day = d.getDate().toString().padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-    } catch(e) {}
-    
-    return dateStr;
+
+    return "";
 }
 
 // ============== TIME PARSING - HANDLES BOTH FORMATS ==============
