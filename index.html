@@ -148,44 +148,40 @@ function parseDateToYYYYMMDD(dateValue) {
     return dateStr;
 }
 
-// ============== FIXED TIME PARSING - Handles Timezone Issue ==============
+// ============== TIME PARSING - HANDLES BOTH FORMATS ==============
 function parseTimeToHHMM(timeValue) {
     if (!timeValue) return "";
     let timeStr = String(timeValue).trim();
     
-    // Already HH:MM
+    // Format 1: HH:MM (perfect)
     if (timeStr.match(/^\d{2}:\d{2}$/)) return timeStr;
     
-    // HH:MM:SS
+    // Format 2: HH:MM:SS
     if (timeStr.match(/^\d{2}:\d{2}:\d{2}$/)) {
-        return timeStr.substring(0, 5);
+        let parts = timeStr.split(':');
+        return `${parts[0]}:${parts[1]}`;
     }
     
-    // Handle datetime strings like "1899-12-30T04:08:50.000Z"
-    // IMPORTANT: Extract the time directly without timezone conversion
-    if (timeStr.includes('T')) {
-        // Extract time part between T and Z or end
-        let timeMatch = timeStr.match(/T(\d{2}:\d{2}):\d{2}/);
-        if (timeMatch) {
-            return timeMatch[1];
-        }
-        // Try another pattern
-        let timeMatch2 = timeStr.match(/T(\d{2}:\d{2})/);
-        if (timeMatch2) {
-            return timeMatch2[1];
-        }
+    // Format 3: Datetime format like "1899-12-30T08:08:50.000Z"
+    if (timeStr.includes('T') || timeStr.includes('Z')) {
+        try {
+            let dateObj = new Date(timeStr);
+            if (!isNaN(dateObj.getTime())) {
+                let hours = dateObj.getUTCHours().toString().padStart(2, '0');
+                let minutes = dateObj.getUTCMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
+            }
+        } catch(e) {}
     }
     
-    // Try to find HH:MM pattern
-    let simpleMatch = timeStr.match(/(\d{2}):(\d{2})/);
-    if (simpleMatch) {
-        return `${simpleMatch[1]}:${simpleMatch[2]}`;
-    }
+    // Format 4: Any HH:MM pattern
+    let timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
+    if (timeMatch) return `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
     
     return "";
 }
 
-function formatDateForDisplay(dateStr) {
+function formatDate(dateStr) {
     if (!dateStr) return "";
     try {
         let d = new Date(dateStr);
@@ -201,9 +197,12 @@ function formatTimeDisplay(timeVal) {
     if (!timeVal) return "";
     let timeStr = String(timeVal).trim();
     if (timeStr.match(/^\d{2}:\d{2}$/)) return timeStr;
-    if (timeStr.match(/^\d{2}:\d{2}:\d{2}$/)) return timeStr.substring(0, 5);
-    let match = timeStr.match(/(\d{2}):(\d{2})/);
-    if (match) return `${match[1]}:${match[2]}`;
+    if (timeStr.match(/^\d{2}:\d{2}:\d{2}$/)) {
+        let parts = timeStr.split(':');
+        return `${parts[0]}:${parts[1]}`;
+    }
+    let timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
+    if (timeMatch) return `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
     return timeStr;
 }
 
