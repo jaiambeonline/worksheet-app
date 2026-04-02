@@ -136,18 +136,14 @@ function parseDateToYYYYMMDD(dateValue) {
 
     let dateStr = String(dateValue).trim();
 
-    // Always treat as DD/MM/YYYY or DD-MM-YYYY
-    if (dateStr.match(/^\d{2}[\/-]\d{2}[\/-]\d{4}$/)) {
-        let parts = dateStr.split(/[\/-]/);
-        return `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+    // ✅ Force DD/MM/YYYY (India format)
+    if (/^\d{2}[\/-]\d{2}[\/-]\d{4}$/.test(dateStr)) {
+        let [dd, mm, yyyy] = dateStr.split(/[\/-]/);
+        return `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
     }
 
-    // Already YYYY-MM-DD
-    if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        return dateStr;
-    }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
 
-    // fallback
     let d = new Date(dateStr);
     if (!isNaN(d.getTime())) {
         return d.toISOString().split("T")[0];
@@ -159,34 +155,52 @@ function parseDateToYYYYMMDD(dateValue) {
 // ============== TIME PARSING - HANDLES BOTH FORMATS ==============
 function parseTimeToHHMM(timeValue) {
     if (!timeValue) return "";
+
     let timeStr = String(timeValue).trim();
-    
-    // Format 1: HH:MM (perfect)
-    if (timeStr.match(/^\d{2}:\d{2}$/)) return timeStr;
-    
-    // Format 2: HH:MM:SS
-    if (timeStr.match(/^\d{2}:\d{2}:\d{2}$/)) {
-        let parts = timeStr.split(':');
-        return `${parts[0]}:${parts[1]}`;
+
+    // ✅ HH:MM
+    if (/^\d{2}:\d{2}$/.test(timeStr)) return timeStr;
+
+    // HH:MM:SS → HH:MM
+    if (/^\d{2}:\d{2}:\d{2}$/.test(timeStr)) {
+        let [h, m] = timeStr.split(":");
+        return `${h}:${m}`;
     }
-    
-    // Format 3: Datetime format like "1899-12-30T08:08:50.000Z"
-    if (timeStr.includes('T') || timeStr.includes('Z')) {
-        try {
-            let dateObj = new Date(timeStr);
-            if (!isNaN(dateObj.getTime())) {
-                let hours = dateObj.getUTCHours().toString().padStart(2, '0');
-                let minutes = dateObj.getUTCMinutes().toString().padStart(2, '0');
-                return `${hours}:${minutes}`;
-            }
-        } catch(e) {}
+
+    // ✅ FIX: Excel numeric time (MAIN BUG FIX)
+    if (!isNaN(timeStr)) {
+        let num = Number(timeStr);
+
+        if (num > 0 && num < 1) {
+            let totalMinutes = Math.round(num * 24 * 60);
+            let h = Math.floor(totalMinutes / 60);
+            let m = totalMinutes % 60;
+
+            return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+        }
     }
-    
-    // Format 4: Any HH:MM pattern
-    let timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
-    if (timeMatch) return `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
-    
+
+    // ISO format (Google Sheets)
+    if (timeStr.includes("T")) {
+        let d = new Date(timeStr);
+        if (!isNaN(d.getTime())) {
+            let h = d.getHours().toString().padStart(2,'0');
+            let m = d.getMinutes().toString().padStart(2,'0');
+            return `${h}:${m}`;
+        }
+    }
+
+    // fallback
+    let match = timeStr.match(/(\d{1,2}):(\d{2})/);
+    if (match) {
+        return `${match[1].padStart(2,'0')}:${match[2]}`;
+    }
+
     return "";
+}
+
+function isValidTime(t) {
+    return /^\d{2}:\d{2}$/.test(t);
 }
 
 function formatDateForDisplay(dateStr) {
@@ -234,7 +248,7 @@ function calculateAndUpdate() {
     let rateType = document.getElementById("rate_type").value;
     let rateField = document.getElementById("rate");
 
-    if (!inTime || !outTime) {
+    if (!isValidTime(inTime) || !isValidTime(outTime)) {
         document.getElementById("total_hours").value = "";
         document.getElementById("unit").value = "";
         document.getElementById("amount").value = "";
