@@ -20,6 +20,7 @@ button.primary { background: #2563eb; color: white; }
 button.danger { background: #dc2626; color: white; }
 button.secondary { background: #f1f5f9; color: #1f2937; border: 1px solid #cbd5e1; }
 button.success { background: #16a34a; color: white; }
+button.warning { background: #f59e0b; color: white; }
 .summary-box { background: #eef2ff; padding: 14px; border-radius: 24px; font-weight: 600; font-size: 0.8rem; text-align: center; color: #0f2b6d; margin-bottom: 14px; }
 .table-container { max-height: 400px; overflow-y: auto; border-radius: 20px; border: 1px solid #e2e8f0; background: white; margin-top: 12px; }
 table { width: 100%; border-collapse: collapse; font-size: 0.7rem; min-width: 700px; }
@@ -41,6 +42,7 @@ tr:nth-child(even) { background: #f8fafc; }
     .filter-row { flex-wrap: nowrap; }
 }
 .error-message { color: #dc2626; background: #fee2e2; padding: 8px; border-radius: 40px; text-align: center; font-size: 0.75rem; margin-top: 12px; display: none; }
+.fix-btn { background: #f59e0b; color: white; margin-top: 8px; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -114,6 +116,7 @@ tr:nth-child(even) { background: #f8fafc; }
                     <button class="primary" onclick="exportExcel()">📎 Export Excel</button>
                     <button class="success" onclick="exportCSV()">📊 Export CSV</button>
                     <button class="primary" onclick="generatePDF()">📄 Export PDF</button>
+                    <button class="warning" onclick="fixOldTimes()">🔧 Fix Old Time Data</button>
                     <button class="danger" onclick="clearAll()">🗑️ Clear All</button>
                 </div>
             </div>
@@ -129,31 +132,12 @@ let rows = [];
 function norm(v) { return (v || "").toString().trim().toUpperCase(); }
 function cleanStr(v) { return (v || "").toString().trim(); }
 
-// ============== DATE PARSING ==============
-function parseDateToYYYYMMDD(dateValue) {
-    if (!dateValue) return "";
-    let dateStr = String(dateValue).trim();
-    
-    if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) return dateStr;
-    if (dateStr.match(/^\d{2}[\/-]\d{2}[\/-]\d{4}$/)) {
-        let parts = dateStr.split(/[\/-]/);
-        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-    }
-    try {
-        let d = new Date(dateStr);
-        if (!isNaN(d.getTime())) {
-            return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
-        }
-    } catch(e) {}
-    return dateStr;
-}
-
-// ============== FIXED TIME PARSING - NO TIMEZONE CONVERSION ==============
-function parseTimeToHHMM(timeValue) {
+// ============== SMART TIME PARSING - DETECTS AND FIXES OFFSET ==============
+function parseTimeToHHMM(timeValue, recordDate = null) {
     if (!timeValue) return "";
     let timeStr = String(timeValue).trim();
     
-    // Already HH:MM
+    // Already HH:MM (perfect format like "13:30")
     if (timeStr.match(/^\d{2}:\d{2}$/)) return timeStr;
     
     // HH:MM:SS
@@ -162,12 +146,36 @@ function parseTimeToHHMM(timeValue) {
     }
     
     // Handle datetime strings like "1899-12-30T04:08:50.000Z"
-    // Extract time DIRECTLY without any timezone conversion
     if (timeStr.includes('T')) {
-        // Look for pattern T04:08:50
+        // Extract the raw time from the string
         let match = timeStr.match(/T(\d{2}:\d{2})/);
         if (match) {
-            return match[1];
+            let rawTime = match[1];
+            let hour = parseInt(rawTime.split(':')[0]);
+            
+            // If hour is between 00-05, it might be a UTC time that needs +5:30 for IST
+            // But check if this is a recent record (after March 29, 2026)
+            let needsFix = false;
+            if (recordDate) {
+                let date = new Date(recordDate);
+                let cutoffDate = new Date("2026-03-29");
+                // Records before March 29 might have UTC offset issue
+                if (date < cutoffDate && hour < 12) {
+                    needsFix = true;
+                }
+            }
+            
+            if (needsFix) {
+                // Add 5 hours 30 minutes for IST
+                let totalMinutes = hour * 60 + parseInt(rawTime.split(':')[1]);
+                totalMinutes += 330; // 5 hours 30 minutes
+                totalMinutes = totalMinutes % (24 * 60);
+                let newHour = Math.floor(totalMinutes / 60).toString().padStart(2, '0');
+                let newMinute = (totalMinutes % 60).toString().padStart(2, '0');
+                return `${newHour}:${newMinute}`;
+            }
+            
+            return rawTime;
         }
     }
     
@@ -178,6 +186,60 @@ function parseTimeToHHMM(timeValue) {
     }
     
     return "";
+}
+
+// Function to manually fix old time data
+function fixOldTimes() {
+    if(confirm("This will attempt to fix old time data (converting 04:08 to 09:38 etc). Continue?")) {
+        let fixedCount = 0;
+        rows = rows.map(row => {
+            let workDate = row.work_date;
+            let date = new Date(workDate);
+            let cutoffDate = new Date("2026-03-29");
+            
+            // Only fix records before March 29, 2026
+            if (date < cutoffDate) {
+                let oldInTime = row.in_time;
+                let oldOutTime = row.out_time;
+                
+                // Fix in_time
+                if (oldInTime && oldInTime.match(/^\d{2}:\d{2}$/)) {
+                    let hour = parseInt(oldInTime.split(':')[0]);
+                    if (hour < 12) {
+                        let totalMinutes = hour * 60 + parseInt(oldInTime.split(':')[1]);
+                        totalMinutes += 330;
+                        totalMinutes = totalMinutes % (24 * 60);
+                        let newHour = Math.floor(totalMinutes / 60).toString().padStart(2, '0');
+                        let newMinute = (totalMinutes % 60).toString().padStart(2, '0');
+                        row.in_time = `${newHour}:${newMinute}`;
+                        fixedCount++;
+                    }
+                }
+                
+                // Fix out_time
+                if (oldOutTime && oldOutTime.match(/^\d{2}:\d{2}$/)) {
+                    let hour = parseInt(oldOutTime.split(':')[0]);
+                    if (hour < 12) {
+                        let totalMinutes = hour * 60 + parseInt(oldOutTime.split(':')[1]);
+                        totalMinutes += 330;
+                        totalMinutes = totalMinutes % (24 * 60);
+                        let newHour = Math.floor(totalMinutes / 60).toString().padStart(2, '0');
+                        let newMinute = (totalMinutes % 60).toString().padStart(2, '0');
+                        row.out_time = `${newHour}:${newMinute}`;
+                        fixedCount++;
+                    }
+                }
+            }
+            return row;
+        });
+        
+        if (fixedCount > 0) {
+            renderTable();
+            alert(`✅ Fixed ${fixedCount} time entries! Please save to Google Sheet to update.`);
+        } else {
+            alert("No old time data found to fix.");
+        }
+    }
 }
 
 function formatDateForDisplay(dateStr) {
@@ -311,7 +373,6 @@ function addRow() {
     renderTable();
     populateFilterDropdowns();
     
-    // Clear form
     document.getElementById("client").value = "";
     document.getElementById("contractor").value = "";
     document.getElementById("assign").value = "";
@@ -502,7 +563,7 @@ function addRowAfterSave(data) {
     populateFilterDropdowns();
 }
 
-// ---- LOAD FROM GOOGLE SHEET (FIXED - NO TIMEZONE SHIFT) ----
+// ---- LOAD FROM GOOGLE SHEET WITH SMART PARSING ----
 async function loadFromGoogle() {
     const url = "https://script.google.com/macros/s/AKfycbxuKB739oBJnVgIAR56Uj7NtQHzOxNLK5xe_POv3mMC1ISKL5XkUqPCU-rqM32UIsN6/exec";
     try {
@@ -513,14 +574,12 @@ async function loadFromGoogle() {
         
         if (Array.isArray(data) && data.length > 0) {
             rows = data.map(r => {
-                // Parse time WITHOUT timezone conversion
-                let inTime = parseTimeToHHMM(r.in_time);
-                let outTime = parseTimeToHHMM(r.out_time);
-                
-                console.log(`Original: in="${r.in_time}", out="${r.out_time}" → Parsed: in="${inTime}", out="${outTime}"`);
+                let workDate = r.work_date;
+                let inTime = parseTimeToHHMM(r.in_time, workDate);
+                let outTime = parseTimeToHHMM(r.out_time, workDate);
                 
                 return {
-                    work_date: parseDateToYYYYMMDD(r.work_date),
+                    work_date: workDate || "",
                     client: norm(r.client_name),
                     contractor: norm(r.contractor_name),
                     crane_type: norm(r.crane_type),
