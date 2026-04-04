@@ -55,7 +55,8 @@ tr:nth-child(even) { background: #f8fafc; }
             Shop No 5, T M Park, Mukund Parnera<br>Valsad - 396020<br>📞 8866995757<br>✉️ bhavishyaenterprisevalsad@gmail.com
         </div>
         <h3 style="margin:20px 0 10px;">🔐 Login</h3>
-        <input type="password" id="password" placeholder="Enter Password" style="text-align:center;">
+        <input id="username" placeholder="Username" style="text-align:center;">
+        <input type="password" id="password" placeholder="Password" style="text-align:center;">
         <button class="primary" onclick="login()">Login</button>
         <div id="errorMsg" class="error-message">❌ Incorrect Password</div>
     </div>
@@ -124,7 +125,13 @@ tr:nth-child(even) { background: #f8fafc; }
 
 <script>
 // Password
-const APP_PASSWORD = "bhavishya123";
+const USERS = {
+    "admin": { password: "bhavishya123", role: "admin" },
+    "entry": { password: "be1234", role: "user" }
+};
+
+let currentRole = "";
+let currentUser = "";
 let rows = [];
 
 function norm(v) { return (v || "").toString().trim().toUpperCase(); }
@@ -463,11 +470,20 @@ function populateFilterDropdowns() {
 
 // ---- LOGIN FUNCTION ----
 function login() {
-    const pass = document.getElementById("password").value;
-    if(pass === APP_PASSWORD) {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (USERS[username] && USERS[username].password === password) {
+
+        currentRole = USERS[username].role;
+        currentUser = username;
+
         document.getElementById("loginScreen").style.display = "none";
         document.getElementById("mainApp").style.display = "block";
+
+        applyRolePermissions();
         loadFromGoogle();
+
     } else {
         const errDiv = document.getElementById("errorMsg");
         errDiv.style.display = "block";
@@ -478,6 +494,21 @@ function login() {
 function logout() {
     document.getElementById("mainApp").style.display = "none";
     document.getElementById("loginScreen").style.display = "block";
+}
+
+function applyRolePermissions() {
+
+    const exportExcelBtn = document.querySelector('[onclick="exportExcel()"]');
+    const exportCSVBtn = document.querySelector('[onclick="exportCSV()"]');
+    const pdfBtn = document.querySelector('[onclick="generatePDF()"]');
+    const clearBtn = document.querySelector('[onclick="clearAll()"]');
+
+    if (currentRole === "user") {
+        if (exportExcelBtn) exportExcelBtn.style.display = "none";
+        if (exportCSVBtn) exportCSVBtn.style.display = "none";
+        if (pdfBtn) pdfBtn.style.display = "none";
+        if (clearBtn) clearBtn.style.display = "none";
+    }
 }
 
 // ---- SAVE TO GOOGLE SHEET ----
@@ -578,10 +609,25 @@ async function loadFromGoogle() {
 
 // ---- EXPORT FUNCTIONS ----
 function exportExcel() {
-    if (typeof XLSX === "undefined") { alert("Excel lib missing"); return; }
+
+    // 🔒 Role check (IMPORTANT)
+    if (currentRole !== "admin") {
+        alert("❌ Access Denied");
+        return;
+    }
+
+    if (typeof XLSX === "undefined") {
+        alert("Excel lib missing");
+        return;
+    }
+
     const filtered = getFilteredRows();
-    if (filtered.length === 0) { alert("No data to export"); return; }
-    
+
+    if (filtered.length === 0) {
+        alert("No data to export");
+        return;
+    }
+
     const exportData = filtered.map(r => ({
         work_date: r.work_date,
         client_name: r.client,
@@ -598,43 +644,86 @@ function exportExcel() {
         rate: r.rate,
         amount: r.amount
     }));
-    
+
     const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Crane_Worksheets");
-    XLSX.writeFile(wb, `Bhavishya_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
+
+    XLSX.writeFile(
+        wb,
+        `Bhavishya_Export_${new Date().toISOString().slice(0,10)}.xlsx`
+    );
+
     alert(`✅ Exported ${filtered.length} records`);
 }
-
 function exportCSV() {
+
+    // 🔒 Role check (IMPORTANT)
+    if (currentRole !== "admin") {
+        alert("❌ Access Denied");
+        return;
+    }
+
     const filtered = getFilteredRows();
-    if (filtered.length === 0) { alert("No data to export"); return; }
-    
-    const headers = ["work_date", "client_name", "contractor_name", "crane_type", "po_code", "crane_number", "assign_sir", "in_time", "out_time", "lunch_minutes", "total_hours", "unit_type", "rate", "amount"];
+
+    if (filtered.length === 0) {
+        alert("No data to export");
+        return;
+    }
+
+    const headers = [
+        "work_date", "client_name", "contractor_name", "crane_type",
+        "po_code", "crane_number", "assign_sir", "in_time", "out_time",
+        "lunch_minutes", "total_hours", "unit_type", "rate", "amount"
+    ];
+
     const csvRows = [headers.join(",")];
-    
+
     filtered.forEach(r => {
         const row = [
-            r.work_date, `"${r.client}"`, `"${r.contractor}"`, r.crane_type, r.po, r.crane_no,
-            `"${r.assign}"`, r.in_time, r.out_time, r.lunch, r.total_hours, r.unit, r.rate, r.amount
+            r.work_date,
+            `"${r.client}"`,
+            `"${r.contractor}"`,
+            r.crane_type,
+            r.po,
+            r.crane_no,
+            `"${r.assign}"`,
+            r.in_time,
+            r.out_time,
+            r.lunch,
+            r.total_hours,
+            r.unit,
+            r.rate,
+            r.amount
         ];
         csvRows.push(row.join(","));
     });
-    
+
     const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
+
     const a = document.createElement("a");
     a.href = url;
     a.download = `Bhavishya_Export_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
+
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+
     URL.revokeObjectURL(url);
+
     alert(`✅ Exported ${filtered.length} records to CSV`);
 }
 
 // ---- PDF GENERATION ----
 async function generatePDF() {
+
+    // 🔒 Role check (ONLY ADD THIS)
+    if (currentRole !== "admin") {
+        alert("❌ Access Denied");
+        return;
+    }
+
     const { jsPDF } = window.jspdf;
     const filtered = getFilteredRows();
     if (filtered.length === 0) { alert("No records to export"); return; }
@@ -727,9 +816,20 @@ async function generatePDF() {
     
     doc.save(`Bhavishya_Report_${new Date().toISOString().slice(0,10)}.pdf`);
 }
-
 function clearAll() {
-    if(confirm("Delete ALL records?")) { rows = []; renderTable(); populateFilterDropdowns(); alert("All records cleared!"); }
+
+    // 🔒 Role check (IMPORTANT)
+    if (currentRole !== "admin") {
+        alert("❌ Access Denied");
+        return;
+    }
+
+    if(confirm("Delete ALL records?")) {
+        rows = [];
+        renderTable();
+        populateFilterDropdowns();
+        alert("All records cleared!");
+    }
 }
 
 function attachFilters() {
