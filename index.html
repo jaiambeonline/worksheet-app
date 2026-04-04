@@ -136,14 +136,28 @@ function parseDateToYYYYMMDD(dateValue) {
 
     let dateStr = String(dateValue).trim();
 
-    // ✅ Force DD/MM/YYYY (India format)
+    // ✅ Case 1: Already YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        return dateStr;
+    }
+
+    // ✅ Case 2: DD/MM/YYYY or DD-MM-YYYY
     if (/^\d{2}[\/-]\d{2}[\/-]\d{4}$/.test(dateStr)) {
         let [dd, mm, yyyy] = dateStr.split(/[\/-]/);
         return `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
     }
 
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+    // ✅ Case 3: MM/DD/YYYY (Google created_at style)
+    if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(dateStr)) {
+        let parts = dateStr.split(" ")[0].split("/");
+        let mm = parts[0];
+        let dd = parts[1];
+        let yyyy = parts[2];
 
+        return `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
+    }
+
+    // fallback
     let d = new Date(dateStr);
     if (!isNaN(d.getTime())) {
         return d.toISOString().split("T")[0];
