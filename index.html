@@ -226,16 +226,33 @@ function isValidTime(t) {
 
 function formatDateForDisplay(dateStr) {
     if (!dateStr) return "";
+
     try {
+        // ✅ FIX: Avoid new Date() timezone issue
+        if (dateStr.includes("-")) {
+            let parts = dateStr.split("-");
+            if (parts.length === 3) {
+                let yyyy = parts[0];
+                let mm = parts[1];
+                let dd = parts[2];
+                return `${dd}/${mm}/${yyyy}`;
+            }
+        }
+
+        // fallback (only if needed)
         let d = new Date(dateStr);
         if (isNaN(d.getTime())) return dateStr;
+
         let day = d.getDate().toString().padStart(2, '0');
         let month = (d.getMonth() + 1).toString().padStart(2, '0');
         let year = d.getFullYear();
-        return `${day}/${month}/${year}`;
-    } catch(e) { return dateStr; }
-}
 
+        return `${day}/${month}/${year}`;
+
+    } catch(e) {
+        return dateStr;
+    }
+}
 function formatTimeDisplay(timeVal) {
     if (!timeVal) return "";
     let timeStr = String(timeVal).trim();
@@ -252,10 +269,8 @@ function formatTimeDisplay(timeVal) {
 // ============== SORT ROWS BY DATE (NEWEST FIRST OR OLDEST FIRST) ==============
 function sortRowsByDate(rowsArray) {
     return [...rowsArray].sort((a, b) => {
-        let dateA = new Date(a.work_date);
-        let dateB = new Date(b.work_date);
-        // Sort by date descending (newest first) - change to dateA - dateB for oldest first
-        return dateB - dateA;
+        // ✅ Safe sorting for YYYY-MM-DD format
+        return b.work_date.localeCompare(a.work_date);
     });
 }
 
@@ -382,24 +397,16 @@ function getFilteredRows() {
         if (assignFilter && norm(r.assign) !== norm(assignFilter)) return false;
         if (craneNoFilter && norm(r.crane_no) !== norm(craneNoFilter)) return false;
         if (craneTypeFilter && norm(r.crane_type) !== norm(craneTypeFilter)) return false;
-        if (fromDate) {
-            let rowDate = new Date(r.work_date);
-            let from = new Date(fromDate);
-            if (rowDate < from) return false;
-        }
-        if (toDate) {
-            let rowDate = new Date(r.work_date);
-            let to = new Date(toDate);
-            to.setHours(23,59,59);
-            if (rowDate > to) return false;
-        }
+
+        // ✅ FIX: Compare as string (YYYY-MM-DD safe)
+        if (fromDate && r.work_date < fromDate) return false;
+        if (toDate && r.work_date > toDate) return false;
+
         return true;
     });
-    
-    // Sort filtered results by date
+
     return sortRowsByDate(filtered);
 }
-
 function renderTable() {
     const filtered = getFilteredRows();
     const tbody = document.getElementById("tableBody");
