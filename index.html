@@ -124,11 +124,6 @@ tr:nth-child(even) { background: #f8fafc; }
 </div>
 
 <script>
-// Password
-const USERS = {
-    "admin": { password: "bhavishya123", role: "admin" },
-    "entry": { password: "be1234", role: "user" }
-};
 
 let currentRole = "";
 let currentUser = "";
@@ -517,33 +512,58 @@ function populateFilterDropdowns() {
 }
 
 // ---- LOGIN FUNCTION ----
-function login() {
+async function login() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
 
-    if (USERS[username] && USERS[username].password === password) {
+    const url = "https://script.google.com/macros/s/AKfycbxuKB739oBJnVgIAR56Uj7NtQHzOxNLK5xe_POv3mMC1ISKL5XkUqPCU-rqM32UIsN6/exec";
 
-        currentRole = USERS[username].role;
-        currentUser = username;
+    try {
+        const res = await fetch(url, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "login",
+                username: username,
+                password: password
+            })
+        });
 
-        document.getElementById("loginScreen").style.display = "none";
-        document.getElementById("mainApp").style.display = "block";
+        const result = await res.json();
 
-        applyRolePermissions();
-        loadFromGoogle();
+        if (result.status === "success") {
 
-    } else {
-        const errDiv = document.getElementById("errorMsg");
-        errDiv.style.display = "block";
-        setTimeout(() => errDiv.style.display = "none", 2000);
+            currentRole = result.role;   // 👈 comes from backend
+            currentUser = username;
+
+            document.getElementById("loginScreen").style.display = "none";
+            document.getElementById("mainApp").style.display = "block";
+
+            applyRolePermissions();
+            loadFromGoogle();
+
+        } else {
+            showError("❌ Invalid username or password");
+        }
+
+    } catch (e) {
+        showError("❌ Server error");
     }
 }
 
+function showError(msg) {
+    const errDiv = document.getElementById("errorMsg");
+    errDiv.innerText = msg;
+    errDiv.style.display = "block";
+    setTimeout(() => errDiv.style.display = "none", 2000);
+}
+
 function logout() {
+    currentUser = "";
+    currentRole = "";
+
     document.getElementById("mainApp").style.display = "none";
     document.getElementById("loginScreen").style.display = "block";
 }
-
 function applyRolePermissions() {
 
     const exportExcelBtn = document.querySelector('[onclick="exportExcel()"]');
