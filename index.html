@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; }
-body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; padding: 16px 12px; }
+body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; padding: 16px 12px; overflow-x: hidden; }
 .app { max-width: 420px; margin: 0 auto; }
 .card { background: white; padding: 18px 16px; border-radius: 24px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05); margin-bottom: 18px; }
 .header { background: linear-gradient(135deg, #1e3a8a, #0f2b6d); color: white; text-align: center; padding: 20px 16px; border-radius: 28px; }
@@ -21,8 +21,8 @@ button.danger { background: #dc2626; color: white; }
 button.secondary { background: #f1f5f9; color: #1f2937; border: 1px solid #cbd5e1; }
 button.success { background: #16a34a; color: white; }
 .summary-box { background: #eef2ff; padding: 14px; border-radius: 24px; font-weight: 600; font-size: 0.8rem; text-align: center; color: #0f2b6d; margin-bottom: 14px; }
-.table-container { max-height: 550px; overflow-y: auto; border-radius: 20px; border: 1px solid #e2e8f0; background: white; margin-top: 12px; }
-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; min-width: 700px; }
+.table-container { max-height: 550px; overflow-y: auto; overflow-x: auto; border-radius: 20px; border: 1px solid #e2e8f0; background: white; margin-top: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
 th { background: #1e3a8a; color: white; padding: 12px 6px; position: sticky; top: 0; font-weight: 600; }
 td { padding: 8px 5px; border-bottom: 1px solid #e2e8f0; }
 tr:nth-child(even) { background: #f8fafc; }
@@ -41,6 +41,7 @@ tr:nth-child(even) { background: #f8fafc; }
     .filter-row { flex-wrap: nowrap; }
 }
 .error-message { color: #dc2626; background: #fee2e2; padding: 8px; border-radius: 40px; text-align: center; font-size: 0.75rem; margin-top: 12px; display: none; }
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -364,7 +365,7 @@ function addRow() {
         unit: document.getElementById("unit").value,
         rate: parseFloat(document.getElementById("rate").value || 0),
         amount: parseFloat(document.getElementById("amount").value || 0),
-        po: calc.po || ""
+        po: calc.po || "",
         rowIndex: null   // ✅ ADD THIS
     };
     
@@ -428,7 +429,7 @@ function renderTable() {
             <td>${r.amount.toFixed(2)}</td>
             <td>${r.po}</td>
             <td>
-                ${currentRole === "admin" ? `<button onclick="deleteRow(${r.rowIndex || 'null'})" style="padding:4px 8px;">🗑️</button>` : ""}
+                ${currentRole === "admin" && r.rowIndex ? `<button onclick="deleteRow(${r.rowIndex})">🗑️</button>` : ""}
             </td>
         </tr>
     `).join("");
@@ -444,6 +445,12 @@ function renderTable() {
 }
 
 async function deleteRow(rowIndex) {
+
+    // ✅ FIX: block unsaved rows
+    if (!rowIndex) {
+        alert("⚠️ Save to Google first before deleting");
+        return;
+    }
 
     if (currentRole !== "admin") {
         alert("❌ Admin only");
@@ -640,7 +647,7 @@ function addRowAfterSave(data) {
         unit: data.unit_type,
         rate: parseFloat(data.rate || 0),
         amount: parseFloat(data.amount || 0),
-        po: data.po_code || ""
+        po: data.po_code || "",
         rowIndex: null   // ✅ ADD THIS
     };
     rows.push(newRow);
