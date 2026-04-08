@@ -540,7 +540,7 @@ async function login() {
 
         if (result.status === "success") {
 
-            currentRole = result.role;   // 👈 comes from backend
+            currentRole = (result.role || "").toLowerCase().trim();   // 👈 comes from backend
             currentUser = username;
 
             document.getElementById("loginScreen").style.display = "none";
