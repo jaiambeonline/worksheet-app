@@ -108,7 +108,7 @@ tr:nth-child(even) { background: #f8fafc; }
                 <div class="summary-box" id="summary">HYDRA HRS: 0 | FARANA HRS: 0 | FARANA DAYS: 0 | TOTAL ₹: 0</div>
                 <div class="table-container">
                     <table id="worksheetTable">
-                        <thead><tr><th>Date</th><th>Client</th><th>Contractor</th><th>Crane Type</th><th>Crane No</th><th>Assign Sir</th><th>In</th><th>Out</th><th>Lunch</th><th>Hours</th><th>Unit</th><th>Rate</th><th>Amount</th><th>PO</th></thead>
+                        <thead><tr><th>Date</th><th>Client</th><th>Contractor</th><th>Crane Type</th><th>Crane No</th><th>Assign Sir</th><th>In</th><th>Out</th><th>Lunch</th><th>Hours</th><th>Unit</th><th>Rate</th><th>Amount</th><th>PO</th><th>Action</th></thead>
                         <tbody id="tableBody"></tbody>
                     </table>
                 </div>
@@ -431,6 +431,9 @@ function renderTable() {
             <td>${r.rate}</td>
             <td>${r.amount.toFixed(2)}</td>
             <td>${r.po}</td>
+            <td>
+                ${currentRole === "admin" ? `<button onclick="deleteRow(${r.rowIndex})" style="padding:4px 8px;">🗑️</button>` : ""}
+            </td>
         </tr>
     `).join("");
 
@@ -442,6 +445,41 @@ function renderTable() {
         if (r.po === "9719720186") faranaD += 1;
     });
     document.getElementById("summary").innerHTML = `HYDRA HRS: ${hydra.toFixed(2)} | FARANA HRS: ${faranaH.toFixed(2)} | FARANA DAYS: ${faranaD} | TOTAL ₹: ${totalAmt.toFixed(2)}`;
+}
+
+async function deleteRow(rowIndex) {
+
+    if (currentRole !== "admin") {
+        alert("❌ Admin only");
+        return;
+    }
+
+    if (!confirm("Delete this row?")) return;
+
+    const url = "https://script.google.com/macros/s/AKfycbxuKB739oBJnVgIAR56Uj7NtQHzOxNLK5xe_POv3mMC1ISKL5XkUqPCU-rqM32UIsN6/exec";
+
+    try {
+        const res = await fetch(url, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "delete",
+                username: currentUser,
+                rowIndex: rowIndex
+            })
+        });
+
+        const result = await res.json();
+
+        if (result.status === "success") {
+            alert("✅ Deleted");
+            loadFromGoogle();
+        } else {
+            alert("❌ Error: " + result.message);
+        }
+
+    } catch (e) {
+        alert("❌ Connection error");
+    }
 }
 
 function populateFilterDropdowns() {
@@ -526,6 +564,9 @@ async function saveToGoogle() {
     const calc = calculateAndUpdate();
     
     const data = {
+        action: "save",              // ✅ ADD
+        username: currentUser,       // ✅ ADD
+        role: currentRole,           // ✅ ADD
         work_date: document.getElementById("work_date").value,
         client_name: document.getElementById("client").value,
         contractor_name: document.getElementById("contractor").value,
@@ -552,7 +593,11 @@ async function saveToGoogle() {
             alert("✅ Saved to Google Sheet!");
             addRowAfterSave(data);
         } else {
-            alert("⚠️ Error: " + (result.message || "Unknown"));
+            if (result.message === "Duplicate entry") {
+                alert("⚠️ Duplicate Entry! Already exists.");
+            } else {
+                alert("⚠️ Error: " + (result.message || "Unknown"));
+            }
         }
     } catch (error) {
         alert("❌ Connection Error");
@@ -592,6 +637,7 @@ async function loadFromGoogle() {
         if (Array.isArray(data) && data.length > 0) {
             rows = data.map(r => ({
                 work_date: parseDateToYYYYMMDD(r.work_date),
+                rowIndex: r.rowIndex,   // ✅ ADD THIS
                 client: norm(r.client_name),
                 contractor: norm(r.contractor_name),
                 crane_type: norm(r.crane_type),
