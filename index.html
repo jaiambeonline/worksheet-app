@@ -156,7 +156,6 @@ function parseDateToYYYYMMDD(dateValue) {
         let mm = parts[0];
         let dd = parts[1];
         let yyyy = parts[2];
-
         return `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
     }
 
@@ -167,7 +166,7 @@ function parseDateToYYYYMMDD(dateValue) {
         let mm = String(d.getMonth() + 1).padStart(2,'0');
         let dd = String(d.getDate()).padStart(2,'0');
         return `${yyyy}-${mm}-${dd}`;
-}
+    }
 
     return "";
 }
@@ -190,12 +189,10 @@ function parseTimeToHHMM(timeValue) {
     // ✅ FIX: Excel numeric time (MAIN BUG FIX)
     if (!isNaN(timeStr)) {
         let num = Number(timeStr);
-
         if (num > 0 && num < 1) {
             let totalMinutes = Math.round(num * 24 * 60);
             let h = Math.floor(totalMinutes / 60);
             let m = totalMinutes % 60;
-
             return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
         }
     }
@@ -225,9 +222,7 @@ function isValidTime(t) {
 
 function formatDateForDisplay(dateStr) {
     if (!dateStr) return "";
-
     try {
-        // ✅ FIX: Avoid new Date() timezone issue
         if (dateStr.includes("-")) {
             let parts = dateStr.split("-");
             if (parts.length === 3) {
@@ -237,21 +232,17 @@ function formatDateForDisplay(dateStr) {
                 return `${dd}/${mm}/${yyyy}`;
             }
         }
-
-        // fallback (only if needed)
         let d = new Date(dateStr);
         if (isNaN(d.getTime())) return dateStr;
-
         let day = d.getDate().toString().padStart(2, '0');
         let month = (d.getMonth() + 1).toString().padStart(2, '0');
         let year = d.getFullYear();
-
         return `${day}/${month}/${year}`;
-
     } catch(e) {
         return dateStr;
     }
 }
+
 function formatTimeDisplay(timeVal) {
     if (!timeVal) return "";
     let timeStr = String(timeVal).trim();
@@ -265,10 +256,9 @@ function formatTimeDisplay(timeVal) {
     return timeStr;
 }
 
-// ============== SORT ROWS BY DATE (NEWEST FIRST OR OLDEST FIRST) ==============
+// ============== SORT ROWS BY DATE (NEWEST FIRST) ==============
 function sortRowsByDate(rowsArray) {
     return [...rowsArray].sort((a, b) => {
-        // ✅ Safe sorting for YYYY-MM-DD format
         return b.work_date.localeCompare(a.work_date);
     });
 }
@@ -366,11 +356,10 @@ function addRow() {
         rate: parseFloat(document.getElementById("rate").value || 0),
         amount: parseFloat(document.getElementById("amount").value || 0),
         po: calc.po || "",
-        rowIndex: null   // ✅ ADD THIS
+        rowIndex: null
     };
     
     rows.push(newRow);
-    // Sort rows after adding
     rows = sortRowsByDate(rows);
     renderTable();
     populateFilterDropdowns();
@@ -397,22 +386,23 @@ function getFilteredRows() {
         if (assignFilter && norm(r.assign) !== norm(assignFilter)) return false;
         if (craneNoFilter && norm(r.crane_no) !== norm(craneNoFilter)) return false;
         if (craneTypeFilter && norm(r.crane_type) !== norm(craneTypeFilter)) return false;
-
-        // ✅ FIX: Compare as string (YYYY-MM-DD safe)
         if (fromDate && r.work_date < fromDate) return false;
         if (toDate && r.work_date > toDate) return false;
-
         return true;
     });
 
     return sortRowsByDate(filtered);
 }
+
 function renderTable() {
     const filtered = getFilteredRows();
     const tbody = document.getElementById("tableBody");
     if (!tbody) return;
 
-    tbody.innerHTML = filtered.map(r => `
+    // ✅ FIX: Compare role case-insensitively
+    const isAdmin = (currentRole || "").toLowerCase() === "admin";
+
+    tbody.innerHTML = filtered.map((r, idx) => `
         <tr>
             <td>${formatDateForDisplay(r.work_date)}</td>
             <td>${r.client}</td>
@@ -429,7 +419,7 @@ function renderTable() {
             <td>${r.amount.toFixed(2)}</td>
             <td>${r.po}</td>
             <td>
-                ${currentRole === "admin" && r.rowIndex ? `<button onclick="deleteRow(${r.rowIndex})">🗑️</button>` : ""}
+                ${isAdmin && r.rowIndex ? `<button onclick="deleteRow(${r.rowIndex})">🗑️</button>` : ""}
             </td>
         </tr>
     `).join("");
@@ -445,15 +435,15 @@ function renderTable() {
 }
 
 async function deleteRow(rowIndex) {
-
-    // ✅ FIX: block unsaved rows
-    if (!rowIndex) {
-        alert("⚠️ Save to Google first before deleting");
+    const isAdmin = (currentRole || "").toLowerCase() === "admin";
+    
+    if (!isAdmin) {
+        alert("❌ Admin only");
         return;
     }
 
-    if ((currentRole || "").toLowerCase().trim() !== "admin") {
-        alert("❌ Admin only");
+    if (!rowIndex) {
+        alert("⚠️ Save to Google first before deleting");
         return;
     }
 
@@ -475,11 +465,10 @@ async function deleteRow(rowIndex) {
 
         if (result.status === "success") {
             alert("✅ Deleted");
-            loadFromGoogle();
+            await loadFromGoogle();
         } else {
             alert("❌ Error: " + result.message);
         }
-
     } catch (e) {
         alert("❌ Connection error");
     }
@@ -539,20 +528,19 @@ async function login() {
         const result = await res.json();
 
         if (result.status === "success") {
-
-            currentRole = (result.role || "").toLowerCase().trim();   // 👈 comes from backend
+            // ✅ FIX: Normalize role to lowercase for consistent comparison
+            currentRole = (result.role || "").toLowerCase().trim();
             currentUser = username;
 
             document.getElementById("loginScreen").style.display = "none";
             document.getElementById("mainApp").style.display = "block";
 
             applyRolePermissions();
-            loadFromGoogle();
+            await loadFromGoogle();
 
         } else {
             showError("❌ Invalid username or password");
         }
-
     } catch (e) {
         showError("❌ Server error");
     }
@@ -568,22 +556,31 @@ function showError(msg) {
 function logout() {
     currentUser = "";
     currentRole = "";
-
+    rows = [];
     document.getElementById("mainApp").style.display = "none";
     document.getElementById("loginScreen").style.display = "block";
 }
+
 function applyRolePermissions() {
+    // ✅ FIX: Case-insensitive check
+    const isAdmin = (currentRole || "").toLowerCase() === "admin";
 
     const exportExcelBtn = document.querySelector('[onclick="exportExcel()"]');
     const exportCSVBtn = document.querySelector('[onclick="exportCSV()"]');
     const pdfBtn = document.querySelector('[onclick="generatePDF()"]');
     const clearBtn = document.querySelector('[onclick="clearAll()"]');
 
-    if (currentRole === "user") {
+    // Show buttons only for admin, hide for user
+    if (!isAdmin) {
         if (exportExcelBtn) exportExcelBtn.style.display = "none";
         if (exportCSVBtn) exportCSVBtn.style.display = "none";
         if (pdfBtn) pdfBtn.style.display = "none";
         if (clearBtn) clearBtn.style.display = "none";
+    } else {
+        if (exportExcelBtn) exportExcelBtn.style.display = "block";
+        if (exportCSVBtn) exportCSVBtn.style.display = "block";
+        if (pdfBtn) pdfBtn.style.display = "block";
+        if (clearBtn) clearBtn.style.display = "block";
     }
 }
 
@@ -592,9 +589,9 @@ async function saveToGoogle() {
     const calc = calculateAndUpdate();
     
     const data = {
-        action: "save",              // ✅ ADD
-        username: currentUser,       // ✅ ADD
-        role: currentRole,           // ✅ ADD
+        action: "save",
+        username: currentUser,
+        role: currentRole,
         work_date: document.getElementById("work_date").value,
         client_name: document.getElementById("client").value,
         contractor_name: document.getElementById("contractor").value,
@@ -619,7 +616,16 @@ async function saveToGoogle() {
         const result = await response.json();
         if (result.status === "success") {
             alert("✅ Saved to Google Sheet!");
-            addRowAfterSave(data);
+            await loadFromGoogle(); // ✅ Reload fresh data instead of manual push
+            // Clear form after successful save
+            document.getElementById("work_date").value = "";
+            document.getElementById("client").value = "";
+            document.getElementById("contractor").value = "";
+            document.getElementById("assign").value = "";
+            document.getElementById("in_time").value = "";
+            document.getElementById("out_time").value = "";
+            document.getElementById("lunch").value = "0";
+            document.getElementById("rate").value = "";
         } else {
             if (result.message === "Duplicate entry") {
                 alert("⚠️ Duplicate Entry! Already exists.");
@@ -632,30 +638,6 @@ async function saveToGoogle() {
     }
 }
 
-function addRowAfterSave(data) {
-    let newRow = {
-        work_date: data.work_date,
-        client: norm(data.client_name),
-        contractor: norm(data.contractor_name),
-        crane_type: data.crane_type,
-        crane_no: data.crane_number,
-        assign: norm(data.assign_sir),
-        in_time: data.in_time,
-        out_time: data.out_time,
-        lunch: parseFloat(data.lunch_minutes || 0),
-        total_hours: parseFloat(data.total_hours || 0),
-        unit: data.unit_type,
-        rate: parseFloat(data.rate || 0),
-        amount: parseFloat(data.amount || 0),
-        po: data.po_code || "",
-        rowIndex: null   // ✅ ADD THIS
-    };
-    rows.push(newRow);
-    rows = sortRowsByDate(rows);
-    renderTable();
-    populateFilterDropdowns();
-}
-
 // ---- LOAD FROM GOOGLE SHEET ----
 async function loadFromGoogle() {
     const url = "https://script.google.com/macros/s/AKfycbxuKB739oBJnVgIAR56Uj7NtQHzOxNLK5xe_POv3mMC1ISKL5XkUqPCU-rqM32UIsN6/exec";
@@ -663,25 +645,26 @@ async function loadFromGoogle() {
         const res = await fetch(url);
         const data = await res.json();
         
-        if (Array.isArray(data) && data.length > 0) {
-            rows = data.map(r => ({
+        if (Array.isArray(data)) {
+            // ✅ Filter out empty/blank rows
+            rows = data.filter(r => r.work_date && r.work_date.toString().trim() !== "").map(r => ({
                 work_date: parseDateToYYYYMMDD(r.work_date),
-                rowIndex: r.rowIndex,   // ✅ ADD THIS
-                client: norm(r.client_name),
-                contractor: norm(r.contractor_name),
-                crane_type: norm(r.crane_type),
-                crane_no: norm(r.crane_number),
-                assign: norm(r.assign_sir),
-                in_time: parseTimeToHHMM(r.in_time),
-                out_time: parseTimeToHHMM(r.out_time),
+                rowIndex: r.rowIndex,
+                client: norm(r.client_name || ""),
+                contractor: norm(r.contractor_name || ""),
+                crane_type: norm(r.crane_type || ""),
+                crane_no: norm(r.crane_number || ""),
+                assign: norm(r.assign_sir || ""),
+                in_time: parseTimeToHHMM(r.in_time || ""),
+                out_time: parseTimeToHHMM(r.out_time || ""),
                 lunch: Number(r.lunch_minutes || 0),
                 total_hours: Number(r.total_hours || 0),
-                unit: norm(r.unit_type),
+                unit: norm(r.unit_type || ""),
                 rate: Number(r.rate || 0),
                 amount: Number(r.amount || 0),
                 po: norm(r.po_code || "")
             }));
-            // Sort rows by date after loading
+            
             rows = sortRowsByDate(rows);
             renderTable();
             populateFilterDropdowns();
@@ -694,9 +677,9 @@ async function loadFromGoogle() {
 
 // ---- EXPORT FUNCTIONS ----
 function exportExcel() {
-
-    // 🔒 Role check (IMPORTANT)
-    if ((currentRole || "").toLowerCase().trim() !== "admin") {
+    const isAdmin = (currentRole || "").toLowerCase() === "admin";
+    
+    if (!isAdmin) {
         alert("❌ Access Denied");
         return;
     }
@@ -734,17 +717,14 @@ function exportExcel() {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Crane_Worksheets");
 
-    XLSX.writeFile(
-        wb,
-        `Bhavishya_Export_${new Date().toISOString().slice(0,10)}.xlsx`
-    );
-
+    XLSX.writeFile(wb, `Bhavishya_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
     alert(`✅ Exported ${filtered.length} records`);
 }
-function exportCSV() {
 
-    // 🔒 Role check (IMPORTANT)
-    if ((currentRole || "").toLowerCase().trim() !== "admin") {
+function exportCSV() {
+    const isAdmin = (currentRole || "").toLowerCase() === "admin";
+    
+    if (!isAdmin) {
         alert("❌ Access Denied");
         return;
     }
@@ -786,25 +766,21 @@ function exportCSV() {
 
     const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
-
     const a = document.createElement("a");
     a.href = url;
     a.download = `Bhavishya_Export_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
-
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-
     URL.revokeObjectURL(url);
-
     alert(`✅ Exported ${filtered.length} records to CSV`);
 }
 
 // ---- PDF GENERATION ----
 async function generatePDF() {
-
-    // 🔒 Role check (ONLY ADD THIS)
-    if ((currentRole || "").toLowerCase().trim() !== "admin") {
+    const isAdmin = (currentRole || "").toLowerCase() === "admin";
+    
+    if (!isAdmin) {
         alert("❌ Access Denied");
         return;
     }
@@ -901,10 +877,11 @@ async function generatePDF() {
     
     doc.save(`Bhavishya_Report_${new Date().toISOString().slice(0,10)}.pdf`);
 }
-function clearAll() {
 
-    // 🔒 Role check (IMPORTANT)
-    if ((currentRole || "").toLowerCase().trim() !== "admin") {
+function clearAll() {
+    const isAdmin = (currentRole || "").toLowerCase() === "admin";
+    
+    if (!isAdmin) {
         alert("❌ Access Denied");
         return;
     }
