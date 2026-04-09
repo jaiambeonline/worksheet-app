@@ -528,15 +528,19 @@ async function login() {
         const result = await res.json();
 
         if (result.status === "success") {
-            // ✅ FIX: Normalize role to lowercase for consistent comparison
             currentRole = (result.role || "").toLowerCase().trim();
             currentUser = username;
+
+            console.log("✅ Username:", currentUser);
+            console.log("✅ Role from backend:", result.role);
+            console.log("✅ Normalized Role:", currentRole);
 
             document.getElementById("loginScreen").style.display = "none";
             document.getElementById("mainApp").style.display = "block";
 
             applyRolePermissions();
             await loadFromGoogle();
+        };
 
         } else {
             showError("❌ Invalid username or password");
