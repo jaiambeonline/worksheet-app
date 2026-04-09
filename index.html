@@ -114,10 +114,10 @@ tr:nth-child(even) { background: #f8fafc; }
                     </table>
                 </div>
                 <div class="button-group">
-                    <button class="primary admin-only" onclick="exportExcel()">📎 Export Excel</button>
-                    <button class="success admin-only" onclick="exportCSV()">📊 Export CSV</button>
-                    <button class="primary admin-only" onclick="generatePDF()">📄 Export PDF</button>
-                    <button class="danger admin-only" onclick="clearAll()">🗑️ Clear All</button>
+                    <button class="primary" onclick="exportExcel()">📎 Export Excel</button>
+                    <button class="success" onclick="exportCSV()">📊 Export CSV</button>
+                    <button class="primary" onclick="generatePDF()">📄 Export PDF</button>
+                    <button class="danger" onclick="clearAll()">🗑️ Clear All</button>
                 </div>
             </div>
         </div>
@@ -562,27 +562,59 @@ function logout() {
 }
 
 function applyRolePermissions() {
-    // ✅ FIX: Case-insensitive check
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
-
+    
+    // Get all export/clear buttons
     const exportExcelBtn = document.querySelector('[onclick="exportExcel()"]');
     const exportCSVBtn = document.querySelector('[onclick="exportCSV()"]');
     const pdfBtn = document.querySelector('[onclick="generatePDF()"]');
     const clearBtn = document.querySelector('[onclick="clearAll()"]');
-
-    // For admin: SHOW buttons with proper display
-    if (isAdmin) {
-        if (exportExcelBtn) exportExcelBtn.style.display = "block";
-        if (exportCSVBtn) exportCSVBtn.style.display = "block";
-        if (pdfBtn) pdfBtn.style.display = "block";
-        if (clearBtn) clearBtn.style.display = "block";
-    } 
-    // For non-admin: HIDE buttons
-    else {
-        if (exportExcelBtn) exportExcelBtn.style.display = "none";
-        if (exportCSVBtn) exportCSVBtn.style.display = "none";
-        if (pdfBtn) pdfBtn.style.display = "none";
-        if (clearBtn) clearBtn.style.display = "none";
+    
+    // Keep buttons VISIBLE but disable them for non-admin
+    if (!isAdmin) {
+        // Disable buttons (make them look disabled and not clickable)
+        if (exportExcelBtn) {
+            exportExcelBtn.disabled = true;
+            exportExcelBtn.style.opacity = "0.5";
+            exportExcelBtn.style.cursor = "not-allowed";
+        }
+        if (exportCSVBtn) {
+            exportCSVBtn.disabled = true;
+            exportCSVBtn.style.opacity = "0.5";
+            exportCSVBtn.style.cursor = "not-allowed";
+        }
+        if (pdfBtn) {
+            pdfBtn.disabled = true;
+            pdfBtn.style.opacity = "0.5";
+            pdfBtn.style.cursor = "not-allowed";
+        }
+        if (clearBtn) {
+            clearBtn.disabled = true;
+            clearBtn.style.opacity = "0.5";
+            clearBtn.style.cursor = "not-allowed";
+        }
+    } else {
+        // Enable buttons for admin
+        if (exportExcelBtn) {
+            exportExcelBtn.disabled = false;
+            exportExcelBtn.style.opacity = "1";
+            exportExcelBtn.style.cursor = "pointer";
+        }
+        if (exportCSVBtn) {
+            exportCSVBtn.disabled = false;
+            exportCSVBtn.style.opacity = "1";
+            exportCSVBtn.style.cursor = "pointer";
+        }
+        if (pdfBtn) {
+            pdfBtn.disabled = false;
+            pdfBtn.style.opacity = "1";
+            pdfBtn.style.cursor = "pointer";
+        }
+        if (clearBtn) {
+            clearBtn.disabled = false;
+            clearBtn.style.opacity = "1";
+            clearBtn.style.cursor = "pointer";
+        }
     }
 }
 
