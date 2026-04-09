@@ -570,17 +570,19 @@ function applyRolePermissions() {
     const pdfBtn = document.querySelector('[onclick="generatePDF()"]');
     const clearBtn = document.querySelector('[onclick="clearAll()"]');
 
-    // Show buttons only for admin, hide for user
-    if (!isAdmin) {
-        if (exportExcelBtn) exportExcelBtn.style.display = "none";
-        if (exportCSVBtn) exportCSVBtn.style.display = "none";
-        if (pdfBtn) pdfBtn.style.display = "none";
-        if (clearBtn) clearBtn.style.display = "none";
-    } else {
+    // For admin: SHOW buttons with proper display
+    if (isAdmin) {
         if (exportExcelBtn) exportExcelBtn.style.display = "block";
         if (exportCSVBtn) exportCSVBtn.style.display = "block";
         if (pdfBtn) pdfBtn.style.display = "block";
         if (clearBtn) clearBtn.style.display = "block";
+    } 
+    // For non-admin: HIDE buttons
+    else {
+        if (exportExcelBtn) exportExcelBtn.style.display = "none";
+        if (exportCSVBtn) exportCSVBtn.style.display = "none";
+        if (pdfBtn) pdfBtn.style.display = "none";
+        if (clearBtn) clearBtn.style.display = "none";
     }
 }
 
