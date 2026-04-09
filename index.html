@@ -114,10 +114,10 @@ tr:nth-child(even) { background: #f8fafc; }
                     </table>
                 </div>
                 <div class="button-group">
-                    <button class="primary" onclick="exportExcel()">📎 Export Excel</button>
-                    <button class="success" onclick="exportCSV()">📊 Export CSV</button>
-                    <button class="primary" onclick="generatePDF()">📄 Export PDF</button>
-                    <button class="danger" onclick="clearAll()">🗑️ Clear All</button>
+                    <button id="exportExcelBtn" class="primary" onclick="exportExcel()">📎 Export Excel</button>
+                    <button id="exportCSVBtn" class="success" onclick="exportCSV()">📊 Export CSV</button>
+                    <button id="pdfBtn" class="primary" onclick="generatePDF()">📄 Export PDF</button>
+                    <button id="clearBtn" class="danger" onclick="clearAll()">🗑️ Clear All</button>
                 </div>
             </div>
         </div>
@@ -565,10 +565,10 @@ function applyRolePermissions() {
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
     
     // Get all export/clear buttons
-    const exportExcelBtn = document.querySelector('[onclick="exportExcel()"]');
-    const exportCSVBtn = document.querySelector('[onclick="exportCSV()"]');
-    const pdfBtn = document.querySelector('[onclick="generatePDF()"]');
-    const clearBtn = document.querySelector('[onclick="clearAll()"]');
+    const exportExcelBtn = document.getElementById("exportExcelBtn");
+    const exportCSVBtn = document.getElementById("exportCSVBtn");
+    const pdfBtn = document.getElementById("pdfBtn");
+    const clearBtn = document.getElementById("clearBtn");
     
     // Keep buttons VISIBLE but disable them for non-admin
     if (!isAdmin) {
