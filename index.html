@@ -513,11 +513,19 @@ async function login() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
 
+    if (!username || !password) {
+        showError("❌ Please enter username and password");
+        return;
+    }
+
     const url = "https://script.google.com/macros/s/AKfycbxuKB739oBJnVgIAR56Uj7NtQHzOxNLK5xe_POv3mMC1ISKL5XkUqPCU-rqM32UIsN6/exec";
 
     try {
         const res = await fetch(url, {
             method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({
                 action: "login",
                 username: username,
@@ -527,32 +535,31 @@ async function login() {
 
         const result = await res.json();
 
-        // 🔍 DEBUG (VERY IMPORTANT)
-        console.log("LOGIN RESPONSE:", result);
-
-        // ✅ STRICT VALIDATION
+        // STRICT VALIDATION - ONLY SUCCESS WITH ROLE ALLOWS LOGIN
         if (result.status === "success" && result.role) {
-
             currentRole = result.role.toLowerCase().trim();
             currentUser = username;
 
-            console.log("✅ Username:", currentUser);
-            console.log("✅ Role:", currentRole);
-
+            // Hide login, show main app
             document.getElementById("loginScreen").style.display = "none";
             document.getElementById("mainApp").style.display = "block";
 
+            // Apply permissions based on role
             applyRolePermissions();
+            
+            // Load data from Google Sheet
             await loadFromGoogle();
-
+            
+            console.log("✅ Login successful - User:", currentUser, "Role:", currentRole);
         } else {
             console.log("❌ Login failed:", result);
             showError("❌ Invalid username or password");
+            document.getElementById("password").value = ""; // Clear password field
         }
 
     } catch (e) {
-        console.log("❌ Error:", e);
-        showError("❌ Server error");
+        console.log("❌ Connection error:", e);
+        showError("❌ Cannot connect to server. Check your connection.");
     }
 }
 
@@ -560,7 +567,9 @@ function showError(msg) {
     const errDiv = document.getElementById("errorMsg");
     errDiv.innerText = msg;
     errDiv.style.display = "block";
-    setTimeout(() => errDiv.style.display = "none", 2000);
+    setTimeout(() => {
+        errDiv.style.display = "none";
+    }, 3000);
 }
 
 function logout() {
@@ -573,6 +582,9 @@ function logout() {
 
 function applyRolePermissions() {
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
+    const isUser = (currentRole || "").toLowerCase() === "user";
+    
+    console.log("Applying permissions - Is Admin:", isAdmin, "Role:", currentRole);
     
     // Get all export/clear buttons
     const exportExcelBtn = document.getElementById("exportExcelBtn");
@@ -580,28 +592,31 @@ function applyRolePermissions() {
     const pdfBtn = document.getElementById("pdfBtn");
     const clearBtn = document.getElementById("clearBtn");
     
-    // Keep buttons VISIBLE but disable them for non-admin
     if (!isAdmin) {
-        // Disable buttons (make them look disabled and not clickable)
+        // Disable buttons for non-admin users
         if (exportExcelBtn) {
             exportExcelBtn.disabled = true;
             exportExcelBtn.style.opacity = "0.5";
             exportExcelBtn.style.cursor = "not-allowed";
+            exportExcelBtn.title = "Admin only feature";
         }
         if (exportCSVBtn) {
             exportCSVBtn.disabled = true;
             exportCSVBtn.style.opacity = "0.5";
             exportCSVBtn.style.cursor = "not-allowed";
+            exportCSVBtn.title = "Admin only feature";
         }
         if (pdfBtn) {
             pdfBtn.disabled = true;
             pdfBtn.style.opacity = "0.5";
             pdfBtn.style.cursor = "not-allowed";
+            pdfBtn.title = "Admin only feature";
         }
         if (clearBtn) {
             clearBtn.disabled = true;
             clearBtn.style.opacity = "0.5";
             clearBtn.style.cursor = "not-allowed";
+            clearBtn.title = "Admin only feature";
         }
     } else {
         // Enable buttons for admin
@@ -609,21 +624,25 @@ function applyRolePermissions() {
             exportExcelBtn.disabled = false;
             exportExcelBtn.style.opacity = "1";
             exportExcelBtn.style.cursor = "pointer";
+            exportExcelBtn.title = "Export to Excel";
         }
         if (exportCSVBtn) {
             exportCSVBtn.disabled = false;
             exportCSVBtn.style.opacity = "1";
             exportCSVBtn.style.cursor = "pointer";
+            exportCSVBtn.title = "Export to CSV";
         }
         if (pdfBtn) {
             pdfBtn.disabled = false;
             pdfBtn.style.opacity = "1";
             pdfBtn.style.cursor = "pointer";
+            pdfBtn.title = "Export to PDF";
         }
         if (clearBtn) {
             clearBtn.disabled = false;
             clearBtn.style.opacity = "1";
             clearBtn.style.cursor = "pointer";
+            clearBtn.title = "Clear all records";
         }
     }
 }
