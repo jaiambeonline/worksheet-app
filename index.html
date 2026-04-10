@@ -114,10 +114,10 @@ tr:nth-child(even) { background: #f8fafc; }
                     </table>
                 </div>
                 <div class="button-group">
-                    <button class="primary" onclick="exportExcel()">📎 Export Excel</button>
-                    <button class="success" onclick="exportCSV()">📊 Export CSV</button>
-                    <button class="primary" onclick="generatePDF()">📄 Export PDF</button>
-                    <button class="danger" onclick="clearAll()">🗑️ Clear All</button>
+                    <button id="exportExcelBtn" class="primary" onclick="exportExcel()">📎 Export Excel</button>
+                    <button id="exportCSVBtn" class="success" onclick="exportCSV()">📊 Export CSV</button>
+                    <button id="pdfBtn" class="primary" onclick="generatePDF()">📄 Export PDF</button>
+                    <button id="clearBtn" class="danger" onclick="clearAll()">🗑️ Clear All</button>
                 </div>
             </div>
         </div>
@@ -527,10 +527,17 @@ async function login() {
 
         const result = await res.json();
 
-        if (result.status === "success") {
-            // ✅ FIX: Normalize role to lowercase for consistent comparison
-            currentRole = (result.role || "").toLowerCase().trim();
+        // 🔍 DEBUG (VERY IMPORTANT)
+        console.log("LOGIN RESPONSE:", result);
+
+        // ✅ STRICT VALIDATION
+        if (result.status === "success" && result.role) {
+
+            currentRole = result.role.toLowerCase().trim();
             currentUser = username;
+
+            console.log("✅ Username:", currentUser);
+            console.log("✅ Role:", currentRole);
 
             document.getElementById("loginScreen").style.display = "none";
             document.getElementById("mainApp").style.display = "block";
@@ -539,9 +546,12 @@ async function login() {
             await loadFromGoogle();
 
         } else {
+            console.log("❌ Login failed:", result);
             showError("❌ Invalid username or password");
         }
+
     } catch (e) {
+        console.log("❌ Error:", e);
         showError("❌ Server error");
     }
 }
@@ -565,10 +575,10 @@ function applyRolePermissions() {
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
     
     // Get all export/clear buttons
-    const exportExcelBtn = document.querySelector('[onclick="exportExcel()"]');
-    const exportCSVBtn = document.querySelector('[onclick="exportCSV()"]');
-    const pdfBtn = document.querySelector('[onclick="generatePDF()"]');
-    const clearBtn = document.querySelector('[onclick="clearAll()"]');
+    const exportExcelBtn = document.getElementById("exportExcelBtn");
+    const exportCSVBtn = document.getElementById("exportCSVBtn");
+    const pdfBtn = document.getElementById("pdfBtn");
+    const clearBtn = document.getElementById("clearBtn");
     
     // Keep buttons VISIBLE but disable them for non-admin
     if (!isAdmin) {
