@@ -20,6 +20,7 @@ button.primary { background: #2563eb; color: white; }
 button.danger { background: #dc2626; color: white; }
 button.secondary { background: #f1f5f9; color: #1f2937; border: 1px solid #cbd5e1; }
 button.success { background: #16a34a; color: white; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
 .summary-box { background: #eef2ff; padding: 14px; border-radius: 24px; font-weight: 600; font-size: 0.8rem; text-align: center; color: #0f2b6d; margin-bottom: 14px; }
 .table-container { max-height: 550px; overflow-y: auto; overflow-x: auto; border-radius: 20px; border: 1px solid #e2e8f0; background: white; margin-top: 12px; }
 table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
@@ -41,7 +42,7 @@ tr:nth-child(even) { background: #f8fafc; }
     .filter-row { flex-wrap: nowrap; }
 }
 .error-message { color: #dc2626; background: #fee2e2; padding: 8px; border-radius: 40px; text-align: center; font-size: 0.75rem; margin-top: 12px; display: none; }
-
+.success-message { color: #16a34a; background: #dcfce7; padding: 8px; border-radius: 40px; text-align: center; font-size: 0.75rem; margin-top: 12px; display: none; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -59,7 +60,7 @@ tr:nth-child(even) { background: #f8fafc; }
         <input id="username" placeholder="Username" style="text-align:center;">
         <input type="password" id="password" placeholder="Password" style="text-align:center;">
         <button class="primary" onclick="login()">Login</button>
-        <div id="errorMsg" class="error-message">❌ Incorrect Password</div>
+        <div id="errorMsg" class="error-message">❌ Invalid credentials</div>
     </div>
 
     <!-- MAIN APP -->
@@ -92,8 +93,8 @@ tr:nth-child(even) { background: #f8fafc; }
                 <input id="total_hours" placeholder="Total Hours" readonly style="background:#f1f5f9;">
                 <input id="unit" placeholder="Unit" readonly style="background:#f1f5f9;">
                 <input id="amount" placeholder="Amount (₹)" readonly style="background:#f1f5f9;">
-                <button class="primary" onclick="addRow()">➕ Add Worksheet</button>
-                <button class="primary" onclick="saveToGoogle()" style="background:#0f3b2c;">📤 Save To Google Sheet</button>
+                <button class="primary" onclick="addRow()">➕ Add to List</button>
+                <button class="primary" onclick="saveToGoogle()" style="background:#0f3b2c;">📤 Save All to Google Sheet</button>
             </div>
 
             <div class="card">
@@ -109,7 +110,9 @@ tr:nth-child(even) { background: #f8fafc; }
                 <div class="summary-box" id="summary">HYDRA HRS: 0 | FARANA HRS: 0 | FARANA DAYS: 0 | TOTAL ₹: 0</div>
                 <div class="table-container">
                     <table id="worksheetTable">
-                        <thead><tr><th>Date</th><th>Client</th><th>Contractor</th><th>Crane Type</th><th>Crane No</th><th>Assign Sir</th><th>In</th><th>Out</th><th>Lunch</th><th>Hours</th><th>Unit</th><th>Rate</th><th>Amount</th><th>PO</th><th>Action</th></thead>
+                        <thead>
+                            <tr><th>Date</th><th>Client</th><th>Contractor</th><th>Crane Type</th><th>Crane No</th><th>Assign Sir</th><th>In</th><th>Out</th><th>Lunch</th><th>Hours</th><th>Unit</th><th>Rate</th><th>Amount</th><th>PO</th><th>Action</th></tr>
+                        </thead>
                         <tbody id="tableBody"></tbody>
                     </table>
                 </div>
@@ -125,41 +128,27 @@ tr:nth-child(even) { background: #f8fafc; }
 </div>
 
 <script>
+// ================= CONFIGURATION =================
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRo2Vus6xg4PQHywhqLmukE9dAlg2biSLwVuhaDqychC-GM8rf9AfbVC6gCJt3KbZC/exec";
 
+// ================= GLOBAL VARIABLES =================
 let currentRole = "";
 let currentUser = "";
 let rows = [];
 
+// ================= HELPER FUNCTIONS =================
 function norm(v) { return (v || "").toString().trim().toUpperCase(); }
 function cleanStr(v) { return (v || "").toString().trim(); }
 
-// ============== DATE PARSING - CONVERT ANY DATE FORMAT TO YYYY-MM-DD ==============
+// ============== DATE PARSING ==============
 function parseDateToYYYYMMDD(dateValue) {
     if (!dateValue) return "";
-
     let dateStr = String(dateValue).trim();
-
-    // ✅ Case 1: Already YYYY-MM-DD
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-        return dateStr;
-    }
-
-    // ✅ Case 2: DD/MM/YYYY or DD-MM-YYYY
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
     if (/^\d{2}[\/-]\d{2}[\/-]\d{4}$/.test(dateStr)) {
         let [dd, mm, yyyy] = dateStr.split(/[\/-]/);
         return `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
     }
-
-    // ✅ Case 3: MM/DD/YYYY (Google created_at style)
-    if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(dateStr)) {
-        let parts = dateStr.split(" ")[0].split("/");
-        let mm = parts[0];
-        let dd = parts[1];
-        let yyyy = parts[2];
-        return `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
-    }
-
-    // fallback SAFE (no timezone shift)
     let d = new Date(dateStr);
     if (!isNaN(d.getTime())) {
         let yyyy = d.getFullYear();
@@ -167,52 +156,20 @@ function parseDateToYYYYMMDD(dateValue) {
         let dd = String(d.getDate()).padStart(2,'0');
         return `${yyyy}-${mm}-${dd}`;
     }
-
     return "";
 }
 
-// ============== TIME PARSING - HANDLES BOTH FORMATS ==============
+// ============== TIME PARSING ==============
 function parseTimeToHHMM(timeValue) {
     if (!timeValue) return "";
-
     let timeStr = String(timeValue).trim();
-
-    // ✅ HH:MM
     if (/^\d{2}:\d{2}$/.test(timeStr)) return timeStr;
-
-    // HH:MM:SS → HH:MM
     if (/^\d{2}:\d{2}:\d{2}$/.test(timeStr)) {
         let [h, m] = timeStr.split(":");
         return `${h}:${m}`;
     }
-
-    // ✅ FIX: Excel numeric time (MAIN BUG FIX)
-    if (!isNaN(timeStr)) {
-        let num = Number(timeStr);
-        if (num > 0 && num < 1) {
-            let totalMinutes = Math.round(num * 24 * 60);
-            let h = Math.floor(totalMinutes / 60);
-            let m = totalMinutes % 60;
-            return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-        }
-    }
-
-    // ISO format (Google Sheets)
-    if (timeStr.includes("T")) {
-        let d = new Date(timeStr);
-        if (!isNaN(d.getTime())) {
-            let h = d.getHours().toString().padStart(2,'0');
-            let m = d.getMinutes().toString().padStart(2,'0');
-            return `${h}:${m}`;
-        }
-    }
-
-    // fallback
     let match = timeStr.match(/(\d{1,2}):(\d{2})/);
-    if (match) {
-        return `${match[1].padStart(2,'0')}:${match[2]}`;
-    }
-
+    if (match) return `${match[1].padStart(2,'0')}:${match[2]}`;
     return "";
 }
 
@@ -225,12 +182,7 @@ function formatDateForDisplay(dateStr) {
     try {
         if (dateStr.includes("-")) {
             let parts = dateStr.split("-");
-            if (parts.length === 3) {
-                let yyyy = parts[0];
-                let mm = parts[1];
-                let dd = parts[2];
-                return `${dd}/${mm}/${yyyy}`;
-            }
+            if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
         }
         let d = new Date(dateStr);
         if (isNaN(d.getTime())) return dateStr;
@@ -247,23 +199,16 @@ function formatTimeDisplay(timeVal) {
     if (!timeVal) return "";
     let timeStr = String(timeVal).trim();
     if (timeStr.match(/^\d{2}:\d{2}$/)) return timeStr;
-    if (timeStr.match(/^\d{2}:\d{2}:\d{2}$/)) {
-        let parts = timeStr.split(':');
-        return `${parts[0]}:${parts[1]}`;
-    }
     let timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
     if (timeMatch) return `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
     return timeStr;
 }
 
-// ============== SORT ROWS BY DATE (NEWEST FIRST) ==============
 function sortRowsByDate(rowsArray) {
-    return [...rowsArray].sort((a, b) => {
-        return b.work_date.localeCompare(a.work_date);
-    });
+    return [...rowsArray].sort((a, b) => b.work_date.localeCompare(a.work_date));
 }
 
-// ---------- CALCULATION ----------
+// ============== CALCULATION ==============
 function calculateAndUpdate() {
     let client = document.getElementById("client").value.trim().toUpperCase();
     let crane = document.getElementById("crane_type").value;
@@ -328,7 +273,7 @@ function calculateAndUpdate() {
     return { po, hours, amount, unit };
 }
 
-// ---------- ADD ROW ----------
+// ============== ADD ROW ==============
 function addRow() {
     let work_date = document.getElementById("work_date").value;
     if (!work_date) { alert("Please select work date"); return; }
@@ -364,6 +309,7 @@ function addRow() {
     renderTable();
     populateFilterDropdowns();
     
+    // Clear form
     document.getElementById("client").value = "";
     document.getElementById("contractor").value = "";
     document.getElementById("assign").value = "";
@@ -390,7 +336,6 @@ function getFilteredRows() {
         if (toDate && r.work_date > toDate) return false;
         return true;
     });
-
     return sortRowsByDate(filtered);
 }
 
@@ -399,7 +344,6 @@ function renderTable() {
     const tbody = document.getElementById("tableBody");
     if (!tbody) return;
 
-    // ✅ FIX: Compare role case-insensitively
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
 
     tbody.innerHTML = filtered.map((r, idx) => `
@@ -418,9 +362,7 @@ function renderTable() {
             <td>${r.rate}</td>
             <td>${r.amount.toFixed(2)}</td>
             <td>${r.po}</td>
-            <td>
-                ${isAdmin && r.rowIndex ? `<button onclick="deleteRow(${r.rowIndex})">🗑️</button>` : ""}
-            </td>
+            <td>${isAdmin && r.rowIndex ? `<button onclick="deleteRow(${r.rowIndex})" style="background:#dc2626; color:white; padding:4px 8px; font-size:11px;">🗑️</button>` : ""}</td>
         </tr>
     `).join("");
 
@@ -436,41 +378,29 @@ function renderTable() {
 
 async function deleteRow(rowIndex) {
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
-    
-    if (!isAdmin) {
-        alert("❌ Admin only");
-        return;
-    }
-
-    if (!rowIndex) {
-        alert("⚠️ Save to Google first before deleting");
-        return;
-    }
-
+    if (!isAdmin) { alert("❌ Admin only"); return; }
+    if (!rowIndex) { alert("⚠️ Please refresh and try again"); return; }
     if (!confirm("Delete this row?")) return;
 
-    const url = "https://script.google.com/macros/s/AKfycbzRo2Vus6xg4PQHywhqLmukE9dAlg2biSLwVuhaDqychC-GM8rf9AfbVC6gCJt3KbZC/exec";
-
     try {
-        const res = await fetch(url, {
+        const res = await fetch(SCRIPT_URL, {
             method: "POST",
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 action: "delete",
                 username: currentUser,
                 rowIndex: rowIndex
             })
         });
-
         const result = await res.json();
-
         if (result.status === "success") {
-            alert("✅ Deleted");
+            alert("✅ Deleted successfully");
             await loadFromGoogle();
         } else {
-            alert("❌ Error: " + result.message);
+            alert("❌ Error: " + (result.message || "Unknown error"));
         }
     } catch (e) {
-        alert("❌ Connection error");
+        alert("❌ Connection error: " + e.message);
     }
 }
 
@@ -508,7 +438,7 @@ function populateFilterDropdowns() {
     }
 }
 
-// ---- LOGIN FUNCTION ----
+// ============== LOGIN FUNCTION ==============
 async function login() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
@@ -518,14 +448,10 @@ async function login() {
         return;
     }
 
-    const url = "https://script.google.com/macros/s/AKfycbzRo2Vus6xg4PQHywhqLmukE9dAlg2biSLwVuhaDqychC-GM8rf9AfbVC6gCJt3KbZC/exec";
-
     try {
-        const res = await fetch(url, {
+        const res = await fetch(SCRIPT_URL, {
             method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 action: "login",
                 username: username,
@@ -535,31 +461,24 @@ async function login() {
 
         const result = await res.json();
 
-        // STRICT VALIDATION - ONLY SUCCESS WITH ROLE ALLOWS LOGIN
         if (result.status === "success" && result.role) {
             currentRole = result.role.toLowerCase().trim();
             currentUser = username;
 
-            // Hide login, show main app
             document.getElementById("loginScreen").style.display = "none";
             document.getElementById("mainApp").style.display = "block";
 
-            // Apply permissions based on role
             applyRolePermissions();
-            
-            // Load data from Google Sheet
             await loadFromGoogle();
             
             console.log("✅ Login successful - User:", currentUser, "Role:", currentRole);
         } else {
-            console.log("❌ Login failed:", result);
             showError("❌ Invalid username or password");
-            document.getElementById("password").value = ""; // Clear password field
+            document.getElementById("password").value = "";
         }
-
     } catch (e) {
-        console.log("❌ Connection error:", e);
-        showError("❌ Cannot connect to server. Check your connection.");
+        console.error("Login error:", e);
+        showError("❌ Cannot connect to server. Please check your connection.");
     }
 }
 
@@ -578,138 +497,102 @@ function logout() {
     rows = [];
     document.getElementById("mainApp").style.display = "none";
     document.getElementById("loginScreen").style.display = "block";
+    document.getElementById("username").value = "";
+    document.getElementById("password").value = "";
 }
 
 function applyRolePermissions() {
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
-    const isUser = (currentRole || "").toLowerCase() === "user";
     
-    console.log("Applying permissions - Is Admin:", isAdmin, "Role:", currentRole);
-    
-    // Get all export/clear buttons
     const exportExcelBtn = document.getElementById("exportExcelBtn");
     const exportCSVBtn = document.getElementById("exportCSVBtn");
     const pdfBtn = document.getElementById("pdfBtn");
     const clearBtn = document.getElementById("clearBtn");
     
     if (!isAdmin) {
-        // Disable buttons for non-admin users
-        if (exportExcelBtn) {
-            exportExcelBtn.disabled = true;
-            exportExcelBtn.style.opacity = "0.5";
-            exportExcelBtn.style.cursor = "not-allowed";
-            exportExcelBtn.title = "Admin only feature";
-        }
-        if (exportCSVBtn) {
-            exportCSVBtn.disabled = true;
-            exportCSVBtn.style.opacity = "0.5";
-            exportCSVBtn.style.cursor = "not-allowed";
-            exportCSVBtn.title = "Admin only feature";
-        }
-        if (pdfBtn) {
-            pdfBtn.disabled = true;
-            pdfBtn.style.opacity = "0.5";
-            pdfBtn.style.cursor = "not-allowed";
-            pdfBtn.title = "Admin only feature";
-        }
-        if (clearBtn) {
-            clearBtn.disabled = true;
-            clearBtn.style.opacity = "0.5";
-            clearBtn.style.cursor = "not-allowed";
-            clearBtn.title = "Admin only feature";
-        }
+        if (exportExcelBtn) { exportExcelBtn.disabled = true; exportExcelBtn.style.opacity = "0.5"; exportExcelBtn.style.cursor = "not-allowed"; }
+        if (exportCSVBtn) { exportCSVBtn.disabled = true; exportCSVBtn.style.opacity = "0.5"; exportCSVBtn.style.cursor = "not-allowed"; }
+        if (pdfBtn) { pdfBtn.disabled = true; pdfBtn.style.opacity = "0.5"; pdfBtn.style.cursor = "not-allowed"; }
+        if (clearBtn) { clearBtn.disabled = true; clearBtn.style.opacity = "0.5"; clearBtn.style.cursor = "not-allowed"; }
     } else {
-        // Enable buttons for admin
-        if (exportExcelBtn) {
-            exportExcelBtn.disabled = false;
-            exportExcelBtn.style.opacity = "1";
-            exportExcelBtn.style.cursor = "pointer";
-            exportExcelBtn.title = "Export to Excel";
-        }
-        if (exportCSVBtn) {
-            exportCSVBtn.disabled = false;
-            exportCSVBtn.style.opacity = "1";
-            exportCSVBtn.style.cursor = "pointer";
-            exportCSVBtn.title = "Export to CSV";
-        }
-        if (pdfBtn) {
-            pdfBtn.disabled = false;
-            pdfBtn.style.opacity = "1";
-            pdfBtn.style.cursor = "pointer";
-            pdfBtn.title = "Export to PDF";
-        }
-        if (clearBtn) {
-            clearBtn.disabled = false;
-            clearBtn.style.opacity = "1";
-            clearBtn.style.cursor = "pointer";
-            clearBtn.title = "Clear all records";
-        }
+        if (exportExcelBtn) { exportExcelBtn.disabled = false; exportExcelBtn.style.opacity = "1"; exportExcelBtn.style.cursor = "pointer"; }
+        if (exportCSVBtn) { exportCSVBtn.disabled = false; exportCSVBtn.style.opacity = "1"; exportCSVBtn.style.cursor = "pointer"; }
+        if (pdfBtn) { pdfBtn.disabled = false; pdfBtn.style.opacity = "1"; pdfBtn.style.cursor = "pointer"; }
+        if (clearBtn) { clearBtn.disabled = false; clearBtn.style.opacity = "1"; clearBtn.style.cursor = "pointer"; }
     }
 }
 
-// ---- SAVE TO GOOGLE SHEET ----
+// ============== SAVE TO GOOGLE SHEET ==============
 async function saveToGoogle() {
-    const calc = calculateAndUpdate();
-    
-    const data = {
-        action: "save",
-        username: currentUser,
-        role: currentRole,
-        work_date: document.getElementById("work_date").value,
-        client_name: document.getElementById("client").value,
-        contractor_name: document.getElementById("contractor").value,
-        crane_type: document.getElementById("crane_type").value,
-        po_code: calc.po || "",
-        crane_number: document.getElementById("crane_no").value,
-        assign_sir: document.getElementById("assign").value,
-        in_time: document.getElementById("in_time").value,
-        out_time: document.getElementById("out_time").value,
-        lunch_minutes: document.getElementById("lunch").value,
-        total_hours: document.getElementById("total_hours").value,
-        unit_type: document.getElementById("unit").value,
-        rate: document.getElementById("rate").value,
-        amount: document.getElementById("amount").value,
-        source_file: "Bhavishya_" + new Date().toISOString().split("T")[0],
-        created_at: new Date().toLocaleString("en-IN")
-    };
-    
-    const url = "https://script.google.com/macros/s/AKfycbzRo2Vus6xg4PQHywhqLmukE9dAlg2biSLwVuhaDqychC-GM8rf9AfbVC6gCJt3KbZC/exec";
-    try {
-        const response = await fetch(url, { method: "POST", body: JSON.stringify(data) });
-        const result = await response.json();
-        if (result.status === "success") {
-            alert("✅ Saved to Google Sheet!");
-            await loadFromGoogle(); // ✅ Reload fresh data instead of manual push
-            // Clear form after successful save
-            document.getElementById("work_date").value = "";
-            document.getElementById("client").value = "";
-            document.getElementById("contractor").value = "";
-            document.getElementById("assign").value = "";
-            document.getElementById("in_time").value = "";
-            document.getElementById("out_time").value = "";
-            document.getElementById("lunch").value = "0";
-            document.getElementById("rate").value = "";
-        } else {
-            if (result.message === "Duplicate entry") {
-                alert("⚠️ Duplicate Entry! Already exists.");
+    if (rows.length === 0) {
+        alert("⚠️ No records to save");
+        return;
+    }
+
+    let savedCount = 0;
+    let errorCount = 0;
+
+    for (let i = 0; i < rows.length; i++) {
+        const r = rows[i];
+        const data = {
+            action: "save",
+            username: currentUser,
+            role: currentRole,
+            work_date: r.work_date,
+            client_name: r.client,
+            contractor_name: r.contractor,
+            crane_type: r.crane_type,
+            po_code: r.po,
+            crane_number: r.crane_no,
+            assign_sir: r.assign,
+            in_time: r.in_time,
+            out_time: r.out_time,
+            lunch_minutes: r.lunch,
+            total_hours: r.total_hours,
+            unit_type: r.unit,
+            rate: r.rate,
+            amount: r.amount,
+            source_file: "Bhavishya_" + new Date().toISOString().split("T")[0],
+            created_at: new Date().toLocaleString("en-IN")
+        };
+
+        try {
+            const response = await fetch(SCRIPT_URL, { 
+                method: "POST", 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data) 
+            });
+            const result = await response.json();
+            if (result.status === "success") {
+                savedCount++;
             } else {
-                alert("⚠️ Error: " + (result.message || "Unknown"));
+                errorCount++;
+                console.error("Save error for row:", r, result.message);
             }
+        } catch (error) {
+            errorCount++;
+            console.error("Connection error:", error);
         }
-    } catch (error) {
-        alert("❌ Connection Error");
+    }
+
+    if (savedCount > 0) {
+        alert(`✅ Saved ${savedCount} records to Google Sheet!${errorCount > 0 ? `\n⚠️ ${errorCount} records failed` : ""}`);
+        await loadFromGoogle();
+        rows = [];
+        renderTable();
+        populateFilterDropdowns();
+    } else {
+        alert("❌ Failed to save records. Check your connection.");
     }
 }
 
-// ---- LOAD FROM GOOGLE SHEET ----
+// ============== LOAD FROM GOOGLE SHEET ==============
 async function loadFromGoogle() {
-    const url = "https://script.google.com/macros/s/AKfycbzRo2Vus6xg4PQHywhqLmukE9dAlg2biSLwVuhaDqychC-GM8rf9AfbVC6gCJt3KbZC/exec";
     try {
-        const res = await fetch(url);
+        const res = await fetch(SCRIPT_URL);
         const data = await res.json();
         
         if (Array.isArray(data)) {
-            // ✅ Filter out empty/blank rows
             rows = data.filter(r => r.work_date && r.work_date.toString().trim() !== "").map(r => ({
                 work_date: parseDateToYYYYMMDD(r.work_date),
                 rowIndex: r.rowIndex,
@@ -738,26 +621,14 @@ async function loadFromGoogle() {
     }
 }
 
-// ---- EXPORT FUNCTIONS ----
+// ============== EXPORT FUNCTIONS ==============
 function exportExcel() {
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
-    
-    if (!isAdmin) {
-        alert("❌ Access Denied");
-        return;
-    }
-
-    if (typeof XLSX === "undefined") {
-        alert("Excel lib missing");
-        return;
-    }
+    if (!isAdmin) { alert("❌ Access Denied - Admin only"); return; }
+    if (typeof XLSX === "undefined") { alert("Excel library not loaded"); return; }
 
     const filtered = getFilteredRows();
-
-    if (filtered.length === 0) {
-        alert("No data to export");
-        return;
-    }
+    if (filtered.length === 0) { alert("No data to export"); return; }
 
     const exportData = filtered.map(r => ({
         work_date: r.work_date,
@@ -779,51 +650,22 @@ function exportExcel() {
     const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Crane_Worksheets");
-
     XLSX.writeFile(wb, `Bhavishya_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
     alert(`✅ Exported ${filtered.length} records`);
 }
 
 function exportCSV() {
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
-    
-    if (!isAdmin) {
-        alert("❌ Access Denied");
-        return;
-    }
+    if (!isAdmin) { alert("❌ Access Denied - Admin only"); return; }
 
     const filtered = getFilteredRows();
+    if (filtered.length === 0) { alert("No data to export"); return; }
 
-    if (filtered.length === 0) {
-        alert("No data to export");
-        return;
-    }
-
-    const headers = [
-        "work_date", "client_name", "contractor_name", "crane_type",
-        "po_code", "crane_number", "assign_sir", "in_time", "out_time",
-        "lunch_minutes", "total_hours", "unit_type", "rate", "amount"
-    ];
-
+    const headers = ["work_date", "client_name", "contractor_name", "crane_type", "po_code", "crane_number", "assign_sir", "in_time", "out_time", "lunch_minutes", "total_hours", "unit_type", "rate", "amount"];
     const csvRows = [headers.join(",")];
 
     filtered.forEach(r => {
-        const row = [
-            r.work_date,
-            `"${r.client}"`,
-            `"${r.contractor}"`,
-            r.crane_type,
-            r.po,
-            r.crane_no,
-            `"${r.assign}"`,
-            r.in_time,
-            r.out_time,
-            r.lunch,
-            r.total_hours,
-            r.unit,
-            r.rate,
-            r.amount
-        ];
+        const row = [r.work_date, `"${r.client}"`, `"${r.contractor}"`, r.crane_type, r.po, r.crane_no, `"${r.assign}"`, r.in_time, r.out_time, r.lunch, r.total_hours, r.unit, r.rate, r.amount];
         csvRows.push(row.join(","));
     });
 
@@ -839,14 +681,10 @@ function exportCSV() {
     alert(`✅ Exported ${filtered.length} records to CSV`);
 }
 
-// ---- PDF GENERATION ----
+// ============== PDF GENERATION ==============
 async function generatePDF() {
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
-    
-    if (!isAdmin) {
-        alert("❌ Access Denied");
-        return;
-    }
+    if (!isAdmin) { alert("❌ Access Denied - Admin only"); return; }
 
     const { jsPDF } = window.jspdf;
     const filtered = getFilteredRows();
@@ -943,17 +781,12 @@ async function generatePDF() {
 
 function clearAll() {
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
-    
-    if (!isAdmin) {
-        alert("❌ Access Denied");
-        return;
-    }
-
-    if(confirm("Delete ALL records?")) {
+    if (!isAdmin) { alert("❌ Access Denied - Admin only"); return; }
+    if(confirm("⚠️ WARNING: This will clear ALL records from the display only!\n\nSaved records in Google Sheet will remain.\n\nContinue?")) {
         rows = [];
         renderTable();
         populateFilterDropdowns();
-        alert("All records cleared!");
+        alert("Display cleared!");
     }
 }
 
@@ -964,6 +797,7 @@ function attachFilters() {
     });
 }
 
+// ============== EVENT LISTENERS ==============
 document.querySelectorAll("#in_time, #out_time, #lunch, #rate_type, #rate, #client, #crane_type").forEach(el => {
     if(el) el.addEventListener("input", () => calculateAndUpdate());
 });
