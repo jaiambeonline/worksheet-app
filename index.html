@@ -533,6 +533,13 @@ async function saveToGoogle() {
 
     for (let i = 0; i < rows.length; i++) {
         const r = rows[i];
+
+        // ✅ SKIP EMPTY / INVALID ROWS (VERY IMPORTANT)
+        if (!r.work_date || !r.crane_no || !r.in_time || !r.out_time) {
+            console.warn("Skipping invalid row:", r);
+            continue;
+        }
+
         const data = {
             action: "save",
             username: currentUser,
@@ -577,7 +584,7 @@ async function saveToGoogle() {
     }
 
     if (savedCount > 0) {
-        alert(`✅ Saved ${savedCount} records`);
+        alert(`✅ Saved ${savedCount} records${errorCount > 0 ? `\n⚠️ ${errorCount} failed` : ""}`);
         await loadFromGoogle();
         rows = [];
         renderTable();
