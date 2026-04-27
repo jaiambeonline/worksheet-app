@@ -524,6 +524,9 @@ function applyRolePermissions() {
 
 async function saveDirect() {
 
+    // ✅ get calculated values (IMPORTANT)
+    const calc = calculateAndUpdate();
+
     const data = {
         action: "save",
         username: currentUser,
@@ -541,7 +544,10 @@ async function saveDirect() {
         unit_type: document.getElementById("unit").value,
         rate: document.getElementById("rate").value,
         amount: document.getElementById("amount").value,
-        po_code: "",
+
+        // ✅ FIXED PO CODE
+        po_code: calc.po,
+
         source_file: "Bhavishya_" + new Date().toISOString().split("T")[0]
     };
 
