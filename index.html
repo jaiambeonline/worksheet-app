@@ -273,51 +273,7 @@ function calculateAndUpdate() {
     return { po, hours, amount, unit };
 }
 
-// ============== ADD ROW ==============
-function addRow() {
-    let work_date = document.getElementById("work_date").value;
-    if (!work_date) { alert("Please select work date"); return; }
-    let client = cleanStr(document.getElementById("client").value);
-    if (!client) { alert("Client name required"); return; }
-    
-    let inTime = document.getElementById("in_time").value;
-    let outTime = document.getElementById("out_time").value;
-    if (!inTime || !outTime) { alert("Please select both In Time and Out Time"); return; }
 
-    let calc = calculateAndUpdate();
-    
-    let newRow = {
-        work_date: work_date,
-        client: norm(client),
-        contractor: norm(cleanStr(document.getElementById("contractor").value)),
-        crane_type: document.getElementById("crane_type").value,
-        crane_no: document.getElementById("crane_no").value,
-        assign: norm(cleanStr(document.getElementById("assign").value)),
-        in_time: inTime,
-        out_time: outTime,
-        lunch: parseFloat(document.getElementById("lunch").value || 0),
-        total_hours: parseFloat(document.getElementById("total_hours").value || 0),
-        unit: document.getElementById("unit").value,
-        rate: parseFloat(document.getElementById("rate").value || 0),
-        amount: parseFloat(document.getElementById("amount").value || 0),
-        po: calc.po || "",
-        rowIndex: null
-    };
-    
-    rows.push(newRow);
-    rows = sortRowsByDate(rows);
-    renderTable();
-    populateFilterDropdowns();
-    
-    // Clear form
-    document.getElementById("client").value = "";
-    document.getElementById("contractor").value = "";
-    document.getElementById("assign").value = "";
-    document.getElementById("in_time").value = "";
-    document.getElementById("out_time").value = "";
-    document.getElementById("lunch").value = "0";
-    document.getElementById("rate").value = "";
-}
 
 function getFilteredRows() {
     const contractorFilter = document.getElementById("pdf_contractor").value;
@@ -582,78 +538,7 @@ async function saveDirect() {
         alert("❌ Connection error");
     }
 }
-// ============== SAVE TO GOOGLE SHEET ==============
-async function saveToGoogle() {
-    if (rows.length === 0) {
-        alert("⚠️ No records to save");
-        return;
-    }
 
-    let savedCount = 0;
-    let errorCount = 0;
-
-    for (let i = 0; i < rows.length; i++) {
-        const r = rows[i];
-
-        // ✅ SKIP EMPTY / INVALID ROWS (VERY IMPORTANT)
-        if (!r.work_date || !r.crane_no || !r.in_time || !r.out_time) {
-            console.warn("Skipping invalid row:", r);
-            continue;
-        }
-
-        const data = {
-            action: "save",
-            username: currentUser,
-            role: currentRole,
-            work_date: r.work_date,
-            client_name: r.client,
-            contractor_name: r.contractor,
-            crane_type: r.crane_type,
-            po_code: r.po,
-            crane_number: r.crane_no,
-            assign_sir: r.assign,
-            in_time: r.in_time,
-            out_time: r.out_time,
-            lunch_minutes: r.lunch,
-            total_hours: r.total_hours,
-            unit_type: r.unit,
-            rate: r.rate,
-            amount: r.amount,
-            source_file: "Bhavishya_" + new Date().toISOString().split("T")[0],
-            created_at: new Date().toLocaleString("en-IN")
-        };
-
-        try {
-            const response = await fetch(SCRIPT_URL, { 
-                method: "POST",
-                body: JSON.stringify(data)
-            });
-
-            const result = await response.json();
-
-            if (result.status === "success") {
-                savedCount++;
-            } else {
-                errorCount++;
-                console.error("Save error:", result.message);
-            }
-
-        } catch (error) {
-            errorCount++;
-            console.error("Connection error:", error);
-        }
-    }
-
-    if (savedCount > 0) {
-        alert(`✅ Saved ${savedCount} records${errorCount > 0 ? `\n⚠️ ${errorCount} failed` : ""}`);
-        await loadFromGoogle();
-        rows = [];
-        renderTable();
-        populateFilterDropdowns();
-    } else {
-        alert("❌ Failed to save records");
-    }
-}
 
 // ============== LOAD FROM GOOGLE SHEET ==============
 async function loadFromGoogle() {
