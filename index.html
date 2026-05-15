@@ -2,47 +2,358 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
 <title>Bhavishya Enterprise - Crane Worksheet</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; }
-body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; padding: 16px 12px; overflow-x: hidden; }
-.app { max-width: 420px; margin: 0 auto; padding: 0 12px;}
-.card { background: white; padding: 18px 16px; border-radius: 24px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05); margin-bottom: 18px; }
-.header { background: linear-gradient(135deg, #1e3a8a, #0f2b6d); color: white; text-align: center; padding: 20px 16px; border-radius: 28px; }
-.header h2 { margin: 0; font-size: 1.4rem; }
-.header p { margin: 5px 0; font-size: 0.75rem; opacity: 0.9; }
-input, select { width: 100%; padding: 12px 14px; margin: 8px 0; border-radius: 16px; border: 1px solid #cbd5e1; font-size: 0.85rem; font-family: inherit; }
-input:focus, select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.2); }
-button { width: 100%; padding: 12px; margin-top: 12px; border: none; border-radius: 40px; font-weight: 600; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: 0.2s; }
-button.primary { background: #2563eb; color: white; }
-button.danger { background: #dc2626; color: white; }
-button.secondary { background: #f1f5f9; color: #1f2937; border: 1px solid #cbd5e1; }
-button.success { background: #16a34a; color: white; }
-button:disabled { opacity: 0.5; cursor: not-allowed; }
-.summary-box { background: #eef2ff; padding: 14px; border-radius: 24px; font-weight: 600; font-size: 0.8rem; text-align: center; color: #0f2b6d; margin-bottom: 14px; }
-.table-container { max-height: 550px; overflow-y: auto; overflow-x: auto; border-radius: 20px; border: 1px solid #e2e8f0; background: white; margin-top: 12px; }
-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
-th { background: #1e3a8a; color: white; padding: 12px 6px; position: sticky; top: 0; font-weight: 600; }
-td { padding: 8px 5px; border-bottom: 1px solid #e2e8f0; }
-tr:nth-child(even) { background: #f8fafc; }
-.filter-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; align-items: flex-end; }
-.filter-group { flex: 1 1 160px; }
-.filter-group label { font-size: 0.7rem; font-weight: 600; color: #334155; display: block; margin-bottom: 4px; }
-.filter-group select, .filter-group input { margin: 0; padding: 8px 10px; font-size: 0.8rem; }
-.date-group { flex: 1 1 140px; }
-.button-group { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
-.button-group button { flex: 1; margin-top: 0; }
-@media (min-width: 760px) {
-    .app { max-width: 1280px; }
-    .dashboard-grid { display: grid; grid-template-columns: 380px 1fr; gap: 22px; align-items: start; justify-content: center; }
-    table { font-size: 0.8rem; min-width: auto; }
-    th, td { padding: 10px 8px; }
-    .filter-row { flex-wrap: nowrap; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
-.error-message { color: #dc2626; background: #fee2e2; padding: 8px; border-radius: 40px; text-align: center; font-size: 0.75rem; margin-top: 12px; display: none; }
-.success-message { color: #16a34a; background: #dcfce7; padding: 8px; border-radius: 40px; text-align: center; font-size: 0.75rem; margin-top: 12px; display: none; }
+
+body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f5f7fb;
+    overflow-x: hidden;
+}
+
+/* WhatsApp-like container */
+.app {
+    min-height: 100vh;
+    background: #f5f7fb;
+}
+
+/* Responsive padding */
+.container {
+    padding: 12px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Cards like WhatsApp bubbles */
+.card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    transition: all 0.2s ease;
+}
+
+/* Header - sticky like WhatsApp header */
+.header {
+    background: linear-gradient(135deg, #075E54, #128C7E);
+    color: white;
+    padding: 16px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.header h2 {
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.header p {
+    font-size: 0.7rem;
+    opacity: 0.9;
+    margin-top: 4px;
+}
+
+/* Form grid - responsive */
+.form-grid {
+    display: grid;
+    gap: 12px;
+}
+
+/* Mobile: 1 column */
+.form-grid {
+    grid-template-columns: 1fr;
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 768px) {
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .full-width {
+        grid-column: span 2;
+    }
+}
+
+/* Input fields - touch friendly */
+input, select, button {
+    font-family: inherit;
+    font-size: 16px; /* Prevents zoom on iOS */
+    border-radius: 12px;
+    padding: 14px 16px;
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s;
+    background: white;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #25D366;
+    box-shadow: 0 0 0 3px rgba(37,211,102,0.1);
+}
+
+/* Buttons - WhatsApp style */
+button {
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.1s, opacity 0.2s;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.btn-primary {
+    background: #25D366;
+    color: white;
+}
+
+.btn-primary:active {
+    background: #128C7E;
+}
+
+.btn-danger {
+    background: #dc2626;
+    color: white;
+}
+
+.btn-secondary {
+    background: #f0f2f5;
+    color: #1f2937;
+    border: 1px solid #e2e8f0;
+}
+
+/* Filter section - responsive grid */
+.filter-grid {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+/* Mobile: 1 column */
+.filter-grid {
+    grid-template-columns: 1fr;
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 640px) {
+    .filter-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Desktop: 3 columns */
+@media (min-width: 1024px) {
+    .filter-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.filter-group label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #374151;
+    display: block;
+    margin-bottom: 6px;
+}
+
+/* Summary cards - WhatsApp status style */
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.summary-card {
+    background: linear-gradient(135deg, #075E54, #128C7E);
+    color: white;
+    padding: 14px;
+    border-radius: 16px;
+    text-align: center;
+}
+
+.summary-card h4 {
+    font-size: 0.7rem;
+    opacity: 0.9;
+    margin-bottom: 6px;
+}
+
+.summary-card .value {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+/* Table container - horizontal scroll on all devices */
+.table-container {
+    overflow-x: auto;
+    overflow-y: auto;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    margin: 16px 0;
+    -webkit-overflow-scrolling: touch;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.75rem;
+    min-width: 800px; /* Ensures horizontal scroll on mobile */
+}
+
+@media (min-width: 1024px) {
+    table {
+        min-width: auto;
+    }
+}
+
+th {
+    background: #075E54;
+    color: white;
+    padding: 14px 8px;
+    position: sticky;
+    top: 0;
+    font-weight: 600;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #f0f2f5;
+    white-space: nowrap;
+}
+
+/* Button group - responsive */
+.button-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
+.button-group button {
+    flex: 1;
+    min-width: 100px;
+}
+
+/* Login screen - centered like WhatsApp web */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #075E54, #128C7E);
+}
+
+.login-card {
+    background: white;
+    border-radius: 32px;
+    padding: 32px 24px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+/* Desktop layout - side by side */
+@media (min-width: 1024px) {
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 450px 1fr;
+        gap: 20px;
+        align-items: start;
+    }
+    
+    .form-section {
+        position: sticky;
+        top: 80px;
+    }
+}
+
+/* Touch optimizations */
+@media (hover: none) {
+    button, 
+    input, 
+    select,
+    .clickable {
+        cursor: pointer;
+    }
+    
+    button:active {
+        transform: scale(0.97);
+    }
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #25D366;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Error/Success messages */
+.message {
+    padding: 12px;
+    border-radius: 12px;
+    margin-top: 12px;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.message-error {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.message-success {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+/* Improve scroll on mobile */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -51,76 +362,146 @@ tr:nth-child(even) { background: #f8fafc; }
 
 <div class="app">
     <!-- LOGIN SCREEN -->
-    <div id="loginScreen" class="card" style="text-align:center;">
-        <div style="font-weight:800; font-size:22px; margin-bottom:12px;">🏗️ BHAVISHYA ENTERPRISE</div>
-        <div style="font-size:12px; color:#334155; margin:8px 0;">
-            Shop No 5, T M Park, Mukund Parnera<br>Valsad - 396020<br>📞 8866995757<br>✉️ bhavishyaenterprisevalsad@gmail.com
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div style="font-size: 48px; margin-bottom: 16px;">🏗️</div>
+            <h2 style="color: #075E54; margin-bottom: 8px;">BHAVISHYA ENTERPRISE</h2>
+            <p style="font-size: 11px; color: #666; margin-bottom: 24px;">
+                Shop No 5, T M Park, Mukund Parnera<br>Valsad - 396020
+            </p>
+            <h3 style="margin: 20px 0 16px;">🔐 Login</h3>
+            <input id="username" placeholder="Username" style="margin-bottom: 12px;">
+            <input type="password" id="password" placeholder="Password" style="margin-bottom: 20px;">
+            <button class="btn-primary" onclick="login()" style="width: 100%;">Login</button>
+            <div id="errorMsg" class="message message-error" style="display:none;"></div>
         </div>
-        <h3 style="margin:20px 0 10px;">🔐 Login</h3>
-        <input id="username" placeholder="Username" style="text-align:center;">
-        <input type="password" id="password" placeholder="Password" style="text-align:center;">
-        <button class="primary" onclick="login()">Login</button>
-        <div id="errorMsg" class="error-message">❌ Invalid credentials</div>
     </div>
 
     <!-- MAIN APP -->
     <div id="mainApp" style="display:none;">
-        <div class="card header">
-            <h2>🏗️ BHAVISHYA ENTERPRISE</h2>
-            <p>Shop No 5, T M Park, Mukund Parnera, Valsad - 396020</p>
-            <p>📞 8866995757 | 📧 bhavishyaenterprisevalsad@gmail.com</p>
-            <button class="secondary" onclick="logout()" style="background:#ffffff20; color:white; margin-top:8px;">🚪 Logout</button>
+        <!-- Sticky Header -->
+        <div class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2>🏗️ BHAVISHYA ENTERPRISE</h2>
+                    <p>Valsad - 396020 | 📞 8866995757</p>
+                </div>
+                <button onclick="logout()" style="background: rgba(255,255,255,0.2); color: white; padding: 8px 16px; width: auto;">🚪 Logout</button>
+            </div>
         </div>
 
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3 style="margin:0 0 12px 0;">📋 Worksheet Entry</h3>
-                <input type="date" id="work_date">
-                <input id="client" placeholder="Client Name" autocomplete="off">
-                <input id="contractor" placeholder="Contractor Name" autocomplete="off">
-                <select id="crane_type"><option>HYDRA</option><option>FARANA</option></select>
-                <select id="crane_no">
-                    <option>GJ15SV1249</option><option>GJ15SV1677</option><option>GJ15SV1316</option>
-                    <option>GJ15SV0869</option><option>GJ15SV1112</option><option>GJ15SV1569</option>
-                    <option>GJ15SV0443</option><option>GJ15BB8456</option><option>GJ15SV0726</option>
-                </select>
-                <input id="assign" placeholder="Assign Sir" autocomplete="off">
-                <input type="time" id="in_time">
-                <input type="time" id="out_time">
-                <input type="number" id="lunch" value="0" placeholder="Lunch (minutes)">
-                <select id="rate_type"><option>Hourly</option><option>Fixed</option></select>
-                <input type="number" id="rate" placeholder="Rate (₹)">
-                <input id="total_hours" placeholder="Total Hours" readonly style="background:#f1f5f9;">
-                <input id="unit" placeholder="Unit" readonly style="background:#f1f5f9;">
-                <input id="amount" placeholder="Amount (₹)" readonly style="background:#f1f5f9;">
-                
-                <button class="primary" onclick="saveDirect()" style="background:#0f3b2c;">📤 Save to Google Sheet</button>
-            </div>
+        <div class="container">
+            <div class="dashboard-grid">
+                <!-- Form Section -->
+                <div class="form-section">
+                    <div class="card">
+                        <h3 style="margin-bottom: 16px; color: #075E54;">📋 New Entry</h3>
+                        <div class="form-grid">
+                            <input type="date" id="work_date" placeholder="Date">
+                            <input id="client" placeholder="Client Name">
+                            <input id="contractor" placeholder="Contractor Name">
+                            <select id="crane_type">
+                                <option>HYDRA</option>
+                                <option>FARANA</option>
+                            </select>
+                            <select id="crane_no">
+                                <option>GJ15SV1249</option><option>GJ15SV1677</option><option>GJ15SV1316</option>
+                                <option>GJ15SV0869</option><option>GJ15SV1112</option><option>GJ15SV1569</option>
+                                <option>GJ15SV0443</option><option>GJ15BB8456</option><option>GJ15SV0726</option>
+                            </select>
+                            <input id="assign" placeholder="Assign Sir">
+                            <input type="time" id="in_time">
+                            <input type="time" id="out_time">
+                            <input type="number" id="lunch" value="0" placeholder="Lunch (minutes)">
+                            <select id="rate_type">
+                                <option>Hourly</option>
+                                <option>Fixed</option>
+                            </select>
+                            <input type="number" id="rate" placeholder="Rate (₹)">
+                            <input id="total_hours" placeholder="Total Hours" readonly style="background:#f5f7fb;">
+                            <input id="unit" placeholder="Unit" readonly style="background:#f5f7fb;">
+                            <input id="amount" placeholder="Amount (₹)" readonly style="background:#f5f7fb;">
+                        </div>
+                        <button class="btn-primary" onclick="saveDirect()" style="margin-top: 20px; width: 100%;">📤 Save to Google Sheet</button>
+                    </div>
+                </div>
 
-            <div class="card">
-                <h4 style="margin:0 0 12px 0;">🔍 Filter Records</h4>
-                <div class="filter-row">
-                    <div class="filter-group"><label>👤 Contractor</label><select id="pdf_contractor"><option value="">ALL</option></select></div>
-                    <div class="filter-group"><label>👨‍💼 Assign Sir</label><select id="pdf_assign"><option value="">ALL</option></select></div>
-                    <div class="filter-group"><label>🚛 Crane No</label><select id="pdf_crane_no"><option value="">ALL</option></select></div>
-                    <div class="filter-group"><label>🏗️ Crane Type</label><select id="pdf_crane_type"><option value="">ALL</option><option>HYDRA</option><option>FARANA</option></select></div>
-                    <div class="filter-group date-group"><label>📅 From Date</label><input type="date" id="pdf_from"></div>
-                    <div class="filter-group date-group"><label>📅 To Date</label><input type="date" id="pdf_to"></div>
-                </div>
-                <div class="summary-box" id="summary">HYDRA HRS: 0 | FARANA HRS: 0 | FARANA DAYS: 0 | TOTAL ₹: 0</div>
-                <div class="table-container">
-                    <table id="worksheetTable">
-                        <thead>
-                            <tr><th>Date</th><th>Client</th><th>Contractor</th><th>Crane Type</th><th>Crane No</th><th>Assign Sir</th><th>In</th><th>Out</th><th>Lunch</th><th>Hours</th><th>Unit</th><th>Rate</th><th>Amount</th><th>PO</th><th>Action</th></tr>
-                        </thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
-                </div>
-                <div class="button-group">
-                    <button id="exportExcelBtn" class="primary" onclick="exportExcel()">📎 Export Excel</button>
-                    <button id="exportCSVBtn" class="success" onclick="exportCSV()">📊 Export CSV</button>
-                    <button id="pdfBtn" class="primary" onclick="generatePDF()">📄 Export PDF</button>
-                    <button id="clearBtn" class="danger" onclick="clearAll()">🗑️ Clear All</button>
+                <!-- Data Section -->
+                <div>
+                    <!-- Filters -->
+                    <div class="card">
+                        <h4 style="margin-bottom: 16px; color: #075E54;">🔍 Filter Records</h4>
+                        <div class="filter-grid">
+                            <div class="filter-group">
+                                <label>👤 Contractor</label>
+                                <select id="pdf_contractor"><option value="">ALL</option></select>
+                            </div>
+                            <div class="filter-group">
+                                <label>👨‍💼 Assign Sir</label>
+                                <select id="pdf_assign"><option value="">ALL</option></select>
+                            </div>
+                            <div class="filter-group">
+                                <label>🚛 Crane No</label>
+                                <select id="pdf_crane_no"><option value="">ALL</option></select>
+                            </div>
+                            <div class="filter-group">
+                                <label>🏗️ Crane Type</label>
+                                <select id="pdf_crane_type"><option value="">ALL</option><option>HYDRA</option><option>FARANA</option></select>
+                            </div>
+                            <div class="filter-group">
+                                <label>📅 From Date</label>
+                                <input type="date" id="pdf_from">
+                            </div>
+                            <div class="filter-group">
+                                <label>📅 To Date</label>
+                                <input type="date" id="pdf_to">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <h4>HYDRA HOURS</h4>
+                            <div class="value" id="hydraHours">0</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>FARANA HOURS</h4>
+                            <div class="value" id="faranaHours">0</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>FARANA DAYS</h4>
+                            <div class="value" id="faranaDays">0</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>TOTAL ₹</h4>
+                            <div class="value" id="totalAmount">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="card">
+                        <div class="table-container">
+                            <table id="worksheetTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th><th>Client</th><th>Contractor</th><th>Crane Type</th><th>Crane No</th>
+                                        <th>Assign</th><th>In</th><th>Out</th><th>Lunch</th><th>Hours</th>
+                                        <th>Unit</th><th>Rate</th><th>Amount</th><th>PO</th><th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody"></tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="button-group">
+                            <button class="btn-secondary" onclick="exportExcel()">📎 Excel</button>
+                            <button class="btn-secondary" onclick="exportCSV()">📊 CSV</button>
+                            <button class="btn-secondary" onclick="generatePDF()">📄 PDF</button>
+                            <button class="btn-danger" onclick="clearAll()">🗑️ Clear All</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -140,7 +521,16 @@ let rows = [];
 function norm(v) { return (v || "").toString().trim().toUpperCase(); }
 function cleanStr(v) { return (v || "").toString().trim(); }
 
-// ============== DATE PARSING ==============
+function showMessage(elementId, message, isError = true) {
+    const msgDiv = document.getElementById(elementId);
+    msgDiv.innerText = message;
+    msgDiv.style.display = "block";
+    msgDiv.className = isError ? "message message-error" : "message message-success";
+    setTimeout(() => {
+        msgDiv.style.display = "none";
+    }, 3000);
+}
+
 function parseDateToYYYYMMDD(dateValue) {
     if (!dateValue) return "";
     let dateStr = String(dateValue).trim();
@@ -159,7 +549,6 @@ function parseDateToYYYYMMDD(dateValue) {
     return "";
 }
 
-// ============== TIME PARSING ==============
 function parseTimeToHHMM(timeValue) {
     if (!timeValue) return "";
     let timeStr = String(timeValue).trim();
@@ -171,10 +560,6 @@ function parseTimeToHHMM(timeValue) {
     let match = timeStr.match(/(\d{1,2}):(\d{2})/);
     if (match) return `${match[1].padStart(2,'0')}:${match[2]}`;
     return "";
-}
-
-function isValidTime(t) {
-    return /^\d{2}:\d{2}$/.test(t);
 }
 
 function formatDateForDisplay(dateStr) {
@@ -218,7 +603,7 @@ function calculateAndUpdate() {
     let rateType = document.getElementById("rate_type").value;
     let rateField = document.getElementById("rate");
 
-    if (!isValidTime(inTime) || !isValidTime(outTime)) {
+    if (!inTime || !outTime) {
         document.getElementById("total_hours").value = "";
         document.getElementById("unit").value = "";
         document.getElementById("amount").value = "";
@@ -273,8 +658,6 @@ function calculateAndUpdate() {
     return { po, hours, amount, unit };
 }
 
-
-
 function getFilteredRows() {
     const contractorFilter = document.getElementById("pdf_contractor").value;
     const assignFilter = document.getElementById("pdf_assign").value;
@@ -295,6 +678,23 @@ function getFilteredRows() {
     return sortRowsByDate(filtered);
 }
 
+function updateSummary() {
+    const filtered = getFilteredRows();
+    let hydra = 0, faranaH = 0, faranaD = 0, totalAmt = 0;
+    
+    filtered.forEach(r => {
+        totalAmt += (r.amount || 0);
+        if (r.po === "9119720043") hydra += (r.total_hours || 0);
+        if (r.po === "9719720185") faranaH += (r.total_hours || 0);
+        if (r.po === "9719720186") faranaD += 1;
+    });
+    
+    document.getElementById("hydraHours").innerHTML = hydra.toFixed(2);
+    document.getElementById("faranaHours").innerHTML = faranaH.toFixed(2);
+    document.getElementById("faranaDays").innerHTML = faranaD;
+    document.getElementById("totalAmount").innerHTML = totalAmt.toFixed(2);
+}
+
 function renderTable() {
     const filtered = getFilteredRows();
     const tbody = document.getElementById("tableBody");
@@ -313,23 +713,16 @@ function renderTable() {
             <td>${formatTimeDisplay(r.in_time)}</td>
             <td>${formatTimeDisplay(r.out_time)}</td>
             <td>${r.lunch}</td>
-            <td>${r.total_hours}</td>
+            <td>${r.total_hours.toFixed(2)}</td>
             <td>${r.unit}</td>
             <td>${r.rate}</td>
             <td>${r.amount.toFixed(2)}</td>
             <td>${r.po}</td>
-            <td>${isAdmin && r.rowIndex ? `<button onclick="deleteRow(${r.rowIndex})" style="background:#dc2626; color:white; padding:4px 8px; font-size:11px;">🗑️</button>` : ""}</td>
+            <td>${isAdmin && r.rowIndex ? `<button onclick="deleteRow(${r.rowIndex})" style="background:#dc2626; color:white; padding:6px 12px; font-size:11px; border-radius:8px;">🗑️</button>` : ""}</td>
         </tr>
     `).join("");
-
-    let hydra = 0, faranaH = 0, faranaD = 0, totalAmt = 0;
-    filtered.forEach(r => {
-        totalAmt += (r.amount || 0);
-        if (r.po === "9119720043") hydra += (r.total_hours || 0);
-        if (r.po === "9719720185") faranaH += (r.total_hours || 0);
-        if (r.po === "9719720186") faranaD += 1;
-    });
-    document.getElementById("summary").innerHTML = `HYDRA HRS: ${hydra.toFixed(2)} | FARANA HRS: ${faranaH.toFixed(2)} | FARANA DAYS: ${faranaD} | TOTAL ₹: ${totalAmt.toFixed(2)}`;
+    
+    updateSummary();
 }
 
 async function deleteRow(rowIndex) {
@@ -400,9 +793,14 @@ async function login() {
     const password = document.getElementById("password").value;
 
     if (!username || !password) {
-        showError("❌ Please enter username and password");
+        showMessage("errorMsg", "❌ Please enter username and password");
         return;
     }
+
+    const loginBtn = event.target;
+    const originalText = loginBtn.innerText;
+    loginBtn.innerText = "⏳ Logging in...";
+    loginBtn.disabled = true;
 
     try {
         const res = await fetch(SCRIPT_URL, {
@@ -425,25 +823,17 @@ async function login() {
 
             applyRolePermissions();
             await loadFromGoogle();
-            
-            console.log("✅ Login successful - User:", currentUser, "Role:", currentRole);
         } else {
-            showError("❌ Invalid username or password");
+            showMessage("errorMsg", "❌ Invalid username or password");
             document.getElementById("password").value = "";
         }
     } catch (e) {
         console.error("Login error:", e);
-        showError("❌ Cannot connect to server. Please check your connection.");
+        showMessage("errorMsg", "❌ Cannot connect to server. Please check your connection.");
+    } finally {
+        loginBtn.innerText = originalText;
+        loginBtn.disabled = false;
     }
-}
-
-function showError(msg) {
-    const errDiv = document.getElementById("errorMsg");
-    errDiv.innerText = msg;
-    errDiv.style.display = "block";
-    setTimeout(() => {
-        errDiv.style.display = "none";
-    }, 3000);
 }
 
 function logout() {
@@ -451,36 +841,21 @@ function logout() {
     currentRole = "";
     rows = [];
     document.getElementById("mainApp").style.display = "none";
-    document.getElementById("loginScreen").style.display = "block";
+    document.getElementById("loginScreen").style.display = "flex";
     document.getElementById("username").value = "";
     document.getElementById("password").value = "";
 }
 
 function applyRolePermissions() {
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
-    
-    const exportExcelBtn = document.getElementById("exportExcelBtn");
-    const exportCSVBtn = document.getElementById("exportCSVBtn");
-    const pdfBtn = document.getElementById("pdfBtn");
-    const clearBtn = document.getElementById("clearBtn");
-    
-    if (!isAdmin) {
-        if (exportExcelBtn) exportExcelBtn.disabled = true;
-        if (exportCSVBtn) exportCSVBtn.disabled = true;
-        if (pdfBtn) pdfBtn.disabled = true;
-        if (clearBtn) clearBtn.disabled = true;
-    } else {
-        if (exportExcelBtn) exportExcelBtn.disabled = false;
-        if (exportCSVBtn) exportCSVBtn.disabled = false;
-        if (pdfBtn) pdfBtn.disabled = false;
-        if (clearBtn) clearBtn.disabled = false;
-    }
+    const buttons = ['exportExcel', 'exportCSV', 'generatePDF', 'clearAll'];
+    buttons.forEach(btn => {
+        const element = document.querySelector(`button[onclick="${btn}()"]`);
+        if (element) element.disabled = !isAdmin;
+    });
 }
 
-
 async function saveDirect() {
-
-    // ✅ get calculated values (IMPORTANT)
     const calc = calculateAndUpdate();
 
     const data = {
@@ -500,18 +875,19 @@ async function saveDirect() {
         unit_type: document.getElementById("unit").value,
         rate: document.getElementById("rate").value,
         amount: document.getElementById("amount").value,
-
-        // ✅ FIXED PO CODE
         po_code: calc.po,
-
         source_file: "Bhavishya_" + new Date().toISOString().split("T")[0]
     };
 
-    // ✅ VALIDATION
     if (!data.work_date || !data.crane_number || !data.in_time || !data.out_time) {
-        alert("⚠️ Fill required fields");
+        alert("⚠️ Please fill all required fields (Date, Crane No, In/Out Time)");
         return;
     }
+
+    const saveBtn = event.target;
+    const originalText = saveBtn.innerText;
+    saveBtn.innerText = "💾 Saving...";
+    saveBtn.disabled = true;
 
     try {
         const res = await fetch(SCRIPT_URL, {
@@ -523,24 +899,21 @@ async function saveDirect() {
 
         if (result.status === "success") {
             alert("✅ Saved successfully");
-
-            // clear form
-            document.querySelectorAll("input").forEach(i => i.value = "");
+            document.querySelectorAll("#mainApp input:not([readonly])").forEach(i => i.value = "");
             document.getElementById("lunch").value = 0;
-
             await loadFromGoogle();
         } else {
             alert("❌ " + result.message);
         }
-
     } catch (e) {
         console.error(e);
         alert("❌ Connection error");
+    } finally {
+        saveBtn.innerText = originalText;
+        saveBtn.disabled = false;
     }
 }
 
-
-// ============== LOAD FROM GOOGLE SHEET ==============
 async function loadFromGoogle() {
     try {
         const res = await fetch(SCRIPT_URL);
@@ -574,6 +947,7 @@ async function loadFromGoogle() {
         rows = [];
     }
 }
+
 // ============== EXPORT FUNCTIONS ==============
 function exportExcel() {
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
@@ -634,7 +1008,6 @@ function exportCSV() {
     alert(`✅ Exported ${filtered.length} records to CSV`);
 }
 
-// ============== PDF GENERATION ==============
 async function generatePDF() {
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
     if (!isAdmin) { alert("❌ Access Denied - Admin only"); return; }
