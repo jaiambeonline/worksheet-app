@@ -398,6 +398,139 @@ td {
     border-radius: 8px;
     font-size: 0.8rem;
 }
+/* Prevent layout shift - Add to your existing CSS */
+
+/* Ensure table container has stable height */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    margin: 16px 0;
+    -webkit-overflow-scrolling: touch;
+    /* Add minimum height to prevent shift */
+    min-height: 200px;
+}
+
+/* Loading skeleton for table */
+.table-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+/* Ensure card doesn't collapse */
+.card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    /* Prevent collapse */
+    min-height: auto;
+}
+
+/* Fixed height for summary cards area */
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+    /* Fixed minimum height */
+    min-height: 95px;
+}
+
+@media (min-width: 640px) {
+    .summary-cards {
+        grid-template-columns: repeat(4, 1fr);
+        min-height: 85px;
+    }
+}
+
+/* Sticky header - already in your code, keep it */
+.header {
+    background: linear-gradient(135deg, #075E54, #128C7E);
+    color: white;
+    padding: 16px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Dashboard grid - stable layout */
+.dashboard-grid {
+    display: block;
+    /* Ensure smooth transition */
+    transition: all 0.2s ease;
+}
+
+@media (min-width: 1024px) {
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 480px 1fr;
+        gap: 20px;
+        align-items: start;
+    }
+}
+
+/* Form section - prevent shifting */
+.form-section {
+    /* Ensure form doesn't change width */
+    min-width: 0;
+}
+
+/* Right section - stable width */
+@media (min-width: 1024px) {
+    .dashboard-grid > div:last-child {
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+/* Loading spinner for table */
+.loading-spinner {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #25D366;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Ensure body doesn't shift */
+body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f5f7fb;
+    overflow-x: hidden;
+    /* Prevent scrollbar width shift */
+    overflow-y: scroll;
+}
+
+/* Smooth scrollbar appearance */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
