@@ -16,20 +16,23 @@
 body {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
     background: #f5f7fb;
-    overflow-x: hidden;
+    overflow-x: auto; /* Allow horizontal scroll if needed */
+    min-width: 320px; /* Minimum width for very small devices */
 }
 
-/* WhatsApp-like container */
+/* Main app container - centered */
 .app {
-    min-height: 100vh;
+    width: 100%;
     background: #f5f7fb;
+    position: relative;
 }
 
-/* Responsive padding */
+/* Container with max-width and auto margins for centering */
 .container {
-    padding: 12px;
+    width: 100%;
     max-width: 1400px;
     margin: 0 auto;
+    padding: 12px;
 }
 
 /* Cards like WhatsApp bubbles */
@@ -42,7 +45,7 @@ body {
     transition: all 0.2s ease;
 }
 
-/* Header - sticky like WhatsApp header */
+/* Header - sticky */
 .header {
     background: linear-gradient(135deg, #075E54, #128C7E);
     color: white;
@@ -51,6 +54,15 @@ body {
     top: 0;
     z-index: 100;
     box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    width: 100%;
+}
+
+.header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .header h2 {
@@ -87,10 +99,17 @@ body {
     }
 }
 
+/* Desktop: 3 columns for better spacing */
+@media (min-width: 1200px) {
+    .form-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
 /* Input fields - touch friendly */
 input, select, button {
     font-family: inherit;
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: 16px;
     border-radius: 12px;
     padding: 14px 16px;
     width: 100%;
@@ -105,7 +124,12 @@ input:focus, select:focus {
     box-shadow: 0 0 0 3px rgba(37,211,102,0.1);
 }
 
-/* Buttons - WhatsApp style */
+input[readonly] {
+    background: #f5f7fb;
+    cursor: not-allowed;
+}
+
+/* Buttons */
 button {
     font-weight: 600;
     cursor: pointer;
@@ -122,7 +146,7 @@ button:active {
     color: white;
 }
 
-.btn-primary:active {
+.btn-primary:hover {
     background: #128C7E;
 }
 
@@ -171,7 +195,7 @@ button:active {
     margin-bottom: 6px;
 }
 
-/* Summary cards - WhatsApp status style */
+/* Summary cards */
 .summary-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -198,8 +222,9 @@ button:active {
     font-weight: 700;
 }
 
-/* Table container - horizontal scroll on all devices */
+/* Table container - FIXED: Proper horizontal scroll */
 .table-container {
+    width: 100%;
     overflow-x: auto;
     overflow-y: auto;
     border-radius: 16px;
@@ -209,16 +234,33 @@ button:active {
     -webkit-overflow-scrolling: touch;
 }
 
+/* Table styles - ensure all columns visible */
 table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.75rem;
-    min-width: 800px; /* Ensures horizontal scroll on mobile */
+    min-width: 100%; /* Changed from 800px to auto */
 }
 
-@media (min-width: 1024px) {
+/* On mobile, ensure table can scroll horizontally */
+@media (max-width: 768px) {
+    table {
+        min-width: 900px; /* Force horizontal scroll on mobile only */
+    }
+}
+
+/* On tablet, reduce min-width */
+@media (min-width: 769px) and (max-width: 1024px) {
+    table {
+        min-width: 1000px;
+    }
+}
+
+/* On desktop, let it be responsive */
+@media (min-width: 1025px) {
     table {
         min-width: auto;
+        width: 100%;
     }
 }
 
@@ -239,7 +281,7 @@ td {
     white-space: nowrap;
 }
 
-/* Button group - responsive */
+/* Button group */
 .button-group {
     display: flex;
     gap: 10px;
@@ -252,7 +294,7 @@ td {
     min-width: 100px;
 }
 
-/* Login screen - centered like WhatsApp web */
+/* Login screen - centered */
 .login-container {
     min-height: 100vh;
     display: flex;
@@ -286,39 +328,10 @@ td {
     }
 }
 
-/* Touch optimizations */
-@media (hover: none) {
-    button, 
-    input, 
-    select,
-    .clickable {
-        cursor: pointer;
-    }
-    
-    button:active {
-        transform: scale(0.97);
-    }
-}
-
 /* Loading states */
 .loading {
     opacity: 0.6;
     pointer-events: none;
-}
-
-.spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #25D366;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
 }
 
 /* Error/Success messages */
@@ -340,19 +353,39 @@ td {
     color: #16a34a;
 }
 
-/* Improve scroll on mobile */
+/* Scrollbar styling */
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-track {
     background: #f1f1f1;
+    border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
     background: #c1c1c1;
-    border-radius: 3px;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Delete button */
+.delete-btn {
+    background: #dc2626;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    border: none;
+    cursor: pointer;
+}
+
+.delete-btn:active {
+    transform: scale(0.95);
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -381,12 +414,12 @@ td {
     <div id="mainApp" style="display:none;">
         <!-- Sticky Header -->
         <div class="header">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="header-content">
                 <div>
                     <h2>🏗️ BHAVISHYA ENTERPRISE</h2>
                     <p>Valsad - 396020 | 📞 8866995757</p>
                 </div>
-                <button onclick="logout()" style="background: rgba(255,255,255,0.2); color: white; padding: 8px 16px; width: auto;">🚪 Logout</button>
+                <button onclick="logout()" style="background: rgba(255,255,255,0.2); color: white; padding: 8px 16px; width: auto; border-radius: 8px;">🚪 Logout</button>
             </div>
         </div>
 
@@ -418,11 +451,11 @@ td {
                                 <option>Fixed</option>
                             </select>
                             <input type="number" id="rate" placeholder="Rate (₹)">
-                            <input id="total_hours" placeholder="Total Hours" readonly style="background:#f5f7fb;">
-                            <input id="unit" placeholder="Unit" readonly style="background:#f5f7fb;">
-                            <input id="amount" placeholder="Amount (₹)" readonly style="background:#f5f7fb;">
+                            <input id="total_hours" placeholder="Total Hours" readonly>
+                            <input id="unit" placeholder="Unit" readonly>
+                            <input id="amount" placeholder="Amount (₹)" readonly>
                         </div>
-                        <button class="btn-primary" onclick="saveDirect()" style="margin-top: 20px; width: 100%;">📤 Save to Google Sheet</button>
+                        <button class="btn-primary" onclick="saveDirect()" style="margin-top: 20px;">📤 Save to Google Sheet</button>
                     </div>
                 </div>
 
@@ -523,12 +556,14 @@ function cleanStr(v) { return (v || "").toString().trim(); }
 
 function showMessage(elementId, message, isError = true) {
     const msgDiv = document.getElementById(elementId);
-    msgDiv.innerText = message;
-    msgDiv.style.display = "block";
-    msgDiv.className = isError ? "message message-error" : "message message-success";
-    setTimeout(() => {
-        msgDiv.style.display = "none";
-    }, 3000);
+    if (msgDiv) {
+        msgDiv.innerText = message;
+        msgDiv.style.display = "block";
+        msgDiv.className = isError ? "message message-error" : "message message-success";
+        setTimeout(() => {
+            msgDiv.style.display = "none";
+        }, 3000);
+    }
 }
 
 function parseDateToYYYYMMDD(dateValue) {
@@ -689,10 +724,15 @@ function updateSummary() {
         if (r.po === "9719720186") faranaD += 1;
     });
     
-    document.getElementById("hydraHours").innerHTML = hydra.toFixed(2);
-    document.getElementById("faranaHours").innerHTML = faranaH.toFixed(2);
-    document.getElementById("faranaDays").innerHTML = faranaD;
-    document.getElementById("totalAmount").innerHTML = totalAmt.toFixed(2);
+    const hydraEl = document.getElementById("hydraHours");
+    const faranaHEl = document.getElementById("faranaHours");
+    const faranaDEl = document.getElementById("faranaDays");
+    const totalEl = document.getElementById("totalAmount");
+    
+    if (hydraEl) hydraEl.innerHTML = hydra.toFixed(2);
+    if (faranaHEl) faranaHEl.innerHTML = faranaH.toFixed(2);
+    if (faranaDEl) faranaDEl.innerHTML = faranaD;
+    if (totalEl) totalEl.innerHTML = totalAmt.toFixed(2);
 }
 
 function renderTable() {
@@ -718,8 +758,8 @@ function renderTable() {
             <td>${r.rate}</td>
             <td>${r.amount.toFixed(2)}</td>
             <td>${r.po}</td>
-            <td>${isAdmin && r.rowIndex ? `<button onclick="deleteRow(${r.rowIndex})" style="background:#dc2626; color:white; padding:6px 12px; font-size:11px; border-radius:8px;">🗑️</button>` : ""}</td>
-        </tr>
+            <td>${isAdmin && r.rowIndex ? `<button class="delete-btn" onclick="deleteRow(${r.rowIndex})">🗑️</button>` : ""}</td>
+        </table>
     `).join("");
     
     updateSummary();
@@ -899,8 +939,18 @@ async function saveDirect() {
 
         if (result.status === "success") {
             alert("✅ Saved successfully");
-            document.querySelectorAll("#mainApp input:not([readonly])").forEach(i => i.value = "");
+            // Clear form
+            document.getElementById("work_date").value = "";
+            document.getElementById("client").value = "";
+            document.getElementById("contractor").value = "";
+            document.getElementById("assign").value = "";
+            document.getElementById("in_time").value = "";
+            document.getElementById("out_time").value = "";
             document.getElementById("lunch").value = 0;
+            document.getElementById("rate").value = "";
+            document.getElementById("total_hours").value = "";
+            document.getElementById("unit").value = "";
+            document.getElementById("amount").value = "";
             await loadFromGoogle();
         } else {
             alert("❌ " + result.message);
