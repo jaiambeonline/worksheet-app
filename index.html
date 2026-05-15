@@ -16,36 +16,16 @@
 body {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
     background: #f5f7fb;
-    overflow-x: auto; /* Allow horizontal scroll if needed */
-    min-width: 320px; /* Minimum width for very small devices */
+    overflow-x: hidden;
 }
 
-/* Main app container - centered */
 .app {
     width: 100%;
+    min-height: 100vh;
     background: #f5f7fb;
-    position: relative;
 }
 
-/* Container with max-width and auto margins for centering */
-.container {
-    width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 12px;
-}
-
-/* Cards like WhatsApp bubbles */
-.card {
-    background: white;
-    border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 16px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    transition: all 0.2s ease;
-}
-
-/* Header - sticky */
+/* Header */
 .header {
     background: linear-gradient(135deg, #075E54, #128C7E);
     color: white;
@@ -53,8 +33,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-    width: 100%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .header-content {
@@ -63,35 +42,93 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .header h2 {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     margin: 0;
 }
 
 .header p {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     opacity: 0.9;
     margin-top: 4px;
 }
 
-/* Form grid - responsive */
+/* Container */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: block;
+}
+
+@media (min-width: 1024px) {
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 480px 1fr;
+        gap: 20px;
+        align-items: start;
+    }
+    
+    .form-section {
+        position: sticky;
+        top: 80px;
+    }
+}
+
+/* Cards */
+.card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.card h3, .card h4 {
+    color: #075E54;
+    margin-bottom: 16px;
+    font-size: 1.2rem;
+}
+
+/* Form - Critical Fix */
 .form-grid {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 12px;
 }
 
-/* Mobile: 1 column */
-.form-grid {
-    grid-template-columns: 1fr;
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-row label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #374151;
+    letter-spacing: 0.3px;
+}
+
+.form-row label.required::after {
+    content: " *";
+    color: #dc2626;
 }
 
 /* Tablet: 2 columns */
-@media (min-width: 768px) {
+@media (min-width: 640px) {
     .form-grid {
+        display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
+        gap: 14px;
     }
     
     .full-width {
@@ -99,19 +136,12 @@ body {
     }
 }
 
-/* Desktop: 3 columns for better spacing */
-@media (min-width: 1200px) {
-    .form-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-/* Input fields - touch friendly */
+/* Desktop: 2 columns is fine, no need for 3 */
 input, select, button {
     font-family: inherit;
-    font-size: 16px;
+    font-size: 14px;
     border-radius: 12px;
-    padding: 14px 16px;
+    padding: 12px 14px;
     width: 100%;
     border: 1px solid #e2e8f0;
     transition: all 0.2s;
@@ -125,8 +155,9 @@ input:focus, select:focus {
 }
 
 input[readonly] {
-    background: #f5f7fb;
-    cursor: not-allowed;
+    background: #f8f9fc;
+    border-color: #e2e8f0;
+    color: #4b5563;
 }
 
 /* Buttons */
@@ -134,7 +165,7 @@ button {
     font-weight: 600;
     cursor: pointer;
     border: none;
-    transition: transform 0.1s, opacity 0.2s;
+    transition: all 0.2s;
 }
 
 button:active {
@@ -161,46 +192,48 @@ button:active {
     border: 1px solid #e2e8f0;
 }
 
-/* Filter section - responsive grid */
+/* Filter Grid */
 .filter-grid {
     display: grid;
     gap: 12px;
-    margin-bottom: 20px;
 }
 
-/* Mobile: 1 column */
-.filter-grid {
-    grid-template-columns: 1fr;
-}
-
-/* Tablet: 2 columns */
 @media (min-width: 640px) {
     .filter-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-/* Desktop: 3 columns */
 @media (min-width: 1024px) {
     .filter-grid {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
 .filter-group label {
     font-size: 0.75rem;
     font-weight: 600;
     color: #374151;
-    display: block;
-    margin-bottom: 6px;
 }
 
-/* Summary cards */
+/* Summary Cards */
 .summary-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
     margin-bottom: 20px;
+}
+
+@media (min-width: 640px) {
+    .summary-cards {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
 .summary-card {
@@ -215,6 +248,7 @@ button:active {
     font-size: 0.7rem;
     opacity: 0.9;
     margin-bottom: 6px;
+    color: white;
 }
 
 .summary-card .value {
@@ -222,7 +256,7 @@ button:active {
     font-weight: 700;
 }
 
-/* Table container - FIXED: Proper horizontal scroll */
+/* Table Container - Critical Fix */
 .table-container {
     width: 100%;
     overflow-x: auto;
@@ -234,54 +268,49 @@ button:active {
     -webkit-overflow-scrolling: touch;
 }
 
-/* Table styles - ensure all columns visible */
 table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.75rem;
-    min-width: 100%; /* Changed from 800px to auto */
+    font-size: 0.7rem;
 }
 
-/* On mobile, ensure table can scroll horizontally */
-@media (max-width: 768px) {
+/* On mobile, ensure horizontal scroll */
+@media (max-width: 767px) {
     table {
-        min-width: 900px; /* Force horizontal scroll on mobile only */
+        min-width: 850px;
     }
 }
 
-/* On tablet, reduce min-width */
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 768px) and (max-width: 1023px) {
     table {
-        min-width: 1000px;
+        min-width: 950px;
     }
 }
 
-/* On desktop, let it be responsive */
-@media (min-width: 1025px) {
+@media (min-width: 1024px) {
     table {
         min-width: auto;
-        width: 100%;
     }
 }
 
 th {
     background: #075E54;
     color: white;
-    padding: 14px 8px;
+    padding: 12px 6px;
     position: sticky;
     top: 0;
     font-weight: 600;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     white-space: nowrap;
 }
 
 td {
-    padding: 12px 8px;
+    padding: 10px 6px;
     border-bottom: 1px solid #f0f2f5;
     white-space: nowrap;
 }
 
-/* Button group */
+/* Button Group */
 .button-group {
     display: flex;
     gap: 10px;
@@ -291,10 +320,12 @@ td {
 
 .button-group button {
     flex: 1;
-    min-width: 100px;
+    min-width: 80px;
+    font-size: 0.75rem;
+    padding: 10px;
 }
 
-/* Login screen - centered */
+/* Login Screen */
 .login-container {
     min-height: 100vh;
     display: flex;
@@ -313,28 +344,7 @@ td {
     text-align: center;
 }
 
-/* Desktop layout - side by side */
-@media (min-width: 1024px) {
-    .dashboard-grid {
-        display: grid;
-        grid-template-columns: 450px 1fr;
-        gap: 20px;
-        align-items: start;
-    }
-    
-    .form-section {
-        position: sticky;
-        top: 80px;
-    }
-}
-
-/* Loading states */
-.loading {
-    opacity: 0.6;
-    pointer-events: none;
-}
-
-/* Error/Success messages */
+/* Messages */
 .message {
     padding: 12px;
     border-radius: 12px;
@@ -353,27 +363,7 @@ td {
     color: #16a34a;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
-/* Delete button */
+/* Delete Button */
 .delete-btn {
     background: #dc2626;
     color: white;
@@ -384,8 +374,29 @@ td {
     cursor: pointer;
 }
 
-.delete-btn:active {
-    transform: scale(0.95);
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+/* Logout button */
+.logout-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    padding: 8px 16px;
+    width: auto;
+    border-radius: 8px;
+    font-size: 0.8rem;
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -412,50 +423,92 @@ td {
 
     <!-- MAIN APP -->
     <div id="mainApp" style="display:none;">
-        <!-- Sticky Header -->
+        <!-- Header -->
         <div class="header">
             <div class="header-content">
                 <div>
                     <h2>🏗️ BHAVISHYA ENTERPRISE</h2>
-                    <p>Valsad - 396020 | 📞 8866995757</p>
+                    <p>Shop No 5, T M Park, Mukund Parnera, Valsad - 396020 | 📞 8866995757</p>
                 </div>
-                <button onclick="logout()" style="background: rgba(255,255,255,0.2); color: white; padding: 8px 16px; width: auto; border-radius: 8px;">🚪 Logout</button>
+                <button class="logout-btn" onclick="logout()">🚪 Logout</button>
             </div>
         </div>
 
         <div class="container">
             <div class="dashboard-grid">
-                <!-- Form Section -->
+                <!-- Form Section - FIXED with labels -->
                 <div class="form-section">
                     <div class="card">
-                        <h3 style="margin-bottom: 16px; color: #075E54;">📋 New Entry</h3>
+                        <h3>📋 New Entry</h3>
                         <div class="form-grid">
-                            <input type="date" id="work_date" placeholder="Date">
-                            <input id="client" placeholder="Client Name">
-                            <input id="contractor" placeholder="Contractor Name">
-                            <select id="crane_type">
-                                <option>HYDRA</option>
-                                <option>FARANA</option>
-                            </select>
-                            <select id="crane_no">
-                                <option>GJ15SV1249</option><option>GJ15SV1677</option><option>GJ15SV1316</option>
-                                <option>GJ15SV0869</option><option>GJ15SV1112</option><option>GJ15SV1569</option>
-                                <option>GJ15SV0443</option><option>GJ15BB8456</option><option>GJ15SV0726</option>
-                            </select>
-                            <input id="assign" placeholder="Assign Sir">
-                            <input type="time" id="in_time">
-                            <input type="time" id="out_time">
-                            <input type="number" id="lunch" value="0" placeholder="Lunch (minutes)">
-                            <select id="rate_type">
-                                <option>Hourly</option>
-                                <option>Fixed</option>
-                            </select>
-                            <input type="number" id="rate" placeholder="Rate (₹)">
-                            <input id="total_hours" placeholder="Total Hours" readonly>
-                            <input id="unit" placeholder="Unit" readonly>
-                            <input id="amount" placeholder="Amount (₹)" readonly>
+                            <div class="form-row">
+                                <label class="required">📅 Date</label>
+                                <input type="date" id="work_date">
+                            </div>
+                            <div class="form-row">
+                                <label>🏢 Client Name</label>
+                                <input id="client" placeholder="Enter client name">
+                            </div>
+                            <div class="form-row">
+                                <label>👷 Contractor Name</label>
+                                <input id="contractor" placeholder="Enter contractor name">
+                            </div>
+                            <div class="form-row">
+                                <label>🏗️ Crane Type</label>
+                                <select id="crane_type">
+                                    <option>HYDRA</option>
+                                    <option>FARANA</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label>🚛 Crane Number</label>
+                                <select id="crane_no">
+                                    <option>GJ15SV1249</option><option>GJ15SV1677</option><option>GJ15SV1316</option>
+                                    <option>GJ15SV0869</option><option>GJ15SV1112</option><option>GJ15SV1569</option>
+                                    <option>GJ15SV0443</option><option>GJ15BB8456</option><option>GJ15SV0726</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label>👨‍💼 Assign Sir</label>
+                                <input id="assign" placeholder="Enter assignee name">
+                            </div>
+                            <div class="form-row">
+                                <label>⏰ In Time</label>
+                                <input type="time" id="in_time">
+                            </div>
+                            <div class="form-row">
+                                <label>⏰ Out Time</label>
+                                <input type="time" id="out_time">
+                            </div>
+                            <div class="form-row">
+                                <label>🍱 Lunch (minutes)</label>
+                                <input type="number" id="lunch" value="0" placeholder="0">
+                            </div>
+                            <div class="form-row">
+                                <label>💰 Rate Type</label>
+                                <select id="rate_type">
+                                    <option>Hourly</option>
+                                    <option>Fixed</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label>💵 Rate (₹)</label>
+                                <input type="number" id="rate" placeholder="Enter rate">
+                            </div>
+                            <div class="form-row">
+                                <label>⏱️ Total Hours</label>
+                                <input id="total_hours" placeholder="Auto calculated" readonly>
+                            </div>
+                            <div class="form-row">
+                                <label>📊 Unit</label>
+                                <input id="unit" placeholder="Auto calculated" readonly>
+                            </div>
+                            <div class="form-row">
+                                <label>💰 Amount (₹)</label>
+                                <input id="amount" placeholder="Auto calculated" readonly>
+                            </div>
                         </div>
-                        <button class="btn-primary" onclick="saveDirect()" style="margin-top: 20px;">📤 Save to Google Sheet</button>
+                        <button class="btn-primary" onclick="saveDirect()" style="margin-top: 20px; width: 100%;">📤 Save to Google Sheet</button>
                     </div>
                 </div>
 
@@ -463,7 +516,7 @@ td {
                 <div>
                     <!-- Filters -->
                     <div class="card">
-                        <h4 style="margin-bottom: 16px; color: #075E54;">🔍 Filter Records</h4>
+                        <h4>🔍 Filter Records</h4>
                         <div class="filter-grid">
                             <div class="filter-group">
                                 <label>👤 Contractor</label>
@@ -527,7 +580,6 @@ td {
                             </table>
                         </div>
                         
-                        <!-- Action Buttons -->
                         <div class="button-group">
                             <button class="btn-secondary" onclick="exportExcel()">📎 Excel</button>
                             <button class="btn-secondary" onclick="exportCSV()">📊 CSV</button>
@@ -759,7 +811,7 @@ function renderTable() {
             <td>${r.amount.toFixed(2)}</td>
             <td>${r.po}</td>
             <td>${isAdmin && r.rowIndex ? `<button class="delete-btn" onclick="deleteRow(${r.rowIndex})">🗑️</button>` : ""}</td>
-        </table>
+        </tr>
     `).join("");
     
     updateSummary();
