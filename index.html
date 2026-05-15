@@ -6,305 +6,43 @@
 <title>Bhavishya Enterprise - Crane Worksheet</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* { box-sizing: border-box; }
+body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; padding: 16px 12px; overflow-x: hidden; }
+.app { max-width: 420px; margin: 0 auto; padding: 0 12px;}
+.card { background: white; padding: 18px 16px; border-radius: 24px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05); margin-bottom: 18px; }
+.header { background: linear-gradient(135deg, #1e3a8a, #0f2b6d); color: white; text-align: center; padding: 20px 16px; border-radius: 28px; }
+.header h2 { margin: 0; font-size: 1.4rem; }
+.header p { margin: 5px 0; font-size: 0.75rem; opacity: 0.9; }
+input, select { width: 100%; padding: 12px 14px; margin: 8px 0; border-radius: 16px; border: 1px solid #cbd5e1; font-size: 0.85rem; font-family: inherit; }
+input:focus, select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.2); }
+button { width: 100%; padding: 12px; margin-top: 12px; border: none; border-radius: 40px; font-weight: 600; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: 0.2s; }
+button.primary { background: #2563eb; color: white; }
+button.danger { background: #dc2626; color: white; }
+button.secondary { background: #f1f5f9; color: #1f2937; border: 1px solid #cbd5e1; }
+button.success { background: #16a34a; color: white; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+.summary-box { background: #eef2ff; padding: 14px; border-radius: 24px; font-weight: 600; font-size: 0.8rem; text-align: center; color: #0f2b6d; margin-bottom: 14px; }
+.table-container { max-height: 550px; overflow-y: auto; overflow-x: auto; border-radius: 20px; border: 1px solid #e2e8f0; background: white; margin-top: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+th { background: #1e3a8a; color: white; padding: 12px 6px; position: sticky; top: 0; font-weight: 600; }
+td { padding: 8px 5px; border-bottom: 1px solid #e2e8f0; }
+tr:nth-child(even) { background: #f8fafc; }
+.filter-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; align-items: flex-end; }
+.filter-group { flex: 1 1 160px; }
+.filter-group label { font-size: 0.7rem; font-weight: 600; color: #334155; display: block; margin-bottom: 4px; }
+.filter-group select, .filter-group input { margin: 0; padding: 8px 10px; font-size: 0.8rem; }
+.date-group { flex: 1 1 140px; }
+.button-group { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+.button-group button { flex: 1; margin-top: 0; }
+@media (min-width: 760px) {
+    .app { max-width: 1280px; }
+    .dashboard-grid { display: grid; grid-template-columns: 380px 1fr; gap: 22px; align-items: start; justify-content: center; }
+    table { font-size: 0.8rem; min-width: auto; }
+    th, td { padding: 10px 8px; }
+    .filter-row { flex-wrap: nowrap; }
 }
-
-body{
-    font-family:'Poppins',sans-serif;
-    background:#f1f5f9;
-    color:#0f172a;
-}
-
-.app{
-    max-width:1400px;
-    margin:auto;
-    padding:14px;
-}
-
-.header{
-    position:sticky;
-    top:0;
-    z-index:100;
-    background:linear-gradient(135deg,#1e3a8a,#0f172a);
-    color:white;
-    border-radius:24px;
-    padding:18px;
-    margin-bottom:16px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.12);
-}
-
-.header-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-}
-
-.brand h1{
-    font-size:22px;
-    font-weight:700;
-}
-
-.brand p{
-    font-size:12px;
-    opacity:0.9;
-    margin-top:4px;
-}
-
-.logout-btn{
-    border:none;
-    background:#ffffff20;
-    color:white;
-    padding:10px 16px;
-    border-radius:14px;
-    cursor:pointer;
-    font-weight:600;
-}
-
-.summary-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:12px;
-    margin-top:18px;
-}
-
-.summary-card{
-    background:#ffffff15;
-    border-radius:18px;
-    padding:14px;
-}
-
-.summary-label{
-    font-size:12px;
-    opacity:0.85;
-}
-
-.summary-value{
-    margin-top:6px;
-    font-size:20px;
-    font-weight:700;
-}
-
-.main-grid{
-    display:grid;
-    grid-template-columns:380px 1fr;
-    gap:18px;
-    align-items:start;
-}
-
-.card{
-    background:white;
-    border-radius:24px;
-    padding:18px;
-    box-shadow:0 6px 18px rgba(0,0,0,0.06);
-}
-
-.section-title{
-    font-size:18px;
-    font-weight:700;
-    margin-bottom:16px;
-}
-
-.form-group{
-    margin-bottom:14px;
-}
-
-.form-group label{
-    display:block;
-    margin-bottom:6px;
-    font-size:13px;
-    font-weight:600;
-    color:#334155;
-}
-
-input,
-select{
-    width:100%;
-    border:1px solid #dbe2ea;
-    border-radius:18px;
-    padding:15px;
-    font-size:15px;
-    font-family:inherit;
-    background:white;
-}
-
-input:focus,
-select:focus{
-    outline:none;
-    border-color:#2563eb;
-    box-shadow:0 0 0 4px rgba(37,99,235,0.12);
-}
-
-.two-col{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-}
-
-.save-btn{
-    width:100%;
-    border:none;
-    background:#16a34a;
-    color:white;
-    height:56px;
-    border-radius:18px;
-    font-size:18px;
-    font-weight:700;
-    cursor:pointer;
-    margin-top:10px;
-}
-
-.filter-row{
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-    gap:12px;
-    margin-bottom:16px;
-}
-
-.table-wrap{
-    overflow:auto;
-    border-radius:18px;
-    border:1px solid #e2e8f0;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    min-width:850px;
-}
-
-th{
-    background:#1e3a8a;
-    color:white;
-    padding:14px 10px;
-    text-align:left;
-    font-size:13px;
-    position:sticky;
-    top:0;
-}
-
-td{
-    padding:12px 10px;
-    border-bottom:1px solid #e2e8f0;
-    font-size:13px;
-}
-
-tr:nth-child(even){
-    background:#f8fafc;
-}
-
-.mobile-records{
-    display:none;
-}
-
-.mobile-card{
-    background:white;
-    border-radius:22px;
-    padding:16px;
-    margin-bottom:14px;
-    box-shadow:0 6px 18px rgba(0,0,0,0.06);
-}
-
-.mobile-title{
-    font-size:16px;
-    font-weight:700;
-    margin-bottom:10px;
-}
-
-.mobile-line{
-    font-size:14px;
-    margin:6px 0;
-    color:#334155;
-}
-
-.login-screen{
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-}
-
-.login-card{
-    width:100%;
-    max-width:420px;
-    background:white;
-    border-radius:28px;
-    padding:28px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.08);
-    text-align:center;
-}
-
-.login-title{
-    font-size:28px;
-    font-weight:700;
-    color:#1e3a8a;
-    margin-bottom:8px;
-}
-
-.login-sub{
-    font-size:13px;
-    color:#64748b;
-    margin-bottom:20px;
-}
-
-.login-btn{
-    width:100%;
-    height:54px;
-    border:none;
-    border-radius:18px;
-    background:#2563eb;
-    color:white;
-    font-size:17px;
-    font-weight:700;
-    cursor:pointer;
-    margin-top:10px;
-}
-
-.success-box{
-    background:#dcfce7;
-    color:#166534;
-    padding:12px;
-    border-radius:14px;
-    margin-top:12px;
-    font-size:14px;
-    display:none;
-}
-
-@media(max-width:768px){
-
-    .main-grid{
-        grid-template-columns:1fr;
-    }
-
-    .filter-row{
-        grid-template-columns:1fr 1fr;
-    }
-
-    .summary-grid{
-        grid-template-columns:1fr;
-    }
-
-    .table-wrap{
-        display:none;
-    }
-
-    .mobile-records{
-        display:block;
-    }
-
-    .brand h1{
-        font-size:18px;
-    }
-
-    .two-col{
-        grid-template-columns:1fr;
-    }
-
-}
+.error-message { color: #dc2626; background: #fee2e2; padding: 8px; border-radius: 40px; text-align: center; font-size: 0.75rem; margin-top: 12px; display: none; }
+.success-message { color: #16a34a; background: #dcfce7; padding: 8px; border-radius: 40px; text-align: center; font-size: 0.75rem; margin-top: 12px; display: none; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
