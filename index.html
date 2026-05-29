@@ -1250,7 +1250,7 @@ async function generatePDF() {
     // Add title
     doc.setFontSize(14);
     doc.setFont(undefined, "bold");
-    doc.text("BHAVISHYA ENTERPRISE - CRANE WORKSHEET", pageWidth / 2, 12, { align: "center" });
+    doc.text("CRANE WORKSHEET", pageWidth / 2, 12, { align: "center" });
     doc.setFontSize(9);
     doc.text(`Generated on: ${new Date().toLocaleString()}`, pageWidth / 2, 20, { align: "center" });
     
