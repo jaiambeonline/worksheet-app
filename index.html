@@ -1076,7 +1076,7 @@ function logout() {
 }
 
 async function saveDirect() {
-    // Get values from form
+    // Get values from form - MATCHING EXACTLY what Google Apps Script expects
     const work_date = document.getElementById("work_date").value;
     const client_name = document.getElementById("client").value;
     const contractor_name = document.getElementById("contractor").value;
@@ -1102,7 +1102,7 @@ async function saveDirect() {
     const calc = calculateAndUpdate();
     const po_code = calc.po || "";
 
-    // Prepare data
+    // Prepare data - MATCHING EXACTLY what Google Apps Script expects
     const data = {
         action: "save",
         username: currentUser,
@@ -1115,16 +1115,16 @@ async function saveDirect() {
         assign_sir: assign_sir,
         in_time: in_time,
         out_time: out_time,
-        lunch_minutes: lunch_minutes || 0,
-        total_hours: total_hours || 0,
+        lunch_minutes: lunch_minutes || "0",
+        total_hours: total_hours || "0",
         unit_type: unit_type || "",
-        rate: rate || 0,
-        amount: amount || 0,
+        rate: rate || "0",
+        amount: amount || "0",
         po_code: po_code,
         source_file: "Bhavishya_" + new Date().toISOString().split("T")[0]
     };
 
-    console.log("Saving data:", data); // Debug log
+    console.log("📤 Sending data:", data);
 
     const saveBtn = event.target;
     const originalText = saveBtn.innerText;
@@ -1141,10 +1141,10 @@ async function saveDirect() {
         });
 
         const result = await response.json();
-        console.log("Save response:", result); // Debug log
+        console.log("📥 Response:", result);
 
         if (result.status === "success") {
-            alert("✅ Saved successfully");
+            alert("✅ Saved successfully!");
             // Clear form
             document.getElementById("work_date").value = "";
             document.getElementById("client").value = "";
@@ -1162,7 +1162,7 @@ async function saveDirect() {
             alert("❌ " + (result.message || "Unknown error"));
         }
     } catch (error) {
-        console.error("Save error:", error);
+        console.error("❌ Save error:", error);
         alert("❌ Connection error: " + error.message);
     } finally {
         saveBtn.innerText = originalText;
@@ -1171,6 +1171,7 @@ async function saveDirect() {
 }
 
 async function saveDirectMobile() {
+    // Copy mobile values to desktop fields
     document.getElementById('work_date').value = document.getElementById('work_date_mobile').value;
     document.getElementById('client').value = document.getElementById('client_mobile').value;
     document.getElementById('contractor').value = document.getElementById('contractor_mobile').value;
@@ -1183,9 +1184,18 @@ async function saveDirectMobile() {
     document.getElementById('rate_type').value = document.getElementById('rate_type_mobile').value;
     document.getElementById('rate').value = document.getElementById('rate_mobile').value;
     
+    // Trigger calculation to get total_hours, unit, amount
     calculateAndUpdate();
+    
+    // Copy calculated values back to mobile
+    document.getElementById('total_hours_mobile').value = document.getElementById('total_hours').value;
+    document.getElementById('unit_mobile').value = document.getElementById('unit').value;
+    document.getElementById('amount_mobile').value = document.getElementById('amount').value;
+    
+    // Call the desktop save function
     await saveDirect();
     
+    // Clear mobile form
     document.getElementById('work_date_mobile').value = '';
     document.getElementById('client_mobile').value = '';
     document.getElementById('contractor_mobile').value = '';
