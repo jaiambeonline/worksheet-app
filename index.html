@@ -16,8 +16,7 @@
 body {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
     background: #f5f7fb;
-    overflow-x: auto;
-    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .app {
@@ -30,7 +29,7 @@ body {
 .header {
     background: linear-gradient(135deg, #075E54, #128C7E);
     color: white;
-    padding: 12px 16px;
+    padding: 16px 20px;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -44,172 +43,79 @@ body {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
 }
 
 .header h2 {
-    font-size: 1rem;
+    font-size: 1.2rem;
     margin: 0;
 }
 
 .header p {
-    font-size: 0.6rem;
+    font-size: 0.65rem;
     opacity: 0.9;
-    margin-top: 2px;
+    margin-top: 4px;
 }
 
 /* Container */
 .container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 12px;
+    padding: 16px;
 }
 
-/* DESKTOP LAYOUT - Only visible on desktop */
-.desktop-layout {
-    display: none;
+/* Dashboard Grid */
+.dashboard-grid {
+    display: block;
 }
 
 @media (min-width: 1024px) {
-    .desktop-layout {
-        display: grid !important;
-        grid-template-columns: 400px 1fr;
-        gap: 16px;
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 480px 1fr;
+        gap: 20px;
         align-items: start;
     }
     
     .form-section {
         position: sticky;
-        top: 70px;
-    }
-}
-
-/* MOBILE/TABLET LAYOUT - Only visible on mobile/tablet */
-.mobile-tabs {
-    display: none;
-}
-
-@media (max-width: 1023px) {
-    .mobile-tabs {
-        display: block !important;
-    }
-}
-
-/* Tab Navigation */
-.tab-navigation {
-    background: white;
-    border-radius: 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    overflow: hidden;
-}
-
-.tab-buttons {
-    display: flex;
-    gap: 0;
-}
-
-.tab-btn {
-    flex: 1;
-    padding: 12px 10px;
-    background: white;
-    border: none;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #64748b;
-    cursor: pointer;
-    transition: all 0.2s;
-    border-bottom: 3px solid transparent;
-    border-radius: 0;
-}
-
-.tab-btn.active {
-    color: #075E54;
-    border-bottom-color: #25D366;
-    background: #f0fdf4;
-}
-
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-/* Mobile Bottom Navigation */
-@media (max-width: 767px) {
-    .tab-navigation {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        margin-bottom: 0;
-        border-radius: 16px 16px 0 0;
-        z-index: 100;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-    }
-    
-    .tab-buttons {
-        padding: 6px 10px;
-    }
-    
-    .tab-btn {
-        padding: 8px 6px;
-        font-size: 0.7rem;
-    }
-    
-    .container {
-        padding-bottom: 70px;
-    }
-}
-
-/* Tablet Top Tabs */
-@media (min-width: 768px) and (max-width: 1023px) {
-    .tab-navigation {
-        position: sticky;
-        top: 60px;
-        z-index: 99;
-    }
-    
-    .tab-btn {
-        padding: 10px 14px;
-        font-size: 0.85rem;
+        top: 80px;
     }
 }
 
 /* Cards */
 .card {
     background: white;
-    border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 16px;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .card h3, .card h4 {
     color: #075E54;
-    margin-bottom: 12px;
-    font-size: 1rem;
+    margin-bottom: 16px;
+    font-size: 1.2rem;
 }
 
-/* Form Grid */
+/* Form - Critical Fix */
 .form-grid {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 .form-row {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
 }
 
 .form-row label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 600;
     color: #374151;
+    letter-spacing: 0.3px;
 }
 
 .form-row label.required::after {
@@ -217,20 +123,25 @@ body {
     color: #dc2626;
 }
 
+/* Tablet: 2 columns */
 @media (min-width: 640px) {
     .form-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+        gap: 14px;
+    }
+    
+    .full-width {
+        grid-column: span 2;
     }
 }
 
-/* Inputs */
+/* Desktop: 2 columns is fine, no need for 3 */
 input, select, button {
     font-family: inherit;
-    font-size: 13px;
-    border-radius: 10px;
-    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 12px;
+    padding: 12px 14px;
     width: 100%;
     border: 1px solid #e2e8f0;
     transition: all 0.2s;
@@ -254,6 +165,7 @@ button {
     font-weight: 600;
     cursor: pointer;
     border: none;
+    transition: all 0.2s;
 }
 
 button:active {
@@ -283,7 +195,7 @@ button:active {
 /* Filter Grid */
 .filter-grid {
     display: grid;
-    gap: 10px;
+    gap: 12px;
 }
 
 @media (min-width: 640px) {
@@ -301,26 +213,21 @@ button:active {
 .filter-group {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
 }
 
 .filter-group label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 600;
     color: #374151;
-}
-
-.filter-group select, .filter-group input {
-    padding: 8px 10px;
-    font-size: 0.8rem;
 }
 
 /* Summary Cards */
 .summary-cards {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 16px;
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
 @media (min-width: 640px) {
@@ -332,34 +239,34 @@ button:active {
 .summary-card {
     background: linear-gradient(135deg, #075E54, #128C7E);
     color: white;
-    padding: 10px;
-    border-radius: 12px;
+    padding: 14px;
+    border-radius: 16px;
     text-align: center;
 }
 
 .summary-card h4 {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     opacity: 0.9;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
     color: white;
 }
 
 .summary-card .value {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     font-weight: 700;
 }
 
-/* Table Container */
+/* Table Container - Critical Fix */
 .table-container {
     width: 100%;
     overflow-x: auto;
     overflow-y: auto;
-    border-radius: 12px;
+    border-radius: 16px;
     border: 1px solid #e2e8f0;
     background: white;
-    margin: 12px 0;
+    margin: 16px 0;
     -webkit-overflow-scrolling: touch;
-    max-height: 450px;
+    max-height: 480px; /* Shows ~10 rows, then scroll */
 }
 
 table {
@@ -368,79 +275,56 @@ table {
     font-size: 0.7rem;
 }
 
-/* Desktop: Fixed column widths */
-@media (min-width: 1024px) {
+/* On mobile, ensure horizontal scroll */
+@media (max-width: 767px) {
     table {
-        table-layout: fixed;
-        min-width: 100%;
+        min-width: 850px;
     }
-    
-    th:nth-child(1), td:nth-child(1) { width: 65px; }
-    th:nth-child(2), td:nth-child(2) { width: 85px; }
-    th:nth-child(3), td:nth-child(3) { width: 85px; }
-    th:nth-child(4), td:nth-child(4) { width: 70px; }
-    th:nth-child(5), td:nth-child(5) { width: 80px; }
-    th:nth-child(6), td:nth-child(6) { width: 80px; }
-    th:nth-child(7), td:nth-child(7) { width: 50px; }
-    th:nth-child(8), td:nth-child(8) { width: 50px; }
-    th:nth-child(9), td:nth-child(9) { width: 45px; }
-    th:nth-child(10), td:nth-child(10) { width: 50px; }
-    th:nth-child(11), td:nth-child(11) { width: 45px; }
-    th:nth-child(12), td:nth-child(12) { width: 55px; }
-    th:nth-child(13), td:nth-child(13) { width: 65px; }
-    th:nth-child(14), td:nth-child(14) { width: 55px; }
-    th:nth-child(15), td:nth-child(15) { width: 55px; }
 }
 
-/* Tablet and Mobile: Allow horizontal scroll */
-@media (max-width: 1023px) {
+@media (min-width: 768px) and (max-width: 1023px) {
     table {
-        min-width: 1000px;
+        min-width: 950px;
+    }
+}
+
+@media (min-width: 1024px) {
+    table {
+        min-width: auto;
     }
 }
 
 th {
     background: #075E54;
     color: white;
-    padding: 10px 5px;
+    padding: 12px 6px;
     position: sticky;
     top: 0;
     font-weight: 600;
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     white-space: nowrap;
     z-index: 10;
 }
 
 td {
-    padding: 8px 5px;
+    padding: 10px 6px;
     border-bottom: 1px solid #f0f2f5;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-td:hover {
-    overflow: visible;
-    white-space: normal;
-    position: relative;
-    background: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    z-index: 20;
 }
 
 /* Button Group */
 .button-group {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     flex-wrap: wrap;
-    margin-top: 12px;
+    margin-top: 16px;
 }
 
 .button-group button {
     flex: 1;
-    min-width: 70px;
-    font-size: 0.7rem;
-    padding: 8px;
+    min-width: 80px;
+    font-size: 0.75rem;
+    padding: 10px;
 }
 
 /* Login Screen */
@@ -455,18 +339,19 @@ td:hover {
 
 .login-card {
     background: white;
-    border-radius: 28px;
-    padding: 28px 20px;
-    max-width: 380px;
+    border-radius: 32px;
+    padding: 32px 24px;
+    max-width: 400px;
     width: 100%;
     text-align: center;
 }
 
+/* Messages */
 .message {
-    padding: 10px;
-    border-radius: 10px;
-    margin-top: 10px;
-    font-size: 0.8rem;
+    padding: 12px;
+    border-radius: 12px;
+    margin-top: 12px;
+    font-size: 0.85rem;
     text-align: center;
 }
 
@@ -475,33 +360,173 @@ td:hover {
     color: #dc2626;
 }
 
+.message-success {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+/* Delete Button */
 .delete-btn {
     background: #dc2626;
     color: white;
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-size: 10px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11px;
     border: none;
     cursor: pointer;
 }
 
-.logout-btn {
-    background: rgba(255,255,255,0.2);
-    color: white;
-    padding: 6px 12px;
-    width: auto;
-    border-radius: 8px;
-    font-size: 0.7rem;
-}
-
+/* Scrollbar */
 ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
 }
 
 ::-webkit-scrollbar-track {
     background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
     border-radius: 3px;
+}
+
+/* Logout button */
+.logout-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    padding: 8px 16px;
+    width: auto;
+    border-radius: 8px;
+    font-size: 0.8rem;
+}
+/* Prevent layout shift - Add to your existing CSS */
+
+/* Ensure table container has stable height */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    margin: 16px 0;
+    -webkit-overflow-scrolling: touch;
+    /* Add minimum height to prevent shift */
+    min-height: 200px;
+}
+
+/* Loading skeleton for table */
+.table-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+/* Ensure card doesn't collapse */
+.card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    /* Prevent collapse */
+    min-height: auto;
+}
+
+/* Fixed height for summary cards area */
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+    /* Fixed minimum height */
+    min-height: 95px;
+}
+
+@media (min-width: 640px) {
+    .summary-cards {
+        grid-template-columns: repeat(4, 1fr);
+        min-height: 85px;
+    }
+}
+
+/* Sticky header - already in your code, keep it */
+.header {
+    background: linear-gradient(135deg, #075E54, #128C7E);
+    color: white;
+    padding: 16px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Dashboard grid - stable layout */
+.dashboard-grid {
+    display: block;
+    /* Ensure smooth transition */
+    transition: all 0.2s ease;
+}
+
+@media (min-width: 1024px) {
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 480px 1fr;
+        gap: 20px;
+        align-items: start;
+    }
+}
+
+/* Form section - prevent shifting */
+.form-section {
+    /* Ensure form doesn't change width */
+    min-width: 0;
+}
+
+/* Right section - stable width */
+@media (min-width: 1024px) {
+    .dashboard-grid > div:last-child {
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+/* Loading spinner for table */
+.loading-spinner {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #25D366;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Ensure body doesn't shift */
+body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f5f7fb;
+    overflow-x: hidden;
+    /* Prevent scrollbar width shift */
+    overflow-y: scroll;
+}
+
+/* Smooth scrollbar appearance */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -511,7 +536,6 @@ td:hover {
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 
@@ -519,14 +543,14 @@ td:hover {
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="login-container">
         <div class="login-card">
-            <div style="font-size: 44px; margin-bottom: 12px;">🏗️</div>
-            <h2 style="color: #075E54; margin-bottom: 6px; font-size: 1.3rem;">BHAVISHYA ENTERPRISE</h2>
-            <p style="font-size: 10px; color: #666; margin-bottom: 20px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">🏗️</div>
+            <h2 style="color: #075E54; margin-bottom: 8px;">BHAVISHYA ENTERPRISE</h2>
+            <p style="font-size: 11px; color: #666; margin-bottom: 24px;">
                 Shop No 5, T M Park, Mukund Parnera<br>Valsad - 396020
             </p>
-            <h3 style="margin: 16px 0 12px; font-size: 1.1rem;">🔐 Login</h3>
-            <input id="username" placeholder="Username" style="margin-bottom: 10px;">
-            <input type="password" id="password" placeholder="Password" style="margin-bottom: 16px;">
+            <h3 style="margin: 20px 0 16px;">🔐 Login</h3>
+            <input id="username" placeholder="Username" style="margin-bottom: 12px;">
+            <input type="password" id="password" placeholder="Password" style="margin-bottom: 20px;">
             <button class="btn-primary" onclick="login()" style="width: 100%;">Login</button>
             <div id="errorMsg" class="message message-error" style="display:none;"></div>
         </div>
@@ -534,143 +558,164 @@ td:hover {
 
     <!-- MAIN APP -->
     <div id="mainApp" style="display:none;">
+        <!-- Header -->
         <div class="header">
             <div class="header-content">
                 <div>
                     <h2>🏗️ BHAVISHYA ENTERPRISE</h2>
-                    <p>Valsad - 396020 | 📞 8866995757</p>
+                    <p>Shop No 5, T M Park, Mukund Parnera, Valsad - 396020 | 📞 8866995757</p>
                 </div>
                 <button class="logout-btn" onclick="logout()">🚪 Logout</button>
             </div>
         </div>
 
         <div class="container">
-            <!-- DESKTOP LAYOUT -->
-            <div class="desktop-layout">
-                <!-- Form Section -->
+            <div class="dashboard-grid">
+                <!-- Form Section - FIXED with labels -->
                 <div class="form-section">
                     <div class="card">
                         <h3>📋 New Entry</h3>
                         <div class="form-grid">
-                            <div class="form-row"><label class="required">📅 Date</label><input type="date" id="work_date"></div>
-                            <div class="form-row"><label>🏢 Client Name</label><input id="client" placeholder="Enter client name"></div>
-                            <div class="form-row"><label>👷 Contractor Name</label><input id="contractor" placeholder="Enter contractor name"></div>
-                            <div class="form-row"><label>🏗️ Crane Type</label><select id="crane_type"><option>HYDRA</option><option>FARANA</option></select></div>
-                            <div class="form-row"><label>🚛 Crane Number</label><select id="crane_no"><option>GJ15SV1249</option><option>GJ15SV1677</option><option>GJ15SV1316</option><option>GJ15SV0869</option><option>GJ15SV1112</option><option>GJ15SV1569</option><option>GJ15SV0443</option><option>GJ15BB8456</option><option>GJ15SV0726</option></select></div>
-                            <div class="form-row"><label>👨‍💼 Assign Sir</label><input id="assign" placeholder="Enter assignee name"></div>
-                            <div class="form-row"><label>⏰ In Time</label><input type="time" id="in_time"></div>
-                            <div class="form-row"><label>⏰ Out Time</label><input type="time" id="out_time"></div>
-                            <div class="form-row"><label>🍱 Lunch (minutes)</label><input type="number" id="lunch" value="0"></div>
-                            <div class="form-row rate-row"><label>💰 Rate Type</label><select id="rate_type"><option>Hourly</option><option>Fixed</option></select></div>
-                            <div class="form-row rate-row"><label>💵 Rate (₹)</label><input type="number" id="rate" placeholder="Enter rate"></div>
-                            <div class="form-row"><label>⏱️ Total Hours</label><input id="total_hours" readonly></div>
-                            <div class="form-row"><label>📊 Unit</label><input id="unit" readonly></div>
-                            <div class="form-row amount-row"><label>💰 Amount (₹)</label><input id="amount" readonly></div>
+                            <div class="form-row">
+                                <label class="required">📅 Date</label>
+                                <input type="date" id="work_date">
+                            </div>
+                            <div class="form-row">
+                                <label>🏢 Client Name</label>
+                                <input id="client" placeholder="Enter client name">
+                            </div>
+                            <div class="form-row">
+                                <label>👷 Contractor Name</label>
+                                <input id="contractor" placeholder="Enter contractor name">
+                            </div>
+                            <div class="form-row">
+                                <label>🏗️ Crane Type</label>
+                                <select id="crane_type">
+                                    <option>HYDRA</option>
+                                    <option>FARANA</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label>🚛 Crane Number</label>
+                                <select id="crane_no">
+                                    <option>GJ15SV1249</option><option>GJ15SV1677</option><option>GJ15SV1316</option>
+                                    <option>GJ15SV0869</option><option>GJ15SV1112</option><option>GJ15SV1569</option>
+                                    <option>GJ15SV0443</option><option>GJ15BB8456</option><option>GJ15SV0726</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label>👨‍💼 Assign Sir</label>
+                                <input id="assign" placeholder="Enter assignee name">
+                            </div>
+                            <div class="form-row">
+                                <label>⏰ In Time</label>
+                                <input type="time" id="in_time">
+                            </div>
+                            <div class="form-row">
+                                <label>⏰ Out Time</label>
+                                <input type="time" id="out_time">
+                            </div>
+                            <div class="form-row">
+                                <label>🍱 Lunch (minutes)</label>
+                                <input type="number" id="lunch" value="0" placeholder="0">
+                            </div>
+                            <div class="form-row">
+                                <label>💰 Rate Type</label>
+                                <select id="rate_type">
+                                    <option>Hourly</option>
+                                    <option>Fixed</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label>💵 Rate (₹)</label>
+                                <input type="number" id="rate" placeholder="Enter rate">
+                            </div>
+                            <div class="form-row">
+                                <label>⏱️ Total Hours</label>
+                                <input id="total_hours" placeholder="Auto calculated" readonly>
+                            </div>
+                            <div class="form-row">
+                                <label>📊 Unit</label>
+                                <input id="unit" placeholder="Auto calculated" readonly>
+                            </div>
+                            <div class="form-row">
+                                <label>💰 Amount (₹)</label>
+                                <input id="amount" placeholder="Auto calculated" readonly>
+                            </div>
                         </div>
-                        <button class="btn-primary" onclick="saveDirect()" style="margin-top: 14px;">📤 Save to Google Sheet</button>
+                        <button class="btn-primary" onclick="saveDirect()" style="margin-top: 20px; width: 100%;">📤 Save to Google Sheet</button>
                     </div>
                 </div>
 
-                <!-- Data Section -->
-                <div class="data-section">
+                                <!-- Data Section - Right Block -->
+                <div>
+                    <!-- Filters -->
                     <div class="card">
                         <h4>🔍 Filter Records</h4>
                         <div class="filter-grid">
-                            <div class="filter-group"><label>👤 Contractor</label><select id="pdf_contractor"><option value="">ALL</option></select></div>
-                            <div class="filter-group"><label>👨‍💼 Assign Sir</label><select id="pdf_assign"><option value="">ALL</option></select></div>
-                            <div class="filter-group"><label>🚛 Crane No</label><select id="pdf_crane_no"><option value="">ALL</option></select></div>
-                            <div class="filter-group"><label>🏗️ Crane Type</label><select id="pdf_crane_type"><option value="">ALL</option><option>HYDRA</option><option>FARANA</option></select></div>
-                            <div class="filter-group"><label>📅 From Date</label><input type="date" id="pdf_from"></div>
-                            <div class="filter-group"><label>📅 To Date</label><input type="date" id="pdf_to"></div>
+                            <div class="filter-group">
+                                <label>👤 Contractor</label>
+                                <select id="pdf_contractor"><option value="">ALL</option></select>
+                            </div>
+                            <div class="filter-group">
+                                <label>👨‍💼 Assign Sir</label>
+                                <select id="pdf_assign"><option value="">ALL</option></select>
+                            </div>
+                            <div class="filter-group">
+                                <label>🚛 Crane No</label>
+                                <select id="pdf_crane_no"><option value="">ALL</option></select>
+                            </div>
+                            <div class="filter-group">
+                                <label>🏗️ Crane Type</label>
+                                <select id="pdf_crane_type"><option value="">ALL</option><option>HYDRA</option><option>FARANA</option></select>
+                            </div>
+                            <div class="filter-group">
+                                <label>📅 From Date</label>
+                                <input type="date" id="pdf_from">
+                            </div>
+                            <div class="filter-group">
+                                <label>📅 To Date</label>
+                                <input type="date" id="pdf_to">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="summary-cards" id="summaryCardsDesktop">
-                        <div class="summary-card"><h4>HYDRA HOURS</h4><div class="value" id="hydraHours">0</div></div>
-                        <div class="summary-card"><h4>FARANA HOURS</h4><div class="value" id="faranaHours">0</div></div>
-                        <div class="summary-card"><h4>FARANA DAYS</h4><div class="value" id="faranaDays">0</div></div>
-                        <div class="summary-card"><h4>TOTAL ₹</h4><div class="value" id="totalAmount">0</div></div>
+                    <!-- Summary Cards -->
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <h4>HYDRA HOURS</h4>
+                            <div class="value" id="hydraHours">0</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>FARANA HOURS</h4>
+                            <div class="value" id="faranaHours">0</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>FARANA DAYS</h4>
+                            <div class="value" id="faranaDays">0</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>TOTAL ₹</h4>
+                            <div class="value" id="totalAmount">0</div>
+                        </div>
                     </div>
 
+                    <!-- Table -->
                     <div class="card">
                         <div class="table-container">
                             <table id="worksheetTable">
                                 <thead>
-                                    <tr><th>Date</th><th>Client</th><th>Contractor</th><th>Crane Type</th><th>Crane No</th><th>Assign</th><th>In</th><th>Out</th><th>Lunch</th><th>Hours</th><th>Unit</th><th>Rate</th><th>Amount</th><th>PO</th><th>Action</th></tr>
+                                    <tr>
+                                        <th>Date</th><th>Client</th><th>Contractor</th><th>Crane Type</th><th>Crane No</th>
+                                        <th>Assign</th><th>In</th><th>Out</th><th>Lunch</th><th>Hours</th>
+                                        <th>Unit</th><th>Rate</th><th>Amount</th><th>PO</th><th>Action</th>
+                                    </tr>
                                 </thead>
                                 <tbody id="tableBody"></tbody>
                             </table>
                         </div>
-                        <div class="button-group" id="exportButtonsDesktop">
-                            <button class="btn-secondary" onclick="exportExcel()">📎 Excel</button>
-                            <button class="btn-secondary" onclick="exportCSV()">📊 CSV</button>
-                            <button class="btn-secondary" onclick="generatePDF()">📄 PDF</button>
-                            <button class="btn-danger" onclick="clearAll()">🗑️ Clear All</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- MOBILE/TABLET TABS -->
-            <div class="mobile-tabs">
-                <div class="tab-navigation">
-                    <div class="tab-buttons">
-                        <button class="tab-btn active" data-tab="entry">📝 ENTRY</button>
-                        <button class="tab-btn" data-tab="history">📋 HISTORY</button>
-                    </div>
-                </div>
-
-                <div class="tab-content active" data-tab-content="entry">
-                    <div class="card">
-                        <h3>📋 New Entry</h3>
-                        <div class="form-grid">
-                            <div class="form-row"><label class="required">📅 Date</label><input type="date" id="work_date_mobile"></div>
-                            <div class="form-row"><label>🏢 Client Name</label><input id="client_mobile" placeholder="Enter client name"></div>
-                            <div class="form-row"><label>👷 Contractor Name</label><input id="contractor_mobile" placeholder="Enter contractor name"></div>
-                            <div class="form-row"><label>🏗️ Crane Type</label><select id="crane_type_mobile"><option>HYDRA</option><option>FARANA</option></select></div>
-                            <div class="form-row"><label>🚛 Crane Number</label><select id="crane_no_mobile"><option>GJ15SV1249</option><option>GJ15SV1677</option><option>GJ15SV1316</option><option>GJ15SV0869</option><option>GJ15SV1112</option><option>GJ15SV1569</option><option>GJ15SV0443</option><option>GJ15BB8456</option><option>GJ15SV0726</option></select></div>
-                            <div class="form-row"><label>👨‍💼 Assign Sir</label><input id="assign_mobile" placeholder="Enter assignee name"></div>
-                            <div class="form-row"><label>⏰ In Time</label><input type="time" id="in_time_mobile"></div>
-                            <div class="form-row"><label>⏰ Out Time</label><input type="time" id="out_time_mobile"></div>
-                            <div class="form-row"><label>🍱 Lunch (minutes)</label><input type="number" id="lunch_mobile" value="0"></div>
-                            <div class="form-row rate-row"><label>💰 Rate Type</label><select id="rate_type_mobile"><option>Hourly</option><option>Fixed</option></select></div>
-                            <div class="form-row rate-row"><label>💵 Rate (₹)</label><input type="number" id="rate_mobile" placeholder="Enter rate"></div>
-                            <div class="form-row"><label>⏱️ Total Hours</label><input id="total_hours_mobile" readonly></div>
-                            <div class="form-row"><label>📊 Unit</label><input id="unit_mobile" readonly></div>
-                            <div class="form-row amount-row"><label>💰 Amount (₹)</label><input id="amount_mobile" readonly></div>
-                        </div>
-                        <button class="btn-primary" onclick="saveDirectMobile()" style="margin-top: 14px;">📤 Save to Google Sheet</button>
-                    </div>
-                </div>
-
-                <div class="tab-content" data-tab-content="history">
-                    <div class="card">
-                        <h4>🔍 Filter Records</h4>
-                        <div class="filter-grid">
-                            <div class="filter-group"><label>👤 Contractor</label><select id="pdf_contractor_mobile"><option value="">ALL</option></select></div>
-                            <div class="filter-group"><label>👨‍💼 Assign Sir</label><select id="pdf_assign_mobile"><option value="">ALL</option></select></div>
-                            <div class="filter-group"><label>🚛 Crane No</label><select id="pdf_crane_no_mobile"><option value="">ALL</option></select></div>
-                            <div class="filter-group"><label>🏗️ Crane Type</label><select id="pdf_crane_type_mobile"><option value="">ALL</option><option>HYDRA</option><option>FARANA</option></select></div>
-                            <div class="filter-group"><label>📅 From Date</label><input type="date" id="pdf_from_mobile"></div>
-                            <div class="filter-group"><label>📅 To Date</label><input type="date" id="pdf_to_mobile"></div>
-                        </div>
-                    </div>
-
-                    <div class="summary-cards" id="summaryCardsMobile">
-                        <div class="summary-card"><h4>HYDRA HOURS</h4><div class="value" id="hydraHoursMobile">0</div></div>
-                        <div class="summary-card"><h4>FARANA HOURS</h4><div class="value" id="faranaHoursMobile">0</div></div>
-                        <div class="summary-card"><h4>FARANA DAYS</h4><div class="value" id="faranaDaysMobile">0</div></div>
-                        <div class="summary-card"><h4>TOTAL ₹</h4><div class="value" id="totalAmountMobile">0</div></div>
-                    </div>
-
-                    <div class="card">
-                        <div class="table-container">
-                            <table id="worksheetTableMobile">
-                                <thead><tr><th>Date</th><th>Client</th><th>Contractor</th><th>Crane Type</th><th>Crane No</th><th>Assign</th><th>In</th><th>Out</th><th>Lunch</th><th>Hours</th><th>Unit</th><th>Rate</th><th>Amount</th><th>PO</th><th>Action</th></tr></thead>
-                                <tbody id="tableBodyMobile"></tbody>
-                            </table>
-                        </div>
-                        <div class="button-group" id="exportButtonsMobile">
+                        
+                        <div class="button-group">
                             <button class="btn-secondary" onclick="exportExcel()">📎 Excel</button>
                             <button class="btn-secondary" onclick="exportCSV()">📊 CSV</button>
                             <button class="btn-secondary" onclick="generatePDF()">📄 PDF</button>
@@ -694,6 +739,19 @@ let rows = [];
 
 // ================= HELPER FUNCTIONS =================
 function norm(v) { return (v || "").toString().trim().toUpperCase(); }
+function cleanStr(v) { return (v || "").toString().trim(); }
+
+function showMessage(elementId, message, isError = true) {
+    const msgDiv = document.getElementById(elementId);
+    if (msgDiv) {
+        msgDiv.innerText = message;
+        msgDiv.style.display = "block";
+        msgDiv.className = isError ? "message message-error" : "message message-success";
+        setTimeout(() => {
+            msgDiv.style.display = "none";
+        }, 3000);
+    }
+}
 
 function parseDateToYYYYMMDD(dateValue) {
     if (!dateValue) return "";
@@ -717,6 +775,10 @@ function parseTimeToHHMM(timeValue) {
     if (!timeValue) return "";
     let timeStr = String(timeValue).trim();
     if (/^\d{2}:\d{2}$/.test(timeStr)) return timeStr;
+    if (/^\d{2}:\d{2}:\d{2}$/.test(timeStr)) {
+        let [h, m] = timeStr.split(":");
+        return `${h}:${m}`;
+    }
     let match = timeStr.match(/(\d{1,2}):(\d{2})/);
     if (match) return `${match[1].padStart(2,'0')}:${match[2]}`;
     return "";
@@ -819,12 +881,12 @@ function calculateAndUpdate() {
 }
 
 function getFilteredRows() {
-    const contractorFilter = document.getElementById("pdf_contractor")?.value || document.getElementById("pdf_contractor_mobile")?.value || "";
-    const assignFilter = document.getElementById("pdf_assign")?.value || document.getElementById("pdf_assign_mobile")?.value || "";
-    const craneNoFilter = document.getElementById("pdf_crane_no")?.value || document.getElementById("pdf_crane_no_mobile")?.value || "";
-    const craneTypeFilter = document.getElementById("pdf_crane_type")?.value || document.getElementById("pdf_crane_type_mobile")?.value || "";
-    const fromDate = document.getElementById("pdf_from")?.value || document.getElementById("pdf_from_mobile")?.value || "";
-    const toDate = document.getElementById("pdf_to")?.value || document.getElementById("pdf_to_mobile")?.value || "";
+    const contractorFilter = document.getElementById("pdf_contractor").value;
+    const assignFilter = document.getElementById("pdf_assign").value;
+    const craneNoFilter = document.getElementById("pdf_crane_no").value;
+    const craneTypeFilter = document.getElementById("pdf_crane_type").value;
+    const fromDate = document.getElementById("pdf_from").value;
+    const toDate = document.getElementById("pdf_to").value;
 
     let filtered = rows.filter(r => {
         if (contractorFilter && norm(r.contractor) !== norm(contractorFilter)) return false;
@@ -839,9 +901,6 @@ function getFilteredRows() {
 }
 
 function updateSummary() {
-    const isAdmin = (currentRole || "").toLowerCase() === "admin";
-    if (!isAdmin) return;
-    
     const filtered = getFilteredRows();
     let hydra = 0, faranaH = 0, faranaD = 0, totalAmt = 0;
     
@@ -852,87 +911,43 @@ function updateSummary() {
         if (r.po === "9719720186") faranaD += 1;
     });
     
-    if (document.getElementById("hydraHours")) document.getElementById("hydraHours").innerHTML = hydra.toFixed(2);
-    if (document.getElementById("faranaHours")) document.getElementById("faranaHours").innerHTML = faranaH.toFixed(2);
-    if (document.getElementById("faranaDays")) document.getElementById("faranaDays").innerHTML = faranaD;
-    if (document.getElementById("totalAmount")) document.getElementById("totalAmount").innerHTML = totalAmt.toFixed(2);
-    if (document.getElementById("hydraHoursMobile")) document.getElementById("hydraHoursMobile").innerHTML = hydra.toFixed(2);
-    if (document.getElementById("faranaHoursMobile")) document.getElementById("faranaHoursMobile").innerHTML = faranaH.toFixed(2);
-    if (document.getElementById("faranaDaysMobile")) document.getElementById("faranaDaysMobile").innerHTML = faranaD;
-    if (document.getElementById("totalAmountMobile")) document.getElementById("totalAmountMobile").innerHTML = totalAmt.toFixed(2);
+    const hydraEl = document.getElementById("hydraHours");
+    const faranaHEl = document.getElementById("faranaHours");
+    const faranaDEl = document.getElementById("faranaDays");
+    const totalEl = document.getElementById("totalAmount");
+    
+    if (hydraEl) hydraEl.innerHTML = hydra.toFixed(2);
+    if (faranaHEl) faranaHEl.innerHTML = faranaH.toFixed(2);
+    if (faranaDEl) faranaDEl.innerHTML = faranaD;
+    if (totalEl) totalEl.innerHTML = totalAmt.toFixed(2);
 }
 
 function renderTable() {
     const filtered = getFilteredRows();
-    const isAdmin = (currentRole || "").toLowerCase() === "admin";
-    
-    // Hide/show table columns based on role
-    const tables = ['worksheetTable', 'worksheetTableMobile'];
-    tables.forEach(tableId => {
-        const table = document.getElementById(tableId);
-        if (table) {
-            const headers = table.querySelectorAll('th');
-            if (headers.length >= 14) {
-                if (!isAdmin) {
-                    headers[11].style.display = 'none'; // Rate
-                    headers[12].style.display = 'none'; // Amount
-                    headers[13].style.display = 'none'; // PO
-                    headers[14].style.display = 'none'; // Action
-                } else {
-                    headers[11].style.display = '';
-                    headers[12].style.display = '';
-                    headers[13].style.display = '';
-                    headers[14].style.display = '';
-                }
-            }
-        }
-    });
-    
     const tbody = document.getElementById("tableBody");
-    if (tbody) {
-        tbody.innerHTML = filtered.map((r, idx) => `
-            <tr>
-                <td>${formatDateForDisplay(r.work_date)}</td>
-                <td>${r.client}</td>
-                <td>${r.contractor}</td>
-                <td>${r.crane_type}</td>
-                <td>${r.crane_no}</td>
-                <td>${r.assign}</td>
-                <td>${formatTimeDisplay(r.in_time)}</td>
-                <td>${formatTimeDisplay(r.out_time)}</td>
-                <td>${r.lunch}</td>
-                <td>${r.total_hours.toFixed(2)}</td>
-                <td>${r.unit}</td>
-                <td>${isAdmin ? r.rate : "***"}</td>
-                <td>${isAdmin ? r.amount.toFixed(2) : "***"}</td>
-                <td>${isAdmin ? r.po : "***"}</td>
-                <td>${isAdmin && r.rowIndex ? `<button class="delete-btn" onclick="deleteRow(${r.rowIndex})">🗑️</button>` : ""}</td>
-            </tr>
-        `).join("");
-    }
-    
-    const tbodyMobile = document.getElementById("tableBodyMobile");
-    if (tbodyMobile) {
-        tbodyMobile.innerHTML = filtered.map((r, idx) => `
-            <tr>
-                <td>${formatDateForDisplay(r.work_date)}</td>
-                <td>${r.client}</td>
-                <td>${r.contractor}</td>
-                <td>${r.crane_type}</td>
-                <td>${r.crane_no}</td>
-                <td>${r.assign}</td>
-                <td>${formatTimeDisplay(r.in_time)}</td>
-                <td>${formatTimeDisplay(r.out_time)}</td>
-                <td>${r.lunch}</td>
-                <td>${r.total_hours.toFixed(2)}</td>
-                <td>${r.unit}</td>
-                <td>${isAdmin ? r.rate : "***"}</td>
-                <td>${isAdmin ? r.amount.toFixed(2) : "***"}</td>
-                <td>${isAdmin ? r.po : "***"}</td>
-                <td>${isAdmin && r.rowIndex ? `<button class="delete-btn" onclick="deleteRow(${r.rowIndex})">🗑️</button>` : ""}</td>
-            </tr>
-        `).join("");
-    }
+    if (!tbody) return;
+
+    const isAdmin = (currentRole || "").toLowerCase() === "admin";
+
+    tbody.innerHTML = filtered.map((r, idx) => `
+        <tr>
+            <td>${formatDateForDisplay(r.work_date)}</td>
+            <td>${r.client}</td>
+            <td>${r.contractor}</td>
+            <td>${r.crane_type}</td>
+            <td>${r.crane_no}</td>
+            <td>${r.assign}</td>
+            <td>${formatTimeDisplay(r.in_time)}</td>
+            <td>${formatTimeDisplay(r.out_time)}</td>
+            <td>${r.lunch}</td>
+            <td>${r.total_hours.toFixed(2)}</td>
+            <td>${r.unit}</td>
+            <td>${r.rate}</td>
+            <td>${r.amount.toFixed(2)}</td>
+            <td>${r.po}</td>
+            <td>${isAdmin && r.rowIndex ? `<button class="delete-btn" onclick="deleteRow(${r.rowIndex})">🗑️</button>` : ""}</td>
+        </tr>
+    `).join("");
     
     updateSummary();
 }
@@ -940,13 +955,18 @@ function renderTable() {
 async function deleteRow(rowIndex) {
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
     if (!isAdmin) { alert("❌ Admin only"); return; }
+    if (!rowIndex) { alert("⚠️ Please refresh and try again"); return; }
     if (!confirm("Delete this row?")) return;
 
     try {
         const res = await fetch(SCRIPT_URL, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: "delete", username: currentUser, rowIndex: rowIndex })
+            body: JSON.stringify({
+                action: "delete",
+                username: currentUser,
+                rowIndex: rowIndex
+            })
         });
         const result = await res.json();
         if (result.status === "success") {
@@ -965,66 +985,42 @@ function populateFilterDropdowns() {
     const assignList = [...new Set(rows.map(r => r.assign).filter(v => v && v !== ""))];
     const craneNos = [...new Set(rows.map(r => r.crane_no).filter(v => v && v !== ""))];
 
-    const selects = [
-        { id: "pdf_contractor", mobile: "pdf_contractor_mobile", options: contractors },
-        { id: "pdf_assign", mobile: "pdf_assign_mobile", options: assignList },
-        { id: "pdf_crane_no", mobile: "pdf_crane_no_mobile", options: craneNos }
-    ];
-    
-    selects.forEach(s => {
-        const desktop = document.getElementById(s.id);
-        const mobile = document.getElementById(s.mobile);
-        if (desktop) {
-            let val = desktop.value;
-            desktop.innerHTML = '<option value="">ALL</option>';
-            s.options.forEach(opt => { desktop.innerHTML += `<option value="${opt}">${opt}</option>`; });
-            if (val && s.options.includes(val)) desktop.value = val;
-        }
-        if (mobile) {
-            let val = mobile.value;
-            mobile.innerHTML = '<option value="">ALL</option>';
-            s.options.forEach(opt => { mobile.innerHTML += `<option value="${opt}">${opt}</option>`; });
-            if (val && s.options.includes(val)) mobile.value = val;
-        }
-    });
-}
+    const contractorSelect = document.getElementById("pdf_contractor");
+    const assignSelect = document.getElementById("pdf_assign");
+    const craneNoSelect = document.getElementById("pdf_crane_no");
 
-// ============== HIDE SENSITIVE DATA FOR USERS ==============
-function hideSensitiveDataForUsers() {
-    const isAdmin = (currentRole || "").toLowerCase() === "admin";
-    
-    if (!isAdmin) {
-        // Hide summary cards on desktop
-        const desktopSummary = document.getElementById("summaryCardsDesktop");
-        if (desktopSummary) desktopSummary.style.display = 'none';
-        
-        // Hide summary cards on mobile
-        const mobileSummary = document.getElementById("summaryCardsMobile");
-        if (mobileSummary) mobileSummary.style.display = 'none';
-        
-        // Hide rate and amount fields in forms
-        const rateRows = document.querySelectorAll('.rate-row');
-        rateRows.forEach(row => { row.style.display = 'none'; });
-        
-        const amountRows = document.querySelectorAll('.amount-row');
-        amountRows.forEach(row => { row.style.display = 'none'; });
-        
-        // Disable export buttons for non-admin
-        const exportButtons = document.querySelectorAll('#exportButtonsDesktop button, #exportButtonsMobile button');
-        exportButtons.forEach(btn => { btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed'; });
+    if (contractorSelect) {
+        let currentVal = contractorSelect.value;
+        contractorSelect.innerHTML = '<option value="">ALL</option>';
+        contractors.forEach(c => { contractorSelect.innerHTML += `<option value="${c}">${c}</option>`; });
+        if (currentVal && contractors.includes(currentVal)) contractorSelect.value = currentVal;
+        else contractorSelect.value = "";
+    }
+
+    if (assignSelect) {
+        let currentAssign = assignSelect.value;
+        assignSelect.innerHTML = '<option value="">ALL</option>';
+        assignList.forEach(a => { assignSelect.innerHTML += `<option value="${a}">${a}</option>`; });
+        if (currentAssign && assignList.includes(currentAssign)) assignSelect.value = currentAssign;
+        else assignSelect.value = "";
+    }
+
+    if (craneNoSelect) {
+        let currentCrane = craneNoSelect.value;
+        craneNoSelect.innerHTML = '<option value="">ALL</option>';
+        craneNos.forEach(cn => { craneNoSelect.innerHTML += `<option value="${cn}">${cn}</option>`; });
+        if (currentCrane && craneNos.includes(currentCrane)) craneNoSelect.value = currentCrane;
+        else craneNoSelect.value = "";
     }
 }
 
-// ============== LOGIN ==============
+// ============== LOGIN FUNCTION ==============
 async function login() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
 
     if (!username || !password) {
-        const errDiv = document.getElementById("errorMsg");
-        errDiv.innerText = "❌ Please enter username and password";
-        errDiv.style.display = "block";
-        setTimeout(() => errDiv.style.display = "none", 3000);
+        showMessage("errorMsg", "❌ Please enter username and password");
         return;
     }
 
@@ -1036,29 +1032,31 @@ async function login() {
     try {
         const res = await fetch(SCRIPT_URL, {
             method: "POST",
-            body: JSON.stringify({ action: "login", username: username, password: password })
+            body: JSON.stringify({
+                action: "login",
+                username: username,
+                password: password
+            })
         });
+
         const result = await res.json();
 
         if (result.status === "success" && result.role) {
             currentRole = result.role.toLowerCase().trim();
             currentUser = username;
+
             document.getElementById("loginScreen").style.display = "none";
             document.getElementById("mainApp").style.display = "block";
+
+            applyRolePermissions();
             await loadFromGoogle();
-            hideSensitiveDataForUsers();
         } else {
-            const errDiv = document.getElementById("errorMsg");
-            errDiv.innerText = "❌ Invalid username or password";
-            errDiv.style.display = "block";
-            setTimeout(() => errDiv.style.display = "none", 3000);
+            showMessage("errorMsg", "❌ Invalid username or password");
             document.getElementById("password").value = "";
         }
     } catch (e) {
-        const errDiv = document.getElementById("errorMsg");
-        errDiv.innerText = "❌ Cannot connect to server";
-        errDiv.style.display = "block";
-        setTimeout(() => errDiv.style.display = "none", 3000);
+        console.error("Login error:", e);
+        showMessage("errorMsg", "❌ Cannot connect to server. Please check your connection.");
     } finally {
         loginBtn.innerText = originalText;
         loginBtn.disabled = false;
@@ -1075,56 +1073,43 @@ function logout() {
     document.getElementById("password").value = "";
 }
 
+function applyRolePermissions() {
+    const isAdmin = (currentRole || "").toLowerCase() === "admin";
+    const buttons = ['exportExcel', 'exportCSV', 'generatePDF', 'clearAll'];
+    buttons.forEach(btn => {
+        const element = document.querySelector(`button[onclick="${btn}()"]`);
+        if (element) element.disabled = !isAdmin;
+    });
+}
+
 async function saveDirect() {
-    // Get values from form - MATCHING EXACTLY what Google Apps Script expects
-    const work_date = document.getElementById("work_date").value;
-    const client_name = document.getElementById("client").value;
-    const contractor_name = document.getElementById("contractor").value;
-    const crane_type = document.getElementById("crane_type").value;
-    const crane_number = document.getElementById("crane_no").value;
-    const assign_sir = document.getElementById("assign").value;
-    const in_time = document.getElementById("in_time").value;
-    const out_time = document.getElementById("out_time").value;
-    const lunch_minutes = document.getElementById("lunch").value;
-    const rate_type = document.getElementById("rate_type").value;
-    const rate = document.getElementById("rate").value;
-    const total_hours = document.getElementById("total_hours").value;
-    const unit_type = document.getElementById("unit").value;
-    const amount = document.getElementById("amount").value;
-
-    // Validate
-    if (!work_date || !crane_number || !in_time || !out_time) {
-        alert("⚠️ Please fill all required fields (Date, Crane No, In/Out Time)");
-        return;
-    }
-
-    // Get PO code from calculation
     const calc = calculateAndUpdate();
-    const po_code = calc.po || "";
 
-    // Prepare data - MATCHING EXACTLY what Google Apps Script expects
     const data = {
         action: "save",
         username: currentUser,
         role: currentRole,
-        work_date: work_date,
-        client_name: client_name,
-        contractor_name: contractor_name,
-        crane_type: crane_type,
-        crane_number: crane_number,
-        assign_sir: assign_sir,
-        in_time: in_time,
-        out_time: out_time,
-        lunch_minutes: lunch_minutes || "0",
-        total_hours: total_hours || "0",
-        unit_type: unit_type || "",
-        rate: rate || "0",
-        amount: amount || "0",
-        po_code: po_code,
+        work_date: document.getElementById("work_date").value,
+        client_name: document.getElementById("client").value,
+        contractor_name: document.getElementById("contractor").value,
+        crane_type: document.getElementById("crane_type").value,
+        crane_number: document.getElementById("crane_no").value,
+        assign_sir: document.getElementById("assign").value,
+        in_time: document.getElementById("in_time").value,
+        out_time: document.getElementById("out_time").value,
+        lunch_minutes: document.getElementById("lunch").value,
+        total_hours: document.getElementById("total_hours").value,
+        unit_type: document.getElementById("unit").value,
+        rate: document.getElementById("rate").value,
+        amount: document.getElementById("amount").value,
+        po_code: calc.po,
         source_file: "Bhavishya_" + new Date().toISOString().split("T")[0]
     };
 
-    console.log("📤 Sending data:", data);
+    if (!data.work_date || !data.crane_number || !data.in_time || !data.out_time) {
+        alert("⚠️ Please fill all required fields (Date, Crane No, In/Out Time)");
+        return;
+    }
 
     const saveBtn = event.target;
     const originalText = saveBtn.innerText;
@@ -1132,19 +1117,15 @@ async function saveDirect() {
     saveBtn.disabled = true;
 
     try {
-        const response = await fetch(SCRIPT_URL, {
+        const res = await fetch(SCRIPT_URL, {
             method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
             body: JSON.stringify(data)
         });
 
-        const result = await response.json();
-        console.log("📥 Response:", result);
+        const result = await res.json();
 
         if (result.status === "success") {
-            alert("✅ Saved successfully!");
+            alert("✅ Saved successfully");
             // Clear form
             document.getElementById("work_date").value = "";
             document.getElementById("client").value = "";
@@ -1159,54 +1140,15 @@ async function saveDirect() {
             document.getElementById("amount").value = "";
             await loadFromGoogle();
         } else {
-            alert("❌ " + (result.message || "Unknown error"));
+            alert("❌ " + result.message);
         }
-    } catch (error) {
-        console.error("❌ Save error:", error);
-        alert("❌ Connection error: " + error.message);
+    } catch (e) {
+        console.error(e);
+        alert("❌ Connection error");
     } finally {
         saveBtn.innerText = originalText;
         saveBtn.disabled = false;
     }
-}
-
-async function saveDirectMobile() {
-    // Copy mobile values to desktop fields
-    document.getElementById('work_date').value = document.getElementById('work_date_mobile').value;
-    document.getElementById('client').value = document.getElementById('client_mobile').value;
-    document.getElementById('contractor').value = document.getElementById('contractor_mobile').value;
-    document.getElementById('crane_type').value = document.getElementById('crane_type_mobile').value;
-    document.getElementById('crane_no').value = document.getElementById('crane_no_mobile').value;
-    document.getElementById('assign').value = document.getElementById('assign_mobile').value;
-    document.getElementById('in_time').value = document.getElementById('in_time_mobile').value;
-    document.getElementById('out_time').value = document.getElementById('out_time_mobile').value;
-    document.getElementById('lunch').value = document.getElementById('lunch_mobile').value;
-    document.getElementById('rate_type').value = document.getElementById('rate_type_mobile').value;
-    document.getElementById('rate').value = document.getElementById('rate_mobile').value;
-    
-    // Trigger calculation to get total_hours, unit, amount
-    calculateAndUpdate();
-    
-    // Copy calculated values back to mobile
-    document.getElementById('total_hours_mobile').value = document.getElementById('total_hours').value;
-    document.getElementById('unit_mobile').value = document.getElementById('unit').value;
-    document.getElementById('amount_mobile').value = document.getElementById('amount').value;
-    
-    // Call the desktop save function
-    await saveDirect();
-    
-    // Clear mobile form
-    document.getElementById('work_date_mobile').value = '';
-    document.getElementById('client_mobile').value = '';
-    document.getElementById('contractor_mobile').value = '';
-    document.getElementById('assign_mobile').value = '';
-    document.getElementById('in_time_mobile').value = '';
-    document.getElementById('out_time_mobile').value = '';
-    document.getElementById('lunch_mobile').value = 0;
-    document.getElementById('rate_mobile').value = '';
-    document.getElementById('total_hours_mobile').value = '';
-    document.getElementById('unit_mobile').value = '';
-    document.getElementById('amount_mobile').value = '';
 }
 
 async function loadFromGoogle() {
@@ -1232,6 +1174,7 @@ async function loadFromGoogle() {
                 amount: Number(r.amount || 0),
                 po: norm(r.po_code || "")
             }));
+            
             rows = sortRowsByDate(rows);
             renderTable();
             populateFilterDropdowns();
@@ -1245,16 +1188,29 @@ async function loadFromGoogle() {
 // ============== EXPORT FUNCTIONS ==============
 function exportExcel() {
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
-    if (!isAdmin) { alert("❌ Admin only"); return; }
+    if (!isAdmin) { alert("❌ Access Denied - Admin only"); return; }
+    if (typeof XLSX === "undefined") { alert("Excel library not loaded"); return; }
+
     const filtered = getFilteredRows();
-    if (filtered.length === 0) { alert("No data"); return; }
+    if (filtered.length === 0) { alert("No data to export"); return; }
+
     const exportData = filtered.map(r => ({
-        work_date: r.work_date, client_name: r.client, contractor_name: r.contractor,
-        crane_type: r.crane_type, po_code: r.po, crane_number: r.crane_no,
-        assign_sir: r.assign, in_time: r.in_time, out_time: r.out_time,
-        lunch_minutes: r.lunch, total_hours: r.total_hours, unit_type: r.unit,
-        rate: r.rate, amount: r.amount
+        work_date: r.work_date,
+        client_name: r.client,
+        contractor_name: r.contractor,
+        crane_type: r.crane_type,
+        po_code: r.po,
+        crane_number: r.crane_no,
+        assign_sir: r.assign,
+        in_time: r.in_time,
+        out_time: r.out_time,
+        lunch_minutes: r.lunch,
+        total_hours: r.total_hours,
+        unit_type: r.unit,
+        rate: r.rate,
+        amount: r.amount
     }));
+
     const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Crane_Worksheets");
@@ -1264,15 +1220,19 @@ function exportExcel() {
 
 function exportCSV() {
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
-    if (!isAdmin) { alert("❌ Admin only"); return; }
+    if (!isAdmin) { alert("❌ Access Denied - Admin only"); return; }
+
     const filtered = getFilteredRows();
-    if (filtered.length === 0) { alert("No data"); return; }
-    const headers = ["work_date","client_name","contractor_name","crane_type","po_code","crane_number","assign_sir","in_time","out_time","lunch_minutes","total_hours","unit_type","rate","amount"];
+    if (filtered.length === 0) { alert("No data to export"); return; }
+
+    const headers = ["work_date", "client_name", "contractor_name", "crane_type", "po_code", "crane_number", "assign_sir", "in_time", "out_time", "lunch_minutes", "total_hours", "unit_type", "rate", "amount"];
     const csvRows = [headers.join(",")];
+
     filtered.forEach(r => {
         const row = [r.work_date, `"${r.client}"`, `"${r.contractor}"`, r.crane_type, r.po, r.crane_no, `"${r.assign}"`, r.in_time, r.out_time, r.lunch, r.total_hours, r.unit, r.rate, r.amount];
         csvRows.push(row.join(","));
     });
+
     const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -1282,108 +1242,110 @@ function exportCSV() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    alert(`✅ Exported ${filtered.length} records`);
+    alert(`✅ Exported ${filtered.length} records to CSV`);
 }
 
 async function generatePDF() {
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
-    if (!isAdmin) { alert("❌ Admin only"); return; }
-    
-    const filtered = getFilteredRows();
-    if (filtered.length === 0) { alert("No data to export"); return; }
-    
-    // Check if jspdf is loaded
-    if (typeof window.jspdf === 'undefined') {
-        alert("PDF library not loaded. Please refresh the page.");
-        return;
-    }
-    
+    if (!isAdmin) { alert("❌ Access Denied - Admin only"); return; }
+
     const { jsPDF } = window.jspdf;
+    const filtered = getFilteredRows();
+    if (filtered.length === 0) { alert("No records to export"); return; }
+    
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     const pageWidth = doc.internal.pageSize.getWidth();
+    const marginLeft = 8;
+    const usableWidth = pageWidth - marginLeft - 8;
     
-    // Add title
+    const columns = [
+        { header: "Date", width: 12 }, { header: "Client", width: 15 }, { header: "Contractor", width: 15 },
+        { header: "Crane Type", width: 12 }, { header: "Crane No", width: 12 }, { header: "Assign", width: 12 },
+        { header: "In", width: 10 }, { header: "Out", width: 10 }, { header: "Lunch", width: 8 },
+        { header: "Hours", width: 10 }, { header: "Unit", width: 8 }, { header: "Rate", width: 10 },
+        { header: "Amount", width: 12 }, { header: "PO", width: 12 }
+    ];
+    
+    let totalPercent = columns.reduce((sum, col) => sum + col.width, 0);
+    let colPositions = [];
+    let currentX = marginLeft;
+    for (let i = 0; i < columns.length; i++) {
+        let colW = (columns[i].width / totalPercent) * usableWidth;
+        colPositions.push({ x: currentX, width: colW });
+        currentX += colW;
+    }
+    
+    const rowHeight = 7;
+    let y = 20;
+    
+    function drawHeader(yPos) {
+        doc.setFontSize(9);
+        doc.setFont(undefined, "bold");
+        for (let i = 0; i < columns.length; i++) {
+            doc.rect(colPositions[i].x, yPos, colPositions[i].width, rowHeight);
+            doc.text(columns[i].header, colPositions[i].x + 1, yPos + 5);
+        }
+    }
+    
+    function drawDataRow(rowData, yPos) {
+        doc.setFontSize(8);
+        doc.setFont(undefined, "normal");
+        for (let i = 0; i < rowData.length; i++) {
+            let cellText = String(rowData[i] || "");
+            if (cellText.length > 18) cellText = cellText.substring(0, 15) + "..";
+            doc.rect(colPositions[i].x, yPos, colPositions[i].width, rowHeight);
+            doc.text(cellText, colPositions[i].x + 1, yPos + 5);
+        }
+    }
+    
     doc.setFontSize(14);
     doc.setFont(undefined, "bold");
-    doc.text("CRANE WORKSHEET", pageWidth / 2, 12, { align: "center" });
-    doc.setFontSize(9);
-    doc.text(`Generated on: ${new Date().toLocaleString()}`, pageWidth / 2, 20, { align: "center" });
+    doc.text("BHAVISHYA ENTERPRISE - CRANE WORKSHEET", pageWidth / 2, 12, { align: "center" });
     
-    // Prepare table data
-    const headers = [['Date', 'Client', 'Contractor', 'Crane Type', 'Crane No', 'Assign', 'In', 'Out', 'Lunch', 'Hours', 'Unit', 'Rate', 'Amount', 'PO']];
-    const body = filtered.map(r => [
-        formatDateForDisplay(r.work_date),
-        r.client,
-        r.contractor,
-        r.crane_type,
-        r.crane_no,
-        r.assign,
-        formatTimeDisplay(r.in_time),
-        formatTimeDisplay(r.out_time),
-        r.lunch.toString(),
-        r.total_hours.toFixed(2),
-        r.unit,
-        r.rate.toString(),
-        r.amount.toFixed(2),
-        r.po
-    ]);
+    y = 26;
+    drawHeader(y);
+    y += rowHeight;
     
-    // Calculate summary
     let hydra = 0, faranaH = 0, faranaD = 0, totalAmt = 0;
-    filtered.forEach(r => {
-        totalAmt += (r.amount || 0);
-        if (r.po === "9119720043") hydra += (r.total_hours || 0);
-        if (r.po === "9719720185") faranaH += (r.total_hours || 0);
+    
+    for (let idx = 0; idx < filtered.length; idx++) {
+        const r = filtered[idx];
+        if (y > 185) { doc.addPage(); y = 18; drawHeader(y); y += rowHeight; }
+        
+        let rowCells = [
+            formatDateForDisplay(r.work_date), r.client, r.contractor, r.crane_type, r.crane_no, r.assign,
+            formatTimeDisplay(r.in_time), formatTimeDisplay(r.out_time), r.lunch,
+            r.total_hours.toFixed(2), r.unit, r.rate, r.amount.toFixed(2), r.po
+        ];
+        drawDataRow(rowCells, y);
+        
+        totalAmt += r.amount;
+        if (r.po === "9119720043") hydra += r.total_hours;
+        if (r.po === "9719720185") faranaH += r.total_hours;
         if (r.po === "9719720186") faranaD += 1;
-    });
+        y += rowHeight;
+    }
     
-    // Add table using autoTable
-    doc.autoTable({
-        head: headers,
-        body: body,
-        startY: 28,
-        styles: { fontSize: 8, cellPadding: 2, font: 'helvetica' },
-        headStyles: { fillColor: [7, 94, 84], textColor: 255, fontStyle: 'bold' },
-        alternateRowStyles: { fillColor: [245, 245, 245] },
-        margin: { top: 28, left: 8, right: 8 },
-        columnStyles: {
-            0: { cellWidth: 22 },  // Date
-            1: { cellWidth: 25 },  // Client
-            2: { cellWidth: 25 },  // Contractor
-            3: { cellWidth: 20 },  // Crane Type
-            4: { cellWidth: 22 },  // Crane No
-            5: { cellWidth: 22 },  // Assign
-            6: { cellWidth: 15 },  // In
-            7: { cellWidth: 15 },  // Out
-            8: { cellWidth: 12 },  // Lunch
-            9: { cellWidth: 15 },  // Hours
-            10: { cellWidth: 12 }, // Unit
-            11: { cellWidth: 18 }, // Rate
-            12: { cellWidth: 20 }, // Amount
-            13: { cellWidth: 18 }  // PO
-        }
-    });
-    
-    // Add summary at the end
-    const finalY = doc.lastAutoTable.finalY + 10;
-    doc.setFontSize(10);
-    doc.setFont(undefined, "bold");
-    doc.text("SUMMARY:", 14, finalY);
+    y += 4;
     doc.setFontSize(9);
-    doc.setFont(undefined, "normal");
-    doc.text(`HYDRA HOURS: ${hydra.toFixed(2)} hrs`, 14, finalY + 6);
-    doc.text(`FARANA HOURS: ${faranaH.toFixed(2)} hrs`, 70, finalY + 6);
-    doc.text(`FARANA DAYS: ${faranaD}`, 130, finalY + 6);
-    doc.text(`TOTAL AMOUNT: ₹ ${totalAmt.toFixed(2)}`, 14, finalY + 12);
+    doc.setFont(undefined, "bold");
+    doc.text("SUMMARY:", marginLeft, y);
+    y += 6;
+    doc.setFontSize(8);
+    doc.text(`HYDRA HOURS: ${hydra.toFixed(2)} hrs`, marginLeft, y);
+    doc.text(`FARANA HOURS: ${faranaH.toFixed(2)} hrs`, marginLeft + 55, y);
+    doc.text(`FARANA DAYS: ${faranaD}`, marginLeft + 110, y);
+    y += 6;
+    doc.setFont(undefined, "bold");
+    doc.text(`TOTAL AMOUNT: ₹ ${totalAmt.toFixed(2)}`, marginLeft, y);
     
-    // Save PDF
     doc.save(`Bhavishya_Report_${new Date().toISOString().slice(0,10)}.pdf`);
 }
 
 function clearAll() {
     const isAdmin = (currentRole || "").toLowerCase() === "admin";
-    if (!isAdmin) { alert("❌ Admin only"); return; }
-    if(confirm("⚠️ Clear ALL records from display only?")) {
+    if (!isAdmin) { alert("❌ Access Denied - Admin only"); return; }
+    if(confirm("⚠️ WARNING: This will clear ALL records from the display only!\n\nSaved records in Google Sheet will remain.\n\nContinue?")) {
         rows = [];
         renderTable();
         populateFilterDropdowns();
@@ -1391,67 +1353,21 @@ function clearAll() {
     }
 }
 
-// ============== EVENT LISTENERS ==============
-document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const tabId = this.getAttribute('data-tab');
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.remove('active');
-            if (content.getAttribute('data-tab-content') === tabId) {
-                content.classList.add('active');
-            }
-        });
-    });
-});
-
-function syncFilters() {
-    const mobileFilters = ['pdf_contractor_mobile', 'pdf_assign_mobile', 'pdf_crane_no_mobile', 'pdf_crane_type_mobile', 'pdf_from_mobile', 'pdf_to_mobile'];
-    const desktopFilters = ['pdf_contractor', 'pdf_assign', 'pdf_crane_no', 'pdf_crane_type', 'pdf_from', 'pdf_to'];
-    
-    mobileFilters.forEach((mobileId, index) => {
-        const mobileEl = document.getElementById(mobileId);
-        const desktopEl = document.getElementById(desktopFilters[index]);
-        if (mobileEl && desktopEl) {
-            mobileEl.addEventListener('change', () => { desktopEl.value = mobileEl.value; renderTable(); });
-            desktopEl.addEventListener('change', () => { mobileEl.value = desktopEl.value; renderTable(); });
-        }
+function attachFilters() {
+    ["pdf_contractor","pdf_assign","pdf_crane_no","pdf_crane_type","pdf_from","pdf_to"].forEach(id => {
+        let el = document.getElementById(id);
+        if(el) el.addEventListener("change", () => renderTable());
     });
 }
 
-document.querySelectorAll('#work_date_mobile, #client_mobile, #crane_type_mobile, #in_time_mobile, #out_time_mobile, #lunch_mobile, #rate_type_mobile, #rate_mobile').forEach(el => {
-    if(el) el.addEventListener('input', () => {
-        document.getElementById('client').value = document.getElementById('client_mobile').value;
-        document.getElementById('crane_type').value = document.getElementById('crane_type_mobile').value;
-        document.getElementById('in_time').value = document.getElementById('in_time_mobile').value;
-        document.getElementById('out_time').value = document.getElementById('out_time_mobile').value;
-        document.getElementById('lunch').value = document.getElementById('lunch_mobile').value;
-        document.getElementById('rate_type').value = document.getElementById('rate_type_mobile').value;
-        document.getElementById('rate').value = document.getElementById('rate_mobile').value;
-        calculateAndUpdate();
-        document.getElementById('total_hours_mobile').value = document.getElementById('total_hours').value;
-        document.getElementById('unit_mobile').value = document.getElementById('unit').value;
-        document.getElementById('amount_mobile').value = document.getElementById('amount').value;
-    });
-});
-
-["pdf_contractor","pdf_assign","pdf_crane_no","pdf_crane_type","pdf_from","pdf_to"].forEach(id => {
-    let el = document.getElementById(id);
-    if(el) el.addEventListener("change", () => renderTable());
-});
-
-["pdf_contractor_mobile","pdf_assign_mobile","pdf_crane_no_mobile","pdf_crane_type_mobile","pdf_from_mobile","pdf_to_mobile"].forEach(id => {
-    let el = document.getElementById(id);
-    if(el) el.addEventListener("change", () => renderTable());
-});
-
+// ============== EVENT LISTENERS ==============
 document.querySelectorAll("#in_time, #out_time, #lunch, #rate_type, #rate, #client, #crane_type").forEach(el => {
     if(el) el.addEventListener("input", () => calculateAndUpdate());
 });
 
 window.onload = () => {
-    syncFilters();
+    attachFilters();
+    document.getElementById("rate")?.addEventListener("input", () => calculateAndUpdate());
 };
 </script>
 </body>
