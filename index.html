@@ -1082,7 +1082,7 @@ function applyRolePermissions() {
     });
 }
 
-async function saveDirect() {
+function saveDirect() {
     // Get values from form
     const work_date = document.getElementById("work_date").value;
     const client_name = document.getElementById("client").value;
@@ -1111,59 +1111,83 @@ async function saveDirect() {
     saveBtn.innerHTML = '💾 Saving...';
     saveBtn.disabled = true;
 
-    try {
-        // Use fetch with GET method (no CORS preflight)
-        const params = new URLSearchParams({
-            action: "save",
-            username: currentUser,
-            role: currentRole,
-            work_date: work_date,
-            client_name: client_name,
-            contractor_name: contractor_name,
-            crane_type: crane_type,
-            crane_number: crane_number,
-            assign_sir: assign_sir,
-            in_time: in_time,
-            out_time: out_time,
-            lunch_minutes: lunch_minutes,
-            total_hours: total_hours,
-            unit_type: unit_type,
-            rate: rate,
-            amount: amount,
-            po_code: po_code,
-            source_file: "Bhavishya_" + new Date().toISOString().split("T")[0]
-        });
+    // Build the URL with parameters
+    const params = new URLSearchParams({
+        action: "save",
+        username: currentUser,
+        role: currentRole,
+        work_date: work_date,
+        client_name: client_name,
+        contractor_name: contractor_name,
+        crane_type: crane_type,
+        crane_number: crane_number,
+        assign_sir: assign_sir,
+        in_time: in_time,
+        out_time: out_time,
+        lunch_minutes: lunch_minutes,
+        total_hours: total_hours,
+        unit_type: unit_type,
+        rate: rate,
+        amount: amount,
+        po_code: po_code,
+        source_file: "Bhavishya_" + new Date().toISOString().split("T")[0]
+    });
 
-        const url = `${SCRIPT_URL}?${params.toString()}`;
-        console.log("Sending request to:", url);
+    const url = `${SCRIPT_URL}?${params.toString()}`;
+    console.log("Saving to:", url);
 
-        const response = await fetch(url, {
-            method: "GET",
-            mode: "no-cors", // This prevents CORS errors
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        });
-
-        // With no-cors, we can't read the response directly
-        // So we assume success if no error
-        alert("✅ Saved successfully! Check your Google Sheet.");
-        
-        // Clear form
-        ["work_date", "client", "contractor", "assign", "in_time", "out_time", "rate", "total_hours", "unit", "amount"]
-            .forEach(id => document.getElementById(id).value = "");
-        document.getElementById("lunch").value = 0;
-        
-        // Reload data
-        await loadFromGoogle();
-
-    } catch (e) {
-        console.error(e);
-        alert("❌ Connection error: " + e.message);
-    } finally {
+    // Use fetch with GET
+    fetch(url, {
+        method: "GET",
+        mode: "cors",
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(result => {
+        console.log("Save result:", result);
+        if (result.status === "success") {
+            alert("✅ Saved successfully!");
+            // Clear form
+            ["work_date", "client", "contractor", "assign", "in_time", "out_time", "rate", "total_hours", "unit", "amount"]
+                .forEach(id => document.getElementById(id).value = "");
+            document.getElementById("lunch").value = 0;
+            loadFromGoogle();
+        } else {
+            alert("❌ Error: " + (result.message || "Unknown error"));
+        }
+    })
+    .catch(error => {
+        console.error("Save error:", error);
+        // Try form submit fallback
+        fallbackSave(params);
+    })
+    .finally(() => {
         saveBtn.innerHTML = originalText;
         saveBtn.disabled = false;
+    });
+}
+
+// Fallback save using form submit
+function fallbackSave(params) {
+    const form = document.createElement('form');
+    form.method = 'GET';
+    form.action = SCRIPT_URL;
+    form.target = '_blank';
+
+    for (const [key, value] of params) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
     }
+
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(() => document.body.removeChild(form), 1000);
+    alert("✅ Save submitted! Check your Google Sheet.");
 }
 
 async function loadFromGoogle() {
