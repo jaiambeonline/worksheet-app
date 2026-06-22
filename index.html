@@ -1084,8 +1084,9 @@ function applyRolePermissions() {
 
 async function saveDirect() {
     const calc = calculateAndUpdate();
-
-    const data = {
+    
+    // Build URL with all parameters
+    const params = new URLSearchParams({
         action: "save",
         username: currentUser,
         role: currentRole,
@@ -1097,56 +1098,47 @@ async function saveDirect() {
         assign_sir: document.getElementById("assign").value,
         in_time: document.getElementById("in_time").value,
         out_time: document.getElementById("out_time").value,
-        lunch_minutes: document.getElementById("lunch").value,
-        total_hours: document.getElementById("total_hours").value,
-        unit_type: document.getElementById("unit").value,
-        rate: document.getElementById("rate").value,
-        amount: document.getElementById("amount").value,
-        po_code: calc.po,
+        lunch_minutes: document.getElementById("lunch").value || "0",
+        total_hours: document.getElementById("total_hours").value || "0",
+        unit_type: document.getElementById("unit").value || "",
+        rate: document.getElementById("rate").value || "0",
+        amount: document.getElementById("amount").value || "0",
+        po_code: calc.po || "",
         source_file: "Bhavishya_" + new Date().toISOString().split("T")[0]
-    };
+    });
 
-    if (!data.work_date || !data.crane_number || !data.in_time || !data.out_time) {
-        alert("⚠️ Please fill all required fields (Date, Crane No, In/Out Time)");
+    if (!params.get("work_date") || !params.get("crane_number") || !params.get("in_time") || !params.get("out_time")) {
+        alert("Please fill all required fields (Date, Crane No, In/Out Time)");
         return;
     }
 
-    const saveBtn = event.target;
-    const originalText = saveBtn.innerText;
-    saveBtn.innerText = "💾 Saving...";
+    const saveBtn = event.target.closest('button');
+    const originalText = saveBtn.innerHTML;
+    saveBtn.innerHTML = '💾 Saving...';
     saveBtn.disabled = true;
 
     try {
-        const res = await fetch(SCRIPT_URL, {
-            method: "POST",
-            body: JSON.stringify(data)
+        const response = await fetch(`${SCRIPT_URL}?${params.toString()}`, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json'
+            }
         });
-
-        const result = await res.json();
-
+        const result = await response.json();
         if (result.status === "success") {
             alert("✅ Saved successfully");
-            // Clear form
-            document.getElementById("work_date").value = "";
-            document.getElementById("client").value = "";
-            document.getElementById("contractor").value = "";
-            document.getElementById("assign").value = "";
-            document.getElementById("in_time").value = "";
-            document.getElementById("out_time").value = "";
+            ["work_date","client","contractor","assign","in_time","out_time","rate","total_hours","unit","amount"]
+                .forEach(id => document.getElementById(id).value = "");
             document.getElementById("lunch").value = 0;
-            document.getElementById("rate").value = "";
-            document.getElementById("total_hours").value = "";
-            document.getElementById("unit").value = "";
-            document.getElementById("amount").value = "";
             await loadFromGoogle();
         } else {
-            alert("❌ " + result.message);
+            alert("❌ Error: " + (result.message || "Unknown error"));
         }
     } catch (e) {
         console.error(e);
-        alert("❌ Connection error");
+        alert("❌ Connection error: " + e.message);
     } finally {
-        saveBtn.innerText = originalText;
+        saveBtn.innerHTML = originalText;
         saveBtn.disabled = false;
     }
 }
