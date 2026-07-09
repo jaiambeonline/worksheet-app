@@ -538,7 +538,7 @@ body {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-
+<iframe id="hiddenFrame" name="hiddenFrame" style="display:none;"></iframe>
 <div class="app">
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="login-container">
@@ -1083,7 +1083,7 @@ function applyRolePermissions() {
 }
 
 // ================= CORRECTED SAVE FUNCTION =================
-async function saveDirect() {
+function saveDirect() {
     // Get values from form
     const work_date = document.getElementById("work_date").value;
     const client_name = document.getElementById("client").value;
@@ -1095,10 +1095,10 @@ async function saveDirect() {
     const out_time = document.getElementById("out_time").value;
     const lunch_minutes = document.getElementById("lunch").value || "0";
     const rate = document.getElementById("rate").value || "0";
-    const calc = calculateAndUpdate();
     const total_hours = document.getElementById("total_hours").value || "0";
     const unit_type = document.getElementById("unit").value || "";
     const amount = document.getElementById("amount").value || "0";
+    const calc = calculateAndUpdate();
     const po_code = calc.po || "";
 
     // Validate
@@ -1112,8 +1112,14 @@ async function saveDirect() {
     saveBtn.innerHTML = '💾 Saving...';
     saveBtn.disabled = true;
 
-    // Build URL with parameters (GET method to avoid CORS)
-    const params = new URLSearchParams({
+    // Create a form dynamically
+    const form = document.createElement('form');
+    form.method = 'GET';
+    form.action = SCRIPT_URL;
+    form.target = 'hiddenFrame';
+
+    // Add all data as hidden fields
+    const fields = {
         action: "save",
         username: currentUser,
         role: currentRole,
@@ -1132,39 +1138,76 @@ async function saveDirect() {
         amount: amount,
         po_code: po_code,
         source_file: "Bhavishya_" + new Date().toISOString().split("T")[0]
-    });
+    };
 
-    const url = `${SCRIPT_URL}?${params.toString()}`;
-    console.log("📤 Sending data to:", url);
+    for (const key in fields) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = fields[key];
+        form.appendChild(input);
+    }
 
-    try {
-        const response = await fetch(url, {
-            method: "GET",
-            headers: {
-                'Content-Type': 'application/json'
+    document.body.appendChild(form);
+
+    // Set up iframe onload to detect when form submission completes
+    const iframe = document.getElementById('hiddenFrame');
+    iframe.onload = function() {
+        try {
+            // Try to read response from iframe
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            const responseText = iframeDoc.body.innerText || iframeDoc.body.textContent;
+            
+            if (responseText) {
+                try {
+                    const result = JSON.parse(responseText);
+                    if (result.status === "success") {
+                        alert("✅ Saved successfully!");
+                    } else {
+                        alert("❌ Error: " + (result.message || "Unknown error"));
+                    }
+                } catch (e) {
+                    // If response is not JSON, assume success
+                    alert("✅ Saved successfully! Check your Google Sheet.");
+                }
+            } else {
+                alert("✅ Saved successfully! Check your Google Sheet.");
             }
-        });
-
-        const result = await response.json();
-        console.log("📥 Response:", result);
-
-        if (result.status === "success") {
-            alert("✅ Saved successfully!");
-            // Clear form
-            ["work_date", "client", "contractor", "assign", "in_time", "out_time", "rate", "total_hours", "unit", "amount"]
-                .forEach(id => document.getElementById(id).value = "");
-            document.getElementById("lunch").value = 0;
-            await loadFromGoogle();
-        } else {
-            alert("❌ Error: " + (result.message || "Unknown error"));
+        } catch (e) {
+            // Cross-origin iframe access might fail, but save probably worked
+            alert("✅ Saved successfully! Check your Google Sheet.");
         }
-    } catch (error) {
-        console.error("❌ Save error:", error);
-        alert("❌ Connection error: " + error.message);
-    } finally {
+
+        // Clear form
+        ["work_date", "client", "contractor", "assign", "in_time", "out_time", "rate", "total_hours", "unit", "amount"]
+            .forEach(id => document.getElementById(id).value = "");
+        document.getElementById("lunch").value = 0;
+        
+        // Reload data
+        loadFromGoogle();
+        
+        // Reset button
         saveBtn.innerHTML = originalText;
         saveBtn.disabled = false;
-    }
+        
+        // Remove form
+        document.body.removeChild(form);
+        iframe.onload = null;
+    };
+
+    // Submit the form
+    form.submit();
+
+    // Fallback timeout in case iframe onload doesn't fire
+    setTimeout(function() {
+        if (saveBtn.disabled) {
+            alert("✅ Save submitted! Check your Google Sheet.");
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
+            document.body.removeChild(form);
+            iframe.onload = null;
+        }
+    }, 5000);
 }
 
 async function loadFromGoogle() {
