@@ -1212,35 +1212,48 @@ function saveDirect() {
 
 async function loadFromGoogle() {
     try {
-        const res = await fetch(SCRIPT_URL);
-        const data = await res.json();
+        console.log("🔄 Loading data from Google Sheet...");
+        const response = await fetch(SCRIPT_URL);
+        const data = await response.json();
+        
+        console.log("📊 Raw data received:", data);
         
         if (Array.isArray(data)) {
-            rows = data.map(r => ({
-                work_date: parseDateToYYYYMMDD(r.work_date),
-                rowIndex: r.rowIndex,
-                client: norm(r.client_name || ""),
-                contractor: norm(r.contractor_name || ""),
-                crane_type: norm(r.crane_type || ""),
-                crane_no: norm(r.crane_number || ""),
-                assign: norm(r.assign_sir || ""),
-                in_time: parseTimeToHHMM(r.in_time || ""),
-                out_time: parseTimeToHHMM(r.out_time || ""),
-                lunch: Number(r.lunch_minutes || 0),
-                total_hours: Number(r.total_hours || 0),
-                unit: norm(r.unit_type || ""),
-                rate: Number(r.rate || 0),
-                amount: Number(r.amount || 0),
-                po: norm(r.po_code || "")
-            }));
+            rows = data.map(r => {
+                console.log("Processing row:", r);
+                return {
+                    work_date: r.work_date || "",
+                    rowIndex: r.rowIndex || 0,
+                    client: norm(r.client_name || ""),
+                    contractor: norm(r.contractor_name || ""),
+                    crane_type: norm(r.crane_type || ""),
+                    crane_no: norm(r.crane_number || ""),
+                    assign: norm(r.assign_sir || ""),
+                    in_time: r.in_time || "",
+                    out_time: r.out_time || "",
+                    lunch: Number(r.lunch_minutes || 0),
+                    total_hours: Number(r.total_hours || 0),
+                    unit: norm(r.unit_type || ""),
+                    rate: Number(r.rate || 0),
+                    amount: Number(r.amount || 0),
+                    po: norm(r.po_code || "")
+                };
+            });
+            
+            console.log("✅ Processed rows:", rows.length, "rows");
             
             rows = sortRowsByDate(rows);
             renderTable();
             populateFilterDropdowns();
+        } else {
+            console.log("⚠️ No data received or invalid format");
+            rows = [];
+            renderTable();
         }
     } catch(e) {
-        console.error("Load error:", e);
+        console.error("❌ Load error:", e);
         rows = [];
+        renderTable();
     }
 }
 
