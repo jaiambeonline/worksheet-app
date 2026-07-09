@@ -730,7 +730,7 @@ body {
 
 <script>
 // ================= CONFIGURATION =================
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyw2IsoTOm2zQ1W9ykgGySl2DVJkCTFzWUyfeisedV2NfPyI-sJExfgHD1f3CvGpS-9/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrpqUKKq3f2lHIlv1C3u2vhe4fse5S09e-Wnt6nmS508JIHPpyOhDCRrpLMDthMZF3/exec";
 
 // ================= GLOBAL VARIABLES =================
 let currentRole = "";
@@ -1083,15 +1083,8 @@ function applyRolePermissions() {
 }
 
 // ================= CORRECTED SAVE FUNCTION =================
-function saveDirect(event) {
-    // 1. Force recalculation FIRST to ensure values are fresh and accurate
-    const calc = calculateAndUpdate();
-    const po_code = calc.po || "";
-    const total_hours = calc.hours ? calc.hours.toFixed(2) : "0";
-    const amount = calc.amount ? calc.amount.toFixed(2) : "0";
-    const unit_type = document.getElementById("unit").value || "";
-
-    // 2. Fetch other non-calculated input elements
+async function saveDirect() {
+    // Get values from form
     const work_date = document.getElementById("work_date").value;
     const client_name = document.getElementById("client").value;
     const contractor_name = document.getElementById("contractor").value;
@@ -1102,30 +1095,34 @@ function saveDirect(event) {
     const out_time = document.getElementById("out_time").value;
     const lunch_minutes = document.getElementById("lunch").value || "0";
     const rate = document.getElementById("rate").value || "0";
+    const calc = calculateAndUpdate();
+    const total_hours = document.getElementById("total_hours").value || "0";
+    const unit_type = document.getElementById("unit").value || "";
+    const amount = document.getElementById("amount").value || "0";
+    const po_code = calc.po || "";
 
-    // Validate required fields
+    // Validate
     if (!work_date || !crane_number || !in_time || !out_time) {
         alert("⚠️ Please fill all required fields (Date, Crane No, In/Out Time)");
         return;
     }
 
-    // Safely capture the button element using the passed event
     const saveBtn = event.target.closest('button');
     const originalText = saveBtn.innerHTML;
     saveBtn.innerHTML = '💾 Saving...';
     saveBtn.disabled = true;
 
-    // Create parameters
+    // Build URL with parameters (GET method to avoid CORS)
     const params = new URLSearchParams({
         action: "save",
         username: currentUser,
         role: currentRole,
         work_date: work_date,
-        client_name: client_name,
-        contractor_name: contractor_name,
+        client_name: client_name || "",
+        contractor_name: contractor_name || "",
         crane_type: crane_type,
         crane_number: crane_number,
-        assign_sir: assign_sir,
+        assign_sir: assign_sir || "",
         in_time: in_time,
         out_time: out_time,
         lunch_minutes: lunch_minutes,
@@ -1138,32 +1135,36 @@ function saveDirect(event) {
     });
 
     const url = `${SCRIPT_URL}?${params.toString()}`;
+    console.log("📤 Sending data to:", url);
 
-    // Clean GET fetch (no custom headers to prevent triggers for CORS preflight options)
-    fetch(url, {
-        method: "GET"
-    })
-    .then(response => response.json())
-    .then(result => {
+    try {
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const result = await response.json();
+        console.log("📥 Response:", result);
+
         if (result.status === "success") {
             alert("✅ Saved successfully!");
-            // Reset input values
+            // Clear form
             ["work_date", "client", "contractor", "assign", "in_time", "out_time", "rate", "total_hours", "unit", "amount"]
                 .forEach(id => document.getElementById(id).value = "");
             document.getElementById("lunch").value = 0;
-            loadFromGoogle();
+            await loadFromGoogle();
         } else {
             alert("❌ Error: " + (result.message || "Unknown error"));
         }
-    })
-    .catch(error => {
-        console.error("Fetch failed, attempting fallback:", error);
-        fallbackSave(params);
-    })
-    .finally(() => {
+    } catch (error) {
+        console.error("❌ Save error:", error);
+        alert("❌ Connection error: " + error.message);
+    } finally {
         saveBtn.innerHTML = originalText;
         saveBtn.disabled = false;
-    });
+    }
 }
 
 async function loadFromGoogle() {
