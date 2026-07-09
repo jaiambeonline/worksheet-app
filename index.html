@@ -745,8 +745,29 @@ function formatTimeDisplay(timeVal) {
 
 function sortRowsByDate(rowsArray) {
     return [...rowsArray].sort((a, b) => {
-        const dateA = new Date(a.work_date);
-        const dateB = new Date(b.work_date);
+        // Parse dates
+        let dateA = new Date(a.work_date);
+        let dateB = new Date(b.work_date);
+        
+        // If date is invalid, try parsing with timezone fix
+        if (isNaN(dateA.getTime()) && a.work_date) {
+            const parts = a.work_date.split('-');
+            if (parts.length === 3) {
+                dateA = new Date(parts[0], parts[1] - 1, parts[2]);
+            }
+        }
+        if (isNaN(dateB.getTime()) && b.work_date) {
+            const parts = b.work_date.split('-');
+            if (parts.length === 3) {
+                dateB = new Date(parts[0], parts[1] - 1, parts[2]);
+            }
+        }
+        
+        // If either date is invalid, treat it as oldest
+        if (isNaN(dateA.getTime())) return 1;
+        if (isNaN(dateB.getTime())) return -1;
+        
+        // Descending (newest first)
         return dateB - dateA;
     });
 }
@@ -1155,7 +1176,6 @@ async function loadFromGoogle() {
         
         if (Array.isArray(data)) {
             rows = data.map(r => {
-                // Handle date - convert to YYYY-MM-DD
                 let workDate = r.work_date || "";
                 
                 // If it's ISO format with time (2026-06-06T18:30:00.000Z)
@@ -1168,9 +1188,12 @@ async function loadFromGoogle() {
                     try {
                         const d = new Date(workDate);
                         if (!isNaN(d.getTime())) {
-                            let yyyy = d.getFullYear();
-                            let mm = String(d.getMonth() + 1).padStart(2,'0');
-                            let dd = String(d.getDate()).padStart(2,'0');
+                            // Adjust for timezone (IST = UTC+5:30)
+                            const offset = d.getTimezoneOffset() * 60000;
+                            const localDate = new Date(d.getTime() + offset + (5.5 * 3600000));
+                            let yyyy = localDate.getFullYear();
+                            let mm = String(localDate.getMonth() + 1).padStart(2,'0');
+                            let dd = String(localDate.getDate()).padStart(2,'0');
                             workDate = `${yyyy}-${mm}-${dd}`;
                         }
                     } catch(e) {}
@@ -1196,7 +1219,6 @@ async function loadFromGoogle() {
             });
             
             console.log("✅ Processed rows:", rows.length, "rows");
-            console.log("📅 First row date:", rows[0]?.work_date);
             
             rows = sortRowsByDate(rows);
             renderTable();
