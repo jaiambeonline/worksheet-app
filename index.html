@@ -1155,9 +1155,25 @@ async function loadFromGoogle() {
         
         if (Array.isArray(data)) {
             rows = data.map(r => {
+                // Handle date - convert to YYYY-MM-DD
                 let workDate = r.work_date || "";
+                
+                // If it's ISO format with time (2026-06-06T18:30:00.000Z)
                 if (workDate && workDate.includes('T')) {
                     workDate = workDate.split('T')[0];
+                }
+                
+                // If it's a Date object or string, format it
+                if (workDate && !workDate.includes('-')) {
+                    try {
+                        const d = new Date(workDate);
+                        if (!isNaN(d.getTime())) {
+                            let yyyy = d.getFullYear();
+                            let mm = String(d.getMonth() + 1).padStart(2,'0');
+                            let dd = String(d.getDate()).padStart(2,'0');
+                            workDate = `${yyyy}-${mm}-${dd}`;
+                        }
+                    } catch(e) {}
                 }
                 
                 return {
@@ -1180,6 +1196,7 @@ async function loadFromGoogle() {
             });
             
             console.log("✅ Processed rows:", rows.length, "rows");
+            console.log("📅 First row date:", rows[0]?.work_date);
             
             rows = sortRowsByDate(rows);
             renderTable();
